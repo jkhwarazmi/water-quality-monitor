@@ -1,6 +1,7 @@
 // Sample implementation for the first card - Tab1
 
 #include <QtWidgets>
+#include "styles.hpp"
 #include "tab1.hpp"
 
 
@@ -10,7 +11,7 @@ Tab1::Tab1(WaterModel* model, QWidget* parent): waterModel(model), QWidget(paren
   createLayout();
   setupStyles();
   
-  // Install event filter for theme changes
+  // Install event filter for Styles changes
   qApp->installEventFilter(this);
 }
 
@@ -55,14 +56,6 @@ void Tab1::createLayout()
 
 void Tab1::setupStyles()
 {
-  bool isDarkMode = qApp->palette().color(QPalette::Window).lightness() < 128;
-  
-  // Define colors based on theme
-  QString textColor = isDarkMode ? "#ffffff" : "#2c3e50";
-  QString actionButtonBg = isDarkMode ? "#3498db" : "#007bff";
-  QString actionButtonHover = isDarkMode ? "#2980b9" : "#0056b3";
-  QString actionButtonDisabled = isDarkMode ? "#445566" : "#cccccc";
-  
   QString styleSheet = QString(R"(
     QWidget {
       background-color: transparent;
@@ -72,30 +65,38 @@ void Tab1::setupStyles()
     QPushButton#actionButton {
       background-color: %2;
       border: none;
-      border-radius: 6px;
+      border-radius: %3px;
       color: white;
       font-weight: bold;
-      padding: 10px 20px;
+      padding: %4px %5px;
+      min-width: %6px;
+      min-height: %7px;
     }
 
     QPushButton#actionButton:hover {
-      background-color: %3;
+      background-color: %8;
     }
 
     QPushButton#actionButton:disabled {
-      background-color: %4;
+      background-color: %9;
       color: white;
     }
 
     QLabel#placeholderLabel {
       font-size: 32px;
       font-weight: bold;
+      color: %1;
     }
   )")
-  .arg(textColor)            // %1 text color
-  .arg(actionButtonBg)       // %2
-  .arg(actionButtonHover)    // %3
-  .arg(actionButtonDisabled); // %4
+  .arg(Styles::textColor())                    // %1
+  .arg(Styles::actionButtonBackground())       // %2
+  .arg(Styles::BORDER_RADIUS)                  // %3
+  .arg(Styles::PADDING_MEDIUM)                 // %4
+  .arg(Styles::PADDING_LARGE)                  // %5
+  .arg(Styles::ACTION_BUTTON_WIDTH)            // %6
+  .arg(Styles::ACTION_BUTTON_HEIGHT)           // %7
+  .arg(Styles::actionButtonHover())            // %8
+  .arg(Styles::actionButtonDisabled());        // %9
 
   this->setStyleSheet(styleSheet);
 }

@@ -1,6 +1,7 @@
 // Modified COMP2811 Coursework 2 sample solution: main window
 
 #include <QtWidgets>
+#include "styles.hpp"
 #include "window.hpp"
 #include "loaddatawidget.hpp"
 #include "tab1.hpp"
@@ -21,7 +22,7 @@ WaterWindow::WaterWindow() : QMainWindow()
   setMinimumHeight(600);
   setWindowTitle(tr("Water Quality Monitor"));
 
-  // Install event filter for theme changes
+  // Install event filter for Styles changes
   qApp->installEventFilter(this);
 }
 
@@ -69,18 +70,6 @@ void WaterWindow::createMainWidget()
 
 void WaterWindow::setupStyles()
 {
-  bool isDarkMode = qApp->palette().color(QPalette::Window).lightness() < 128;
-  
-  // Define colors based on theme
-  QString bgColor = isDarkMode ? "#1e272e" : "#ffffff";
-  QString textColor = isDarkMode ? "#ffffff" : "#2c3e50";
-  QString tabBgColor = isDarkMode ? "#2c3e50" : "#f8f9fa";
-  QString selectedTabColor = isDarkMode ? "#3498db" : "#007bff";
-  QString borderColor = isDarkMode ? "#4a6480" : "#dee2e6";
-  QString menuBgColor = isDarkMode ? "#2c3e50" : "#f8f9fa";
-  QString menuHoverColor = isDarkMode ? "#34495e" : "#e9ecef";
-  QString menuTextColor = isDarkMode ? "#ffffff" : "#2c3e50";
-  
   QString styleSheet = QString(R"(
     QMainWindow {
       background-color: %1;
@@ -88,76 +77,72 @@ void WaterWindow::setupStyles()
     }
 
     QMenuBar {
-      background-color: %7;
-      color: %8;
+      background-color: %3;
+      color: %2;
       border: none;
-      padding: 5px;
+      padding: %4px;
     }
 
     QMenuBar::item {
       background-color: transparent;
-      padding: 5px 10px;
-      border-radius: 4px;
-      margin-right: 2px;
+      padding: %4px %5px;
+      border-radius: %6px;
+      margin-right: %4px;
     }
 
     QMenuBar::item:selected {
-      background-color: %8;
+      background-color: %7;
     }
 
     QMenu {
-      background-color: %7;
-      color: %8;
-      border: 1px solid %5;
-      border-radius: 6px;
-      padding: 5px;
+      background-color: %3;
+      color: %2;
+      border: 1px solid %8;
+      border-radius: %6px;
+      padding: %4px;
     }
 
     QMenu::item {
-      padding: 5px 30px 5px 20px;
-      border-radius: 4px;
-      margin: 2px;
+      padding: %4px 30px %4px 20px;
+      border-radius: %6px;
+      margin: %9px;
     }
 
     QMenu::item:selected {
-      background-color: %8;
+      background-color: %7;
     }
 
     QTabWidget::pane {
-      border: 1px solid %5;
-      border-radius: 6px;
-      background-color: %3;
-      top: 15px; /* Space between title bar and tab content */
+      border: 1px solid %8;
+      border-radius: %6px;
+      background-color: %10;
+      top: %11px;
     }
 
     QTabWidget::tab-bar {
       alignment: center;
-      top: 15px; /* Space between title bar and tabs */
-      left: 15px; /* Space from left edge to first tab */
-    }
-
-    QTabBar {
-      margin-left: 15px; /* Additional margin for tab bar */
+      top: %11px;
+      left: %11px;
     }
 
     QTabBar::tab {
-      background-color: %3;
+      background-color: %10;
       color: %2;
-      padding: 10px 20px;
+      padding: %5px %12px;
       border: none;
-      border-top-left-radius: 6px;
-      border-top-right-radius: 6px;
-      margin-right: 2px;
+      border-top-left-radius: %6px;
+      border-top-right-radius: %6px;
+      margin-right: %9px;
       min-width: 100px;
     }
 
     QTabBar::tab:selected {
-      background-color: %4;
+      background-color: %13;
       color: white;
     }
 
     QTabBar::tab:hover:!selected {
-      background-color: %8;
+      background-color: %7;
     }
 
     QProgressDialog {
@@ -184,14 +169,19 @@ void WaterWindow::setupStyles()
       color: %2;
     }
   )")
-  .arg(bgColor)           // %1 background
-  .arg(textColor)         // %2 text
-  .arg(tabBgColor)        // %3 tab background
-  .arg(selectedTabColor)  // %4 selected tab
-  .arg(borderColor)       // %5 borders
-  .arg(menuHoverColor)    // %6 hover
-  .arg(menuBgColor)       // %7 menu background
-  .arg(menuTextColor);    // %8 menu text
+  .arg(Styles::backgroundColor())              // %1
+  .arg(Styles::textColor())                    // %2
+  .arg(Styles::menuBackground())               // %3
+  .arg(Styles::PADDING_SMALL)                  // %4
+  .arg(Styles::PADDING_MEDIUM)                 // %5
+  .arg(Styles::BORDER_RADIUS)                  // %6
+  .arg(Styles::menuHover())                    // %7
+  .arg(Styles::borderColor())                  // %8
+  .arg(Styles::SPACING_SMALL)                  // %9
+  .arg(Styles::tabBackground())                // %10
+  .arg(Styles::PADDING_LARGE)                  // %11
+  .arg(Styles::PADDING_LARGE * 2)              // %12
+  .arg(Styles::selectedTabBackground());       // %13
 
   this->setStyleSheet(styleSheet);
 }

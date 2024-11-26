@@ -1,6 +1,7 @@
 // Sample implementation for the third card - Raw Data
 
 #include <QtWidgets>
+#include "styles.hpp"
 #include "tab3.hpp"
 
 
@@ -11,7 +12,7 @@ Tab3::Tab3(WaterModel* model, QWidget* parent): waterModel(model), QWidget(paren
   setupStyles();
   adjustColumnWidths();
   
-  // Install event filter for theme changes
+  // Install event filter for Styles changes
   qApp->installEventFilter(this);
   
   // Connect to model changes to readjust columns when data changes
@@ -102,19 +103,6 @@ void Tab3::createLayout()
 
 void Tab3::setupStyles()
 {
-  bool isDarkMode = qApp->palette().color(QPalette::Window).lightness() < 128;
-  
-  // Define colors based on theme
-  QString textColor = isDarkMode ? "#ffffff" : "#2c3e50";
-  QString bgColor = isDarkMode ? "#2c3e50" : "#ffffff";
-  QString altRowColor = isDarkMode ? "#34495e" : "#f8f9fa";
-  QString headerBgColor = isDarkMode ? "#3498db" : "#007bff";
-  QString headerTextColor = "#ffffff";
-  QString borderColor = isDarkMode ? "#4a6480" : "#dee2e6";
-  QString selectionColor = isDarkMode ? "#3498db" : "#007bff";
-  QString selectionTextColor = "#ffffff";
-  QString gridColor = isDarkMode ? "#4a6480" : "#dee2e6";
-  
   QString styleSheet = QString(R"(
     QWidget {
       background-color: transparent;
@@ -124,51 +112,49 @@ void Tab3::setupStyles()
     QTableView#mainTable {
       background-color: %2;
       border: 1px solid %3;
-      border-radius: 6px;
-      selection-background-color: %8;
-      selection-color: %9;
-      gridline-color: %10;
+      border-radius: %4px;
+      selection-background-color: %5;
+      selection-color: %6;
+      gridline-color: %7;
     }
     
     QHeaderView::section {
-      background-color: %4;
-      color: %5;
-      padding: 10px;
+      background-color: %8;
+      color: %9;
+      padding: %10px;
       border: none;
       font-weight: bold;
     }
     
     QHeaderView::section:first {
-      border-top-left-radius: 6px;
+      border-top-left-radius: %4px;
     }
     
     QHeaderView::section:hover {
-      background-color: %6;
+      background-color: %11;
     }
     
     QTableView::item {
-      padding: 8px;
+      padding: %12px;
       margin: 0;
       border: none;
     }
     
     QTableView::item:selected {
-      background-color: %8;
-      color: %9;
-      padding: 8px;
+      background-color: %5;
+      color: %6;
+      padding: %12px;
       margin: 0;
       border: none;
     }
     
-    /* Style for alternating rows */
     QTableView::item:alternate {
-      background-color: %7;
-      padding: 8px;
+      background-color: %13;
+      padding: %12px;
       margin: 0;
       border: none;
     }
     
-    /* Scrollbar styling */
     QScrollBar:vertical {
       border: none;
       background-color: %2;
@@ -178,12 +164,12 @@ void Tab3::setupStyles()
     
     QScrollBar::handle:vertical {
       background-color: %3;
-      border-radius: 6px;
+      border-radius: %4px;
       min-height: 20px;
     }
     
     QScrollBar::handle:vertical:hover {
-      background-color: %6;
+      background-color: %11;
     }
     
     QScrollBar:horizontal {
@@ -195,24 +181,27 @@ void Tab3::setupStyles()
     
     QScrollBar::handle:horizontal {
       background-color: %3;
-      border-radius: 6px;
+      border-radius: %4px;
       min-width: 20px;
     }
     
     QScrollBar::handle:horizontal:hover {
-      background-color: %6;
+      background-color: %11;
     }
   )")
-  .arg(textColor)          // %1 text color
-  .arg(bgColor)           // %2 background color
-  .arg(borderColor)       // %3 border color
-  .arg(headerBgColor)     // %4 header background
-  .arg(headerTextColor)   // %5 header text
-  .arg(selectionColor)    // %6 hover/selection color
-  .arg(altRowColor)       // %7 alternate row color
-  .arg(selectionColor)    // %8 selection background
-  .arg(selectionTextColor) // %9 selection text
-  .arg(gridColor);        // %10 grid color
+  .arg(Styles::textColor())                    // %1
+  .arg(Styles::backgroundColor())              // %2
+  .arg(Styles::borderColor())                  // %3
+  .arg(Styles::BORDER_RADIUS)                  // %4
+  .arg(Styles::selectionBackground())          // %5
+  .arg(Styles::selectionText())                // %6
+  .arg(Styles::gridColor())                    // %7
+  .arg(Styles::tableHeaderBackground())        // %8
+  .arg(Styles::tableHeaderText())              // %9
+  .arg(Styles::PADDING_MEDIUM)                 // %10
+  .arg(Styles::menuHover())                    // %11
+  .arg(Styles::PADDING_SMALL)                  // %12
+  .arg(Styles::alternateRowBackground());      // %13
 
   this->setStyleSheet(styleSheet);
 }

@@ -1,6 +1,7 @@
 // Implementation file for the data loading page
 
 #include <QtWidgets>
+#include "styles.hpp"
 #include "loaddatawidget.hpp"
 
 
@@ -124,86 +125,79 @@ void LoadDataWidget::createLayout()
 
 void LoadDataWidget::setupStyles()
 {
-  bool isDarkMode = qApp->palette().color(QPalette::Window).lightness() < 128;
-  
-  // Define colors based on theme
-  QString textColor = isDarkMode ? "#ffffff" : "#2c3e50";
-  QString bgColor = isDarkMode ? "#2c3e50" : "#ffffff";
-  QString pathBgColor = isDarkMode ? "#34495e" : "#f8f9fa";
-  QString primaryButtonBg = isDarkMode ? "#34495e" : "#f8f9fa";
-  QString primaryButtonBorder = isDarkMode ? "#4a6480" : "#e9ecef";
-  QString primaryButtonHover = isDarkMode ? "#4a6480" : "#e9ecef";
-  QString actionButtonBg = isDarkMode ? "#3498db" : "#007bff";
-  QString actionButtonHover = isDarkMode ? "#2980b9" : "#0056b3";
-  QString actionButtonDisabled = isDarkMode ? "#445566" : "#cccccc";
-  QString secondaryButtonBg = isDarkMode ? "#95a5a6" : "#6c757d";
-  QString secondaryButtonHover = isDarkMode ? "#7f8c8d" : "#5a6268";
-  QString comboBoxBg = isDarkMode ? "#34495e" : "#ffffff";
-  QString comboBoxBorder = isDarkMode ? "#4a6480" : "#e9ecef";
-  QString comboBoxText = isDarkMode ? "#ffffff" : "#2c3e50";
-  QString comboBoxArrow = isDarkMode ? "#ecf0f1" : "#2c3e50";
-  
   QString styleSheet = QString(R"(
     QWidget {
       background-color: transparent;
       color: %1;
     }
 
+    QLabel#titleLabel, QLabel#pathLabel {
+      color: %1;
+    }
+
     QLabel#pathLabel {
       background-color: %2;
-      border-radius: 6px;
-      padding: 8px;
+      border-radius: %3px;
+      padding: %4px;
     }
 
     QPushButton#primaryButton {
-      background-color: %3;
-      border: 2px solid %4;
-      border-radius: 6px;
+      background-color: %5;
+      border: 2px solid %6;
+      border-radius: %3px;
       color: %1;
       font-weight: bold;
-      padding: 8px 16px;
+      padding: %7px %8px;
+      min-width: %9px;
+      min-height: %10px;
     }
 
     QPushButton#primaryButton:hover {
-      background-color: %5;
+      background-color: %11;
     }
 
     QPushButton#actionButton {
-      background-color: %6;
+      background-color: %12;
       border: none;
-      border-radius: 6px;
+      border-radius: %3px;
       color: white;
       font-weight: bold;
-      padding: 10px 20px;
+      padding: %7px %8px;
+      min-width: %13px;
+      min-height: %14px;
     }
 
     QPushButton#actionButton:hover {
-      background-color: %7;
+      background-color: %15;
     }
 
     QPushButton#actionButton:disabled {
-      background-color: %8;
+      background-color: %16;
       color: white;
     }
 
     QPushButton#secondaryButton {
-      background-color: %9;
+      background-color: %17;
       border: none;
-      border-radius: 6px;
+      border-radius: %3px;
       color: white;
-      padding: 8px 16px;
+      padding: %7px %8px;
+      min-width: %9px;
+      min-height: %10px;
     }
 
     QPushButton#secondaryButton:hover {
-      background-color: %10;
+      background-color: %18;
     }
 
     QComboBox#languageSelect {
-      background-color: %11;
-      border: 2px solid %12;
-      border-radius: 6px;
-      color: %13;
+      background-color: %5;
+      border: 2px solid %6;
+      border-radius: %3px;
+      color: %1;
       padding: 5px 10px;
+      min-width: 150px;
+      min-height: 35px;
     }
 
     QComboBox#languageSelect::drop-down {
@@ -215,31 +209,35 @@ void LoadDataWidget::setupStyles()
       image: none;
       border-left: 5px solid transparent;
       border-right: 5px solid transparent;
-      border-top: 5px solid %14;
+      border-top: 5px solid %1;
       margin-right: 10px;
     }
 
     QComboBox#languageSelect QAbstractItemView {
-      background-color: %11;
-      border: 2px solid %12;
-      color: %13;
-      selection-background-color: %5;
+      background-color: %5;
+      border: 2px solid %6;
+      color: %1;
+      selection-background-color: %11;
     }
   )")
-  .arg(textColor)         // %1 text color
-  .arg(pathBgColor)       // %2 path background
-  .arg(primaryButtonBg)   // %3
-  .arg(primaryButtonBorder) // %4
-  .arg(primaryButtonHover)  // %5
-  .arg(actionButtonBg)      // %6
-  .arg(actionButtonHover)   // %7
-  .arg(actionButtonDisabled) // %8
-  .arg(secondaryButtonBg)    // %9
-  .arg(secondaryButtonHover) // %10
-  .arg(comboBoxBg)          // %11
-  .arg(comboBoxBorder)      // %12
-  .arg(comboBoxText)        // %13
-  .arg(comboBoxArrow);      // %14
+  .arg(Styles::textColor())                    // %1
+  .arg(Styles::primaryButtonBackground())      // %2
+  .arg(Styles::BORDER_RADIUS)                  // %3
+  .arg(Styles::PADDING_MEDIUM)                 // %4
+  .arg(Styles::primaryButtonBackground())      // %5
+  .arg(Styles::primaryButtonBorder())          // %6
+  .arg(Styles::PADDING_MEDIUM)                 // %7
+  .arg(Styles::PADDING_LARGE)                  // %8
+  .arg(Styles::BUTTON_MIN_WIDTH)               // %9
+  .arg(Styles::BUTTON_MIN_HEIGHT)              // %10
+  .arg(Styles::primaryButtonHover())           // %11
+  .arg(Styles::actionButtonBackground())       // %12
+  .arg(Styles::ACTION_BUTTON_WIDTH)            // %13
+  .arg(Styles::ACTION_BUTTON_HEIGHT)           // %14
+  .arg(Styles::actionButtonHover())            // %15
+  .arg(Styles::actionButtonDisabled())         // %16
+  .arg(Styles::secondaryButtonBackground())    // %17
+  .arg(Styles::secondaryButtonHover());        // %18
 
   this->setStyleSheet(styleSheet);
 }

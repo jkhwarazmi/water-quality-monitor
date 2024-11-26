@@ -1,6 +1,7 @@
 // Sample implementation for the second card - Tab2
 
 #include <QtWidgets>
+#include "styles.hpp"
 #include "tab2.hpp"
 
 
@@ -47,11 +48,6 @@ void Tab2::createLayout()
 
 void Tab2::setupStyles()
 {
-  bool isDarkMode = qApp->palette().color(QPalette::Window).lightness() < 128;
-  
-  // Define colors based on theme
-  QString textColor = isDarkMode ? "#ffffff" : "#2c3e50";
-  
   QString styleSheet = QString(R"(
     QWidget {
       background-color: transparent;
@@ -61,9 +57,10 @@ void Tab2::setupStyles()
     QLabel#placeholderLabel {
       font-size: 32px;
       font-weight: bold;
+      color: %1;
     }
   )")
-  .arg(textColor);  // %1 text color
+  .arg(Styles::textColor());        // %1
 
   this->setStyleSheet(styleSheet);
 }
