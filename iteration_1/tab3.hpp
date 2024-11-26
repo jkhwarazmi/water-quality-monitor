@@ -6,7 +6,6 @@
 #include "model.hpp"
 
 class QTableView;
-class QLabel;
 
 class Tab3 : public QWidget
 {
@@ -15,10 +14,15 @@ class Tab3 : public QWidget
   public:
     Tab3(WaterModel* model, QWidget* parent = nullptr);
 
+  private slots:
+    void adjustColumnWidths();
+
   private:
     WaterModel* waterModel;
     QTableView* tableView;
 
     void createWidgets();
     void createLayout();
+    void setupStyles();
+    bool eventFilter(QObject *watched, QEvent *event) override;
 };

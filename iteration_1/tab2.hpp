@@ -5,7 +5,6 @@
 #include <QWidget>
 #include "model.hpp"
 
-class QPushButton;
 class QLabel;
 
 class Tab2: public QWidget
@@ -21,4 +20,6 @@ class Tab2: public QWidget
 
     void createWidgets();
     void createLayout();
+    void setupStyles();
+    bool eventFilter(QObject *watched, QEvent *event) override;
 };

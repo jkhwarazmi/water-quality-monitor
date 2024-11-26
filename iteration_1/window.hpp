@@ -43,6 +43,8 @@ class WaterWindow: public QMainWindow
     void createLanguageMenu();
     void switchToTabView();
     void loadData(const QString& path);
+    void setupStyles();
+    bool eventFilter(QObject *watched, QEvent *event) override;
 
   private slots:
     void setDataLocation();
@@ -51,5 +53,4 @@ class WaterWindow: public QMainWindow
     void about();
     void changeLanguage(const QString &);
     void handleLanguageAction(QAction *);
-    
 };

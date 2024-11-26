@@ -34,4 +34,6 @@ class LoadDataWidget : public QWidget
 
     void createWidgets();
     void createLayout();
+    void setupStyles();
+    bool eventFilter(QObject *watched, QEvent *event) override;
 };

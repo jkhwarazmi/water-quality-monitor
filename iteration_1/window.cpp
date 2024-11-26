@@ -15,15 +15,29 @@ WaterWindow::WaterWindow() : QMainWindow()
     
   createMainWidget();
   createMenus();
+  setupStyles();
   
   setMinimumWidth(800);
   setMinimumHeight(600);
   setWindowTitle(tr("Water Quality Monitor"));
+
+  // Install event filter for theme changes
+  qApp->installEventFilter(this);
+}
+
+bool WaterWindow::eventFilter(QObject *watched, QEvent *event)
+{
+  if (watched == qApp && event->type() == QEvent::ApplicationPaletteChange) {
+    setupStyles();
+    return true;
+  }
+  return QMainWindow::eventFilter(watched, event);
 }
 
 void WaterWindow::createMainWidget()
 {
   stackedWidget = new QStackedWidget;
+  stackedWidget->setObjectName("mainStack");
 
   loadDataWidget = new LoadDataWidget(dataLocation);
 
@@ -31,6 +45,8 @@ void WaterWindow::createMainWidget()
   connect(loadDataWidget, SIGNAL(loadRequested()), this, SLOT(setPath()));
     
   tabWidget = new QTabWidget;
+  tabWidget->setObjectName("mainTabs");
+  
   tab1 = new Tab1(&model);
   tab2 = new Tab2(&model);
   tab3 = new Tab3(&model);
@@ -49,6 +65,135 @@ void WaterWindow::createMainWidget()
   stackedWidget->setCurrentWidget(loadDataWidget);
 
   connect(loadDataWidget, SIGNAL(languageChanged(QString)), this, SLOT(changeLanguage(QString)));
+}
+
+void WaterWindow::setupStyles()
+{
+  bool isDarkMode = qApp->palette().color(QPalette::Window).lightness() < 128;
+  
+  // Define colors based on theme
+  QString bgColor = isDarkMode ? "#1e272e" : "#ffffff";
+  QString textColor = isDarkMode ? "#ffffff" : "#2c3e50";
+  QString tabBgColor = isDarkMode ? "#2c3e50" : "#f8f9fa";
+  QString selectedTabColor = isDarkMode ? "#3498db" : "#007bff";
+  QString borderColor = isDarkMode ? "#4a6480" : "#dee2e6";
+  QString menuBgColor = isDarkMode ? "#2c3e50" : "#f8f9fa";
+  QString menuHoverColor = isDarkMode ? "#34495e" : "#e9ecef";
+  QString menuTextColor = isDarkMode ? "#ffffff" : "#2c3e50";
+  
+  QString styleSheet = QString(R"(
+    QMainWindow {
+      background-color: %1;
+      color: %2;
+    }
+
+    QMenuBar {
+      background-color: %7;
+      color: %8;
+      border: none;
+      padding: 5px;
+    }
+
+    QMenuBar::item {
+      background-color: transparent;
+      padding: 5px 10px;
+      border-radius: 4px;
+      margin-right: 2px;
+    }
+
+    QMenuBar::item:selected {
+      background-color: %8;
+    }
+
+    QMenu {
+      background-color: %7;
+      color: %8;
+      border: 1px solid %5;
+      border-radius: 6px;
+      padding: 5px;
+    }
+
+    QMenu::item {
+      padding: 5px 30px 5px 20px;
+      border-radius: 4px;
+      margin: 2px;
+    }
+
+    QMenu::item:selected {
+      background-color: %8;
+    }
+
+    QTabWidget::pane {
+      border: 1px solid %5;
+      border-radius: 6px;
+      background-color: %3;
+      top: 15px; /* Space between title bar and tab content */
+    }
+
+    QTabWidget::tab-bar {
+      alignment: center;
+      top: 15px; /* Space between title bar and tabs */
+      left: 15px; /* Space from left edge to first tab */
+    }
+
+    QTabBar {
+      margin-left: 15px; /* Additional margin for tab bar */
+    }
+
+    QTabBar::tab {
+      background-color: %3;
+      color: %2;
+      padding: 10px 20px;
+      border: none;
+      border-top-left-radius: 6px;
+      border-top-right-radius: 6px;
+      margin-right: 2px;
+      min-width: 100px;
+    }
+
+    QTabBar::tab:selected {
+      background-color: %4;
+      color: white;
+    }
+
+    QTabBar::tab:hover:!selected {
+      background-color: %8;
+    }
+
+    QProgressDialog {
+      background-color: %1;
+      color: %2;
+    }
+
+    QProgressDialog QLabel {
+      color: %2;
+      font-weight: bold;
+    }
+
+    QMessageBox {
+      background-color: %1;
+      color: %2;
+    }
+
+    QMessageBox QLabel {
+      color: %2;
+    }
+
+    QFileDialog {
+      background-color: %1;
+      color: %2;
+    }
+  )")
+  .arg(bgColor)           // %1 background
+  .arg(textColor)         // %2 text
+  .arg(tabBgColor)        // %3 tab background
+  .arg(selectedTabColor)  // %4 selected tab
+  .arg(borderColor)       // %5 borders
+  .arg(menuHoverColor)    // %6 hover
+  .arg(menuBgColor)       // %7 menu background
+  .arg(menuTextColor);    // %8 menu text
+
+  this->setStyleSheet(styleSheet);
 }
 
 void WaterWindow::createMenus()
