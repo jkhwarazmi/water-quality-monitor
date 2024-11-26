@@ -17,6 +17,8 @@
 - Need to test fully in both light and dark mode and find apprpriate colour scheme
 - Should probably define the colour scheme in some header file then import and use that as needed
 
+<hr>
+
 Note, to generate populated translation files, run: 
 ```
 cmake --build . --target update_translations
