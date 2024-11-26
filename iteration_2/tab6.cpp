@@ -1,4 +1,4 @@
-// Sample implementation for the sixth card - Tab6
+// [OPTIONAL] Implementation for the sixth card - Geographical Hotspots
 
 #include <QtWidgets>
 #include "styles.hpp"
@@ -26,7 +26,7 @@ bool Tab6::eventFilter(QObject *watched, QEvent *event)
 
 void Tab6::createWidgets()
 {
-  placeholder = new QLabel(tr("Coming Soon"));
+  placeholder = new QLabel(tr("[OPTIONAL] Geographical Hotspots - Coming Soon"));
   QFont labelFont;
   labelFont.setPointSize(32);
   labelFont.setBold(true);

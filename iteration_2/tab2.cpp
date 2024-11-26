@@ -1,4 +1,5 @@
-// Sample implementation for the second card - Tab6
+// Implementation for the second card - Pollutant Overview
+// Nicolas
 
 #include <QtWidgets>
 #include "styles.hpp"
@@ -26,7 +27,7 @@ bool Tab2::eventFilter(QObject *watched, QEvent *event)
 
 void Tab2::createWidgets()
 {
-  placeholder = new QLabel(tr("Coming Soon"));
+  placeholder = new QLabel(tr("Pollutant Overview - Coming Soon (Nicolas)"));
   QFont labelFont;
   labelFont.setPointSize(32);
   labelFont.setBold(true);

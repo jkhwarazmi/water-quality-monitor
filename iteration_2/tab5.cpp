@@ -1,4 +1,5 @@
-// Sample implementation for the fifth card - Tab5
+// Implementation for the fifth card - Compliance
+// Sara
 
 #include <QtWidgets>
 #include "styles.hpp"
@@ -11,7 +12,7 @@ Tab5::Tab5(WaterModel* model, QWidget* parent): waterModel(model), QWidget(paren
   createLayout();
   setupStyles();
   
-  // Install event filter for theme changes
+  // Install event filteßr for theme changes
   qApp->installEventFilter(this);
 }
 
@@ -26,7 +27,7 @@ bool Tab5::eventFilter(QObject *watched, QEvent *event)
 
 void Tab5::createWidgets()
 {
-  placeholder = new QLabel(tr("Coming Soon"));
+  placeholder = new QLabel(tr("Compliance - Coming Soon (Sara)"));
   QFont labelFont;
   labelFont.setPointSize(32);
   labelFont.setBold(true);

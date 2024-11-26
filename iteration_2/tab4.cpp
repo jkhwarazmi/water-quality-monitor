@@ -1,4 +1,5 @@
-// Sample implementation for the third card - Tab4
+// Implementation for the fourth card - Fluorinated Compounds
+// Yusuf
 
 #include <QtWidgets>
 #include "styles.hpp"
@@ -26,7 +27,7 @@ bool Tab4::eventFilter(QObject *watched, QEvent *event)
 
 void Tab4::createWidgets()
 {
-  placeholder = new QLabel(tr("Coming Soon"));
+  placeholder = new QLabel(tr("Fluorinated Compounds - Coming Soon (Yusuf)"));
   QFont labelFont;
   labelFont.setPointSize(32);
   labelFont.setBold(true);

@@ -1,4 +1,5 @@
-// Sample implementation for the first card - Dashboard
+// Implementation for the first card - Dashboard
+// Jamil
 
 #include <QtWidgets>
 #include "styles.hpp"
@@ -33,7 +34,7 @@ void Tab1::createWidgets()
   reloadButton->setObjectName("actionButton");
   connect(reloadButton, SIGNAL(clicked()), this, SIGNAL(reloadRequested()));
 
-  placeholder = new QLabel(tr("Coming Soon"));
+  placeholder = new QLabel(tr("Dashboard - Coming Soon (Jamil)"));
   QFont labelFont;
   labelFont.setPointSize(32);
   labelFont.setBold(true);

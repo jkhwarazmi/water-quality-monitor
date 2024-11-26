@@ -1,4 +1,5 @@
-// Sample implementation for the third card - Tab3
+// Implementation for the third card - Environmental Litter Indicator
+// Mila
 
 #include <QtWidgets>
 #include "styles.hpp"
@@ -26,7 +27,7 @@ bool Tab3::eventFilter(QObject *watched, QEvent *event)
 
 void Tab3::createWidgets()
 {
-  placeholder = new QLabel(tr("Coming Soon"));
+  placeholder = new QLabel(tr("Environmental Litter Indicators - Coming Soon (Mila)"));
   QFont labelFont;
   labelFont.setPointSize(32);
   labelFont.setBold(true);

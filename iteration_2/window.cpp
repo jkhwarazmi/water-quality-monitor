@@ -21,7 +21,7 @@ WaterWindow::WaterWindow() : QMainWindow()
   createMenus();
   setupStyles();
   
-  setMinimumWidth(800);
+  setMinimumWidth(1250);
   setMinimumHeight(600);
   setWindowTitle(tr("Water Quality Monitor"));
 
@@ -62,11 +62,11 @@ void WaterWindow::createMainWidget()
   connect(tab1, SIGNAL(reloadRequested()), this, SLOT(switchToLoadView()));
     
   tabWidget->addTab(tab1, tr("Dashboard"));
-  tabWidget->addTab(tab2, tr("Tab 2"));
-  tabWidget->addTab(tab3, tr("Tab 3"));
-  tabWidget->addTab(tab4, tr("Tab 4"));
-  tabWidget->addTab(tab5, tr("Tab 5"));
-  tabWidget->addTab(tab6, tr("Tab 6"));
+  tabWidget->addTab(tab2, tr("Pollutant Overview"));
+  tabWidget->addTab(tab3, tr("Litter Indicators"));
+  tabWidget->addTab(tab4, tr("Fluorinated Compounds"));
+  tabWidget->addTab(tab5, tr("Compliance"));
+  tabWidget->addTab(tab6, tr("Hotspots"));
   tabWidget->addTab(tab7, tr("Raw Data"));
     
   stackedWidget->addWidget(loadDataWidget);
@@ -338,3 +338,7 @@ void WaterWindow::about()
     "a CSV file produced by the UK Environment Agency.\n\n"
     "(c) 2024 Nick Efford and Group 37"));
 }
+
+// Add help menu option
+// Add horizontal scrollbar
+// Add file label at bottom of app

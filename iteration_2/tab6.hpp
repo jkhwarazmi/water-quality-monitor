@@ -1,4 +1,4 @@
-// Sample header for sixth card - Tab6
+// [OPTIONAL] Header for sixth card - Geographical Hotspots
 
 #pragma once
 

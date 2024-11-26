@@ -1,4 +1,5 @@
-// Sample header for second first card - Tab1
+// Header for second card - Pollutant Overview
+// Nicolas
 
 #pragma once
 
