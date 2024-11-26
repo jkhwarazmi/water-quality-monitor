@@ -5,6 +5,7 @@
 - Allows reloading files w/out resetting the app
 - Tabs for different pages (placeholders)
 - Table compliance highlighting (dummy values)
+- Different light and dark mode variants
 - Language changing (does not work for every widget, maybe custom change functions need implementing), kind of works for French but file menu and combobox need synchronised updating
 
 - No tooltips or real pages added
