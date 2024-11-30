@@ -29,8 +29,8 @@ public:
     // Helper method for colouring cells
     double getPollutantThreshold(const QString&) const;
 
-    // Method to get compliance statistics
-    QMap<QString, int> getComplianceStats();
+    // Helper methods for charts
+    QMap<QString, int> getComplianceStats() const;
 
 private:
     WaterDataset dataset;

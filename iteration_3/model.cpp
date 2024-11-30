@@ -155,7 +155,7 @@ QVariant WaterModel::headerData(int section, Qt::Orientation orientation, int ro
   }
 }
 
-QMap<QString, int> WaterModel::getComplianceStats() {
+QMap<QString, int> WaterModel::getComplianceStats() const {
   QMap<QString, int> stats;
   QSqlQuery query(database);
   
