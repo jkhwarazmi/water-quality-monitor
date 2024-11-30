@@ -19,6 +19,7 @@ class Tab1: public QWidget
 
     // Charts
     void updateComplianceChart();
+    void updateCharts();
 
   signals:
     void reloadRequested();

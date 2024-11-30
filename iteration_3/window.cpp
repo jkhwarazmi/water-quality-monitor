@@ -287,9 +287,8 @@ void WaterWindow::loadData(const QString &path)
       return;
     }
     
-    // Update your charts
-    tab1->updateComplianceChart();
-
+    // Update charts
+    tab1->updateCharts();
     switchToTabView();
 
   } catch (const std::exception& error) {

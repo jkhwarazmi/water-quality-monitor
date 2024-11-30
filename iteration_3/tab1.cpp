@@ -39,7 +39,7 @@ void Tab1::createWidgets()
   chartView->setMinimumSize(400, 300);
 
   // Create charts
-  updateComplianceChart();
+  updateCharts();
 }
 
 void Tab1::createLayout()
@@ -99,6 +99,10 @@ void Tab1::setupStyles()
   .arg(Styles::actionButtonDisabled());        // %9
 
   this->setStyleSheet(styleSheet);
+}
+
+void Tab1::updateCharts() {
+  updateComplianceChart();
 }
 
 void Tab1::updateComplianceChart() {

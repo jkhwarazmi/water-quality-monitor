@@ -6,8 +6,8 @@ Also always loads data on startup and initial db might be full so added custom d
 
 To add stuff:
 - Write a SQL query for the data you want in model.cpp and model.hpp like `getComplianceStats()`
-- Create the chart you want using the data in your tab as per Tab1 `updateComplianceChart()`
-- Add it to window.cpp above like `tab1->updateComplianceChart()` above `switchToTabView()` in the loadData function
+- Create the chart you want using the data in your tab as per Tab1 `updateComplianceChart()` and add it to `updateCharts()`
+- Add it to window.cpp above like `tab1->updateCharts()` above `switchToTabView()` in the loadData function
 
 To run:
 ```
