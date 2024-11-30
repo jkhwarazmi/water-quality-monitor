@@ -14,20 +14,19 @@
 
 WaterWindow::WaterWindow() : QMainWindow()
 {
+  // Default data directory  
+  dataLocation = "../../data/";
     
-    // Default data directory  
-    dataLocation = "../../data/";
+  createMainWidget();
+  createMenus();
+  setupStyles();
+  
+  setMinimumWidth(1250);
+  setMinimumHeight(600);
+  setWindowTitle(tr("Water Quality Monitor"));
 
-    createMainWidget();
-    createMenus();
-    setupStyles();
-    
-    setMinimumWidth(1250);
-    setMinimumHeight(600);
-    setWindowTitle(tr("Water Quality Monitor"));
-
-    // Install event filter for Styles changes
-    qApp->installEventFilter(this);
+  // Install event filter for Styles changes
+  qApp->installEventFilter(this);
 }
 
 bool WaterWindow::eventFilter(QObject *watched, QEvent *event)
@@ -45,6 +44,7 @@ void WaterWindow::createMainWidget()
   stackedWidget->setObjectName("mainStack");
 
   loadDataWidget = new LoadDataWidget(dataLocation);
+
   connect(loadDataWidget, SIGNAL(dataFileSelected()), this, SLOT(setDataLocation()));
   connect(loadDataWidget, SIGNAL(loadRequested()), this, SLOT(setPath()));
     
@@ -73,6 +73,7 @@ void WaterWindow::createMainWidget()
   stackedWidget->addWidget(tabWidget);
     
   setCentralWidget(stackedWidget);
+    
   stackedWidget->setCurrentWidget(loadDataWidget);
 
   connect(loadDataWidget, SIGNAL(languageChanged(QString)), this, SLOT(changeLanguage(QString)));
@@ -286,9 +287,7 @@ void WaterWindow::loadData(const QString &path)
       QMessageBox::critical(this, tr("Data Error"), tr("The selected file contains no valid data."));
       return;
     }
-    
-    // Update charts
-    tab1->updateCharts();
+        
     switchToTabView();
 
   } catch (const std::exception& error) {

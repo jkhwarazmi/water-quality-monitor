@@ -2,17 +2,19 @@
 
 #pragma once
 
-#include <string>
+#include <vector>
+#include "sample.hpp"
 
 class WaterDataset
 {
   public:
     WaterDataset() {}
-    WaterDataset(const std::string &filename) { loadData(filename); }
-    
-    // Load data from CSV into SQLite database
-    void loadData(const std::string& filename);
-    
-    // Get total number of records in database
-    int size() const;
+    WaterDataset(const std::string& filename) { loadData(filename); }
+    void loadData(const std::string&);
+    int size() const { return data.size(); }
+    Sample operator[](int index) const { return data.at(index); }
+
+  private:
+    std::vector<Sample> data;
+    void checkDataExists() const;
 };

@@ -29,6 +29,7 @@ class LoadDataWidget : public QWidget
     QLabel *languageLabel;
     QPushButton *selectButton;
     QPushButton *loadButton;
+    QPushButton *cancelButton;
     QComboBox *languageComboBox;
 
     void createWidgets();

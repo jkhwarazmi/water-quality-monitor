@@ -52,6 +52,13 @@ void LoadDataWidget::createWidgets()
   loadButton->setObjectName("actionButton");
   loadButton->setEnabled(currentPath.endsWith(".csv", Qt::CaseInsensitive));
 
+  cancelButton = new QPushButton(tr("Cancel"));
+  cancelButton->setMinimumWidth(120);
+  cancelButton->setMinimumHeight(40);
+  cancelButton->setCursor(Qt::PointingHandCursor);
+  cancelButton->setObjectName("secondaryButton");
+  cancelButton->hide();
+
   languageLabel = new QLabel(tr("Language:"));
   languageLabel->setObjectName("settingsLabel");
   
@@ -92,6 +99,7 @@ void LoadDataWidget::createLayout()
   // Button area layout
   QHBoxLayout* buttonLayout = new QHBoxLayout;
   buttonLayout->addStretch();
+  buttonLayout->addWidget(cancelButton);
   buttonLayout->addWidget(loadButton);
   buttonLayout->setSpacing(15);
   buttonLayout->setContentsMargins(0, 0, 0, 0);

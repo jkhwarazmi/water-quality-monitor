@@ -34,18 +34,19 @@ void Tab1::createWidgets()
   reloadButton->setObjectName("actionButton");
   connect(reloadButton, SIGNAL(clicked()), this, SIGNAL(reloadRequested()));
 
-  chartView = new QChartView();
-  chartView->setRenderHint(QPainter::Antialiasing);
-  chartView->setMinimumSize(400, 300);
-
-  // Create charts
-  updateCharts();
+  placeholder = new QLabel(tr("Dashboard - Coming Soon (Jamil)"));
+  QFont labelFont;
+  labelFont.setPointSize(32);
+  labelFont.setBold(true);
+  placeholder->setFont(labelFont);
+  placeholder->setAlignment(Qt::AlignCenter);
+  placeholder->setObjectName("placeholderLabel");
 }
 
 void Tab1::createLayout()
 {
   QVBoxLayout* layout = new QVBoxLayout;
-  layout->addWidget(chartView);
+  layout->addWidget(placeholder);
   layout->addStretch();
   layout->addWidget(reloadButton, 0, Qt::AlignCenter);
   layout->setSpacing(20);
@@ -99,39 +100,4 @@ void Tab1::setupStyles()
   .arg(Styles::actionButtonDisabled());        // %9
 
   this->setStyleSheet(styleSheet);
-}
-
-void Tab1::updateCharts() {
-  updateComplianceChart();
-}
-
-void Tab1::updateComplianceChart() {
-  // Get compliance statistics from model
-  QMap<QString, int> stats = waterModel->getComplianceStats();
-  
-  // Create pie series
-  QPieSeries *series = new QPieSeries();
-  
-  // Add slices
-  series->append("Compliance", stats["Compliance"]);
-  series->append("Non-Compliance", stats["Non-Compliance"]);
-  
-  // Customize slices
-  QPieSlice *compliantSlice = series->slices().at(0);
-  compliantSlice->setBrush(QColor("#4CAF50")); // Green
-  compliantSlice->setLabelVisible(true);
-  
-  QPieSlice *nonCompliantSlice = series->slices().at(1);
-  nonCompliantSlice->setBrush(QColor("#F44336")); // Red
-  nonCompliantSlice->setLabelVisible(true);
-  
-  // Create chart
-  QChart *chart = new QChart();
-  chart->addSeries(series);
-  chart->setTitle("Compliance Distribution");
-  chart->legend()->setVisible(true);
-  chart->legend()->setAlignment(Qt::AlignBottom);
-  
-  // Set chart to chart view
-  chartView->setChart(chart);
 }

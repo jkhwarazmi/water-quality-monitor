@@ -34,7 +34,6 @@ void Tab7::createWidgets()
 {
   tableView = new QTableView;
   tableView->setModel(waterModel);
-  
   QFont tableFont = QFontDatabase::systemFont(QFontDatabase::FixedFont);
   tableFont.setPointSize(12);
   tableView->setFont(tableFont);
@@ -46,7 +45,7 @@ void Tab7::createWidgets()
   tableView->setSelectionMode(QAbstractItemView::SingleSelection);
   tableView->setShowGrid(true);
   tableView->setObjectName("mainTable");
-  tableView->setWordWrap(false);
+  tableView->setWordWrap(false);  // Prevent word wrapping to get accurate column widths
   
   // Header settings
   QHeaderView* horizontalHeader = tableView->horizontalHeader();
@@ -66,9 +65,7 @@ void Tab7::createWidgets()
 
 void Tab7::adjustColumnWidths()
 {
-  if (!waterModel) {
-    return;
-  }
+  if (!waterModel) return;
   
   const int padding = 20;  // Additional padding for each column
   QFontMetrics metrics(tableView->font());
@@ -81,11 +78,8 @@ void Tab7::adjustColumnWidths()
     QString headerText = waterModel->headerData(column, Qt::Horizontal, Qt::DisplayRole).toString();
     maxWidth = metrics.horizontalAdvance(headerText);
     
-    // Check content width for first few rows only
-    const int MAX_ROWS_TO_CHECK = 100;
-    int rowsToCheck = qMin(MAX_ROWS_TO_CHECK, waterModel->rowCount(parent));
-    
-    for (int row = 0; row < rowsToCheck; ++row) {
+    // Check content width for each row
+    for (int row = 0; row < waterModel->rowCount(parent); ++row) {
       QModelIndex idx = waterModel->index(row, column, parent);
       QString text = waterModel->data(idx, Qt::DisplayRole).toString();
       int width = metrics.horizontalAdvance(text);

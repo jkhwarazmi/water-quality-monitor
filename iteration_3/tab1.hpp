@@ -5,7 +5,6 @@
 
 #include <QWidget>
 #include "model.hpp"
-#include <QtCharts>
 
 class QPushButton;
 class QLabel;
@@ -17,10 +16,6 @@ class Tab1: public QWidget
   public:
     Tab1(WaterModel* model, QWidget* parent = nullptr);
 
-    // Charts
-    void updateComplianceChart();
-    void updateCharts();
-
   signals:
     void reloadRequested();
 
@@ -28,7 +23,6 @@ class Tab1: public QWidget
     WaterModel* waterModel;
     QPushButton *reloadButton;
     QLabel *placeholder;
-    QChartView *chartView;
 
     void createWidgets();
     void createLayout();
