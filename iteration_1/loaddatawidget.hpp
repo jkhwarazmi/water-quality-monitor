@@ -20,20 +20,15 @@ class LoadDataWidget : public QWidget
   signals:
     void dataFileSelected();
     void loadRequested();
-    void languageChanged(QString);
 
   private:
     QString currentPath;
     QLabel *titleLabel;
     QLabel *pathLabel;
-    QLabel *languageLabel;
     QPushButton *selectButton;
     QPushButton *loadButton;
     QPushButton *cancelButton;
-    QComboBox *languageComboBox;
-
+    
     void createWidgets();
     void createLayout();
-    void setupStyles();
-    bool eventFilter(QObject *watched, QEvent *event) override;
 };
