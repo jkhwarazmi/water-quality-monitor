@@ -1,21 +1,12 @@
 ## Iteration 2 - Features
 
-To run:
-```
-mkdir build && cd build
-```
+Improvements:
+- Improved styling, added basic light and dark mode
+- Added placeholder pages
+- Added translation logic
+- Added placeholder compliance indicators for table
 
-```
-cmake ..
-```
-
-```
-make
-```
-
-
-```
-./watermonitor
-```
-
-NOTE: This will not compile if your path has ANY spaces in it. To fix, just move the folder to a path without spaces, i.e. your Desktop
+TODO:
+- Implement pages!!!
+- Translate to French
+- Improve styling further, responsivity, better help and tooltips, WCAG accessibility, bottom toolbar saying which file's loaded, etc.

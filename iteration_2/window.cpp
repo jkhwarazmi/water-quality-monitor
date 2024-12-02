@@ -287,8 +287,7 @@ void WaterWindow::loadData(const QString &path)
       QMessageBox::critical(this, tr("Data Error"), tr("The selected file contains no valid data."));
       return;
     }
-
-    tab1->initCharts();    
+        
     switchToTabView();
 
   } catch (const std::exception& error) {
