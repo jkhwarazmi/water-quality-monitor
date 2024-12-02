@@ -8,8 +8,8 @@ Sample::Sample(
   int northing, 
   const QString& location,
   const QString& dateTime,
-  const QString& pollutant,
-  const QString& pollutantDefinition,
+  const QString& determinand,
+  const QString& determinandDefinition,
   double result,
   const QString& unit,
   const QString& materialType,
@@ -21,12 +21,11 @@ Sample::Sample(
   northing(northing),
   location(location),
   dateTime(QDateTime::fromString(dateTime, Qt::ISODate)),
-  pollutant(pollutant),
-  pollutantDefinition(pollutantDefinition),
+  determinand(determinand),
+  determinandDefinition(determinandDefinition),
   result(result),
   unit(unit),
   materialType(materialType),
   isCompliance(isCompliance),
   purpose(purpose)
-{
-}
+{}

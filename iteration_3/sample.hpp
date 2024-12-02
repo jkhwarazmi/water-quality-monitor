@@ -13,8 +13,8 @@ class Sample
       int northing,
       const QString &location,
       const QString &dateTime,
-      const QString &pollutant,
-      const QString &pollutantDefinition,
+      const QString &determinand,
+      const QString &determinandDefinition,
       double result,
       const QString &unit,
       const QString &materialType,
@@ -26,8 +26,8 @@ class Sample
     int getNorthing() const { return northing; }
     QString getLocation() const { return location; }
     QDateTime getDateTime() const { return dateTime; }
-    QString getPollutant() const { return pollutant; }
-    QString getPollutantDefinition() const { return pollutantDefinition; }
+    QString getDeterminand() const { return determinand; }
+    QString getDeterminandDefinition() const { return determinandDefinition; }
     double getResult() const { return result; }
     QString getUnit() const { return unit; }
     QString getMaterialType() const { return materialType; }
@@ -35,15 +35,15 @@ class Sample
     QString getPurpose() const { return purpose; }
 
   private:
-    int easting;                  // sample.samplingPoint.easting
-    int northing;                 // sample.samplingPoint.northing
-    QString location;             // sample.samplingPoint.label
-    QDateTime dateTime;           // sample.sampleDateTime
-    QString pollutant;            // determinand.label
-    QString pollutantDefinition;  // determinand.definition
-    double result;                // result
-    QString unit;                 // determinand.unit.label
-    QString materialType;         // sample.sampledMaterialType.label
-    bool isCompliance;            // sample.isComplianceSample
-    QString purpose;              // sample.purpose.label
+    int easting;                    // sample.samplingPoint.easting
+    int northing;                   // sample.samplingPoint.northing
+    QString location;               // sample.samplingPoint.label
+    QDateTime dateTime;             // sample.sampleDateTime
+    QString determinand;            // determinand.label
+    QString determinandDefinition;  // determinand.definition
+    double result;                  // result
+    QString unit;                   // determinand.unit.label
+    QString materialType;           // sample.sampledMaterialType.label
+    bool isCompliance;              // sample.isComplianceSample
+    QString purpose;                // sample.purpose.label
 };

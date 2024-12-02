@@ -10,14 +10,13 @@ enum Column {
   Northing,
   Location,
   DateTime,
-  Pollutant,
-  PollutantDefinition,
+  Determinand,
+  DeterminandDefinition,
   Concentration,
   Unit,
   SampleLocation,
   ComplianceSample,
-  SamplePurpose,
-  ColumnCount
+  SamplePurpose
 };
 
 
@@ -45,10 +44,10 @@ QVariant WaterModel::data(const QModelIndex& index, int role) const {
           return sample.getLocation();
         case DateTime: 
           return sample.getDateTime();
-        case Pollutant: 
-          return sample.getPollutant();
-        case PollutantDefinition: 
-          return sample.getPollutantDefinition();
+        case Determinand: 
+          return sample.getDeterminand();
+        case DeterminandDefinition: 
+          return sample.getDeterminandDefinition();
         case Concentration:
           return sample.getResult();
         case Unit: 
@@ -77,7 +76,7 @@ QVariant WaterModel::data(const QModelIndex& index, int role) const {
       // Color coding for compliance and concentration
       if (index.column() == Concentration) {
         double value = sample.getResult();
-        double threshold = getPollutantThreshold(sample.getPollutant());
+        double threshold = getDeterminandThreshold(sample.getDeterminand());
         // Amber = 80% of red
         if (value > threshold) {
           return QBrush(QColor(204, 31, 40));  // Red
@@ -96,7 +95,7 @@ QVariant WaterModel::data(const QModelIndex& index, int role) const {
           return tr("Result: %1 %2\nThreshold: %3 %4")
             .arg(sample.getResult())
             .arg(sample.getUnit())
-            .arg(getPollutantThreshold(sample.getPollutant()))
+            .arg(getDeterminandThreshold(sample.getDeterminand()))
             .arg(sample.getUnit());
         case ComplianceSample:
           return sample.isComplianceSample() 
@@ -110,39 +109,107 @@ QVariant WaterModel::data(const QModelIndex& index, int role) const {
 }
 
 QVariant WaterModel::headerData(int section, Qt::Orientation orientation, int role) const {
-    if (role != Qt::DisplayRole) {
-        return QVariant();
-    }
+  if (role != Qt::DisplayRole) {
+    return QVariant();
+  }
 
-    if (orientation == Qt::Vertical) {
-        return section + 1;
-    }
+  if (orientation == Qt::Vertical) {
+    return section + 1;
+  }
 
-    switch (section) {
-        case Easting: return tr("Easting");
-        case Northing: return tr("Northing");
-        case Location: return tr("Location Name");
-        case DateTime: return tr("Date/Time");
-        case Pollutant: return tr("Pollutant");
-        case PollutantDefinition: return tr("Pollutant Definition");
-        case Concentration: return tr("Concentration");
-        case Unit: return tr("Unit");
-        case SampleLocation: return tr("Sample Location");
-        case ComplianceSample: return tr("Compliance Sample");
-        case SamplePurpose: return tr("Sample Purpose");
-        default: return QVariant();
-    }
+  switch (section) {
+    case Easting: return tr("Easting");
+    case Northing: return tr("Northing");
+    case Location: return tr("Location Name");
+    case DateTime: return tr("Date/Time");
+    case Determinand: return tr("Determinand");
+    case DeterminandDefinition: return tr("Determinand Definition");
+    case Concentration: return tr("Concentration");
+    case Unit: return tr("Unit");
+    case SampleLocation: return tr("Sample Location");
+    case ComplianceSample: return tr("Compliance Sample");
+    case SamplePurpose: return tr("Sample Purpose");
+    default: return QVariant();
+  }
 }
 
-// Helper method to get threshold for a pollutant
-double WaterModel::getPollutantThreshold(const QString& pollutant) const {
-    // Example thresholds - replace with actual values
-    static const QMap<QString, double> thresholds = {
-        {"Endrin", 0.0002},
-        {"PhenoxytcAcd", 0.02},
-        {"MCPB", 0.01},
-        {"Mn- Filtered", 15.0}
-    };
+// Helper method to get threshold for a Determinand
+double WaterModel::getDeterminandThreshold(const QString& Determinand) const {
+  // Example thresholds - replace with actual values
+  static const QMap<QString, double> thresholds = {
+    {"Endrin", 0.0002},
+    {"PhenoxytcAcd", 0.02},
+    {"MCPB", 0.01},
+    {"Mn- Filtered", 15.0}
+  };
 
-    return thresholds.value(pollutant, 0.0);
+  return thresholds.value(Determinand, 0.0);
+}
+
+void WaterModel::dataProcessing() {
+  QSet<QString> uniqueLocations;
+  QSet<QString> uniqueDeterminands;
+
+  complianceSamples = qMakePair(0, 0);
+
+  QMap<QString, int> tmpSampleLocations;
+  sampleLocations.clear();
+
+  QMap<QString, int> tmpDeterminandCounts;
+  determinandCounts.clear();
+
+  sampleDates.clear();
+  
+  // Iterate through the data and calculate summary statistics
+  for(int i = 0; i < dataset.size(); i++) {
+    uniqueLocations.insert(dataset[i].getLocation());
+    uniqueDeterminands.insert(dataset[i].getDeterminandDefinition());
+
+    if (dataset[i].isComplianceSample()) {
+      complianceSamples.first++;
+    } else {
+      complianceSamples.second++;
+    }
+
+    tmpSampleLocations[dataset[i].getLocation()]++;
+    tmpDeterminandCounts[dataset[i].getDeterminandDefinition()]++;
+    sampleDates[dataset[i].getDateTime().date()]++;
+  }
+
+  QVector<QPair<QString, int>> sortedLocations;
+  for(auto i = tmpSampleLocations.constBegin(); i != tmpSampleLocations.constEnd(); i++) {
+    sortedLocations.append(qMakePair(i.key(), i.value()));
+  }
+
+  // Sort by count in descending order
+  std::sort(sortedLocations.begin(), sortedLocations.end(),
+    [](const QPair<QString, int>& a, const QPair<QString, int>& b) {
+      return a.second > b.second;
+  });
+
+  // Take only top 5 for sampleLocations
+  int n = qMin(5, sortedLocations.size());
+  for(int i = 0; i < n; ++i) {
+    sampleLocations[sortedLocations[i].first] = sortedLocations[i].second;
+  }
+
+  QVector<QPair<QString, int>> sortedDeterminands;
+  for(auto i = tmpDeterminandCounts.constBegin(); i != tmpDeterminandCounts.constEnd(); i++) {
+    sortedDeterminands.append(qMakePair(i.key(), i.value()));
+  }
+
+  // Sort by count in descending order
+  std::sort(sortedDeterminands.begin(), sortedDeterminands.end(),
+    [](const QPair<QString, int>& a, const QPair<QString, int>& b) {
+      return a.second > b.second;
+  });
+
+  // Take only top 5 for determinandCounts
+  n = qMin(5, sortedDeterminands.size());
+  for(int i = 0; i < n; ++i) {
+    determinandCounts[sortedDeterminands[i].first] = sortedDeterminands[i].second;
+  }
+  
+  locationCount = uniqueLocations.size();
+  determinandCount = uniqueDeterminands.size();
 }

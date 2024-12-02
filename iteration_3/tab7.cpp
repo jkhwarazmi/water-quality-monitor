@@ -78,8 +78,8 @@ void Tab7::adjustColumnWidths()
     QString headerText = waterModel->headerData(column, Qt::Horizontal, Qt::DisplayRole).toString();
     maxWidth = metrics.horizontalAdvance(headerText);
     
-    // Check content width for each row
-    for (int row = 0; row < waterModel->rowCount(parent); ++row) {
+    // Check content width for first 100 rows
+    for (int row = 0; row < 100; ++row) {
       QModelIndex idx = waterModel->index(row, column, parent);
       QString text = waterModel->data(idx, Qt::DisplayRole).toString();
       int width = metrics.horizontalAdvance(text);
