@@ -18,7 +18,7 @@ class Tab1: public QWidget
   signals:
     void reloadRequested();
 
-  private slots:
+  public slots:
     void initCharts();
 
   private:
