@@ -1,23 +1,35 @@
-// Header for third card - Environmental Litter Indicators
-// Mila
+// Header for second card - Pollutant Overview
+// Nicolas
 
 #pragma once
 
 #include <QWidget>
+#include <QtCharts>
+#include <QComboBox>
+#include <QTableView>
 #include "model.hpp"
 
 class QLabel;
 
-class Tab3: public QWidget
+class Tab2 : public QWidget
 {
-  Q_OBJECT
+    Q_OBJECT
 
-  public:
-    Tab3(WaterModel *model, QWidget *parent = nullptr);
+public:
+    Tab2(WaterModel *model, QWidget *parent = nullptr);
 
-  private:
-    WaterModel* waterModel;
+private slots:
+    void populateData();
+
+private:
+    WaterModel *waterModel;
+
+    // UI Elements
     QLabel *placeholder;
+    QComboBox *pollutantFilter;
+    QComboBox *timeRangeFilter;
+    QChartView *chartView;
+    QTableView *dataTable;
 
     void createWidgets();
     void createLayout();
