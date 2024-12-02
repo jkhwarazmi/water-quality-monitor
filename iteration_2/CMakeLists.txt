@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.16)
 
-# Project name and settings
+# Project name and settingsssssss
 project(WaterQualityMonitor VERSION 1.0.0 LANGUAGES CXX)
 
 # Set C++ standard
