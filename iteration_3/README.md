@@ -39,7 +39,7 @@ As always, wrap all user facing strings in `tr()` to allow for easy translation 
 
 TODO:
 - Complete all pages with charts
-- Make prettier: better colours, better formatting, better chart layout, responsivity - ensure colour accessibility in light and dark modes
+- Make prettier: better colours, better formatting, better chart layout, responsivity, hover tooltips - ensure colour accessibility in light and dark modes
 - Add tooltips where appropriate
 - Add help menu
 - Add toolbar at bottom saying which file is currently loaded
