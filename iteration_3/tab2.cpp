@@ -9,6 +9,7 @@
 #include <QtWidgets/QVBoxLayout>
 #include <QtWidgets/QHBoxLayout>
 #include <QtWidgets/QLabel>
+#include <QStandardItemModel>
 #include "styles.hpp"
 #include "tab2.hpp"
 
