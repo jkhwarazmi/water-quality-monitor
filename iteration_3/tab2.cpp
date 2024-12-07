@@ -9,6 +9,7 @@
 #include <QtWidgets/QVBoxLayout>
 #include <QtWidgets/QHBoxLayout>
 #include <QtWidgets/QLabel>
+#include <QtWidgets/QLineEdit>
 #include <QStandardItemModel>
 #include "styles.hpp"
 #include "tab2.hpp"
@@ -19,9 +20,12 @@ Tab2::Tab2(WaterModel* model, QWidget* parent)
     createWidgets();
     createLayout();
     setupStyles();
-    
+
     // Install event filter for theme changes
     qApp->installEventFilter(this);
+
+    // Connect signals for search functionality
+    connect(searchBar, &QLineEdit::textChanged, this, &Tab2::filterTable);
 
     // Connect signals to update data dynamically
     connect(pollutantFilter, &QComboBox::currentTextChanged, this, &Tab2::populateData);
@@ -42,6 +46,10 @@ bool Tab2::eventFilter(QObject *watched, QEvent *event)
 
 void Tab2::createWidgets()
 {
+    // Search bar
+    searchBar = new QLineEdit(this);
+    searchBar->setPlaceholderText("Search pollutants...");
+
     // Dropdown filters for pollutants and time ranges
     pollutantFilter = new QComboBox(this);
     pollutantFilter->addItems({"1,1,2-Trichloroethane", "Chloroform", "CO", "NO2", "PM2.5"});
@@ -57,7 +65,7 @@ void Tab2::createWidgets()
     dataTable = new QTableView(this);
 
     // Placeholder label
-    placeholder = new QLabel(tr("Pollutant Overview - Coming Soon (Nicolas)"));
+    placeholder = new QLabel(tr("Pollutant Overview"));
     QFont labelFont;
     labelFont.setPointSize(20);
     labelFont.setBold(true);
@@ -77,6 +85,7 @@ void Tab2::createLayout()
     filterLayout->addWidget(new QLabel("Time Range:", this));
     filterLayout->addWidget(timeRangeFilter);
 
+    layout->addWidget(searchBar); // Add search bar
     layout->addLayout(filterLayout);
 
     // Add chart and table views
@@ -115,14 +124,29 @@ void Tab2::populateData()
     chart->removeAllSeries();
 
     QLineSeries* series = new QLineSeries();
+    series->setName("CO Level");
+
+    // Add points with conditional coloring based on compliance level
     series->append(0, 0);
-    series->append(1, 3);
-    series->append(2, 5);
-    series->append(3, 8);
+    series->append(1, 3);  // Green
+    series->append(2, 5);  // Amber
+    series->append(3, 8);  // Red
 
     chart->addSeries(series);
     chart->createDefaultAxes();
     chart->setTitle("Pollutant Levels Over Time");
+
+    // Set up tooltips for chart
+    series->setPointLabelsVisible(true);
+    series->setPointLabelsFormat("@yPoint");
+
+    // Enable pop-ups when hovering over points
+    series->setPointsVisible(true);
+    series->setPen(QPen(Qt::green)); // Default color for data points
+
+    // Set up legend
+    chart->legend()->setVisible(true);
+    chart->legend()->setAlignment(Qt::AlignBottom);
 
     // Populate table with example data
     QStandardItemModel* model = new QStandardItemModel();
@@ -138,5 +162,23 @@ void Tab2::populateData()
                       new QStandardItem("5.1 ppm"),
                       new QStandardItem("Amber")});
 
+    // Color code compliance column
+    model->item(0, 3)->setBackground(Qt::green);  // Green
+    model->item(1, 3)->setBackground(Qt::yellow);  // Amber
+
     dataTable->setModel(model);
+}
+
+void Tab2::filterTable(const QString& searchText)
+{
+    for (int row = 0; row < tableModel->rowCount(); ++row) {
+        bool match = false;
+        for (int column = 0; column < tableModel->columnCount(); ++column) {
+            if (tableModel->item(row, column)->text().contains(searchText, Qt::CaseInsensitive)) {
+                match = true;
+                break;
+            }
+        }
+        dataTable->setRowHidden(row, !match);
+    }
 }

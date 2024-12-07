@@ -8,6 +8,8 @@
 #include <QtCharts/QLineSeries>
 #include <QtWidgets/QComboBox>
 #include <QtWidgets/QTableView>
+#include <QtWidgets/QLineEdit> // For search bar
+#include <QStandardItemModel>
 #include "model.hpp"
 
 class QLabel;
@@ -20,6 +22,7 @@ public:
 
 private slots:
     void populateData();
+    void filterTable(const QString& searchText);
 
 private:
     WaterModel *waterModel;
@@ -28,6 +31,8 @@ private:
     QComboBox *timeRangeFilter;
     QChartView *chartView;
     QTableView *dataTable;
+    QLineEdit *searchBar; // Search bar
+    QStandardItemModel *tableModel;
 
     void createWidgets();
     void createLayout();
