@@ -5,6 +5,9 @@ project(WaterQualityMonitor VERSION 1.0.0 LANGUAGES CXX)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
+include_directories(${Qt6Widgets_INCLUDE_DIRS})
+include_directories(${Qt6Charts_INCLUDE_DIRS})
+
 find_package(Qt6 REQUIRED COMPONENTS Widgets Charts) # Add "LinguistTools" back
 qt_standard_project_setup() # Add "I18N_TRANSLATED_LANGUAGES fr" back
 

@@ -3,16 +3,16 @@
 
 #pragma once
 
-#include <QWidget>
-#include <QtCharts>
-#include <QComboBox>
-#include <QTableView>
+#include <QtWidgets/QWidget>
+#include <QtCharts/QChartView>
+#include <QtCharts/QLineSeries>
+#include <QtWidgets/QComboBox>
+#include <QtWidgets/QTableView>
 #include "model.hpp"
 
 class QLabel;
 
-class Tab2 : public QWidget
-{
+class Tab2 : public QWidget {
     Q_OBJECT
 
 public:
@@ -23,8 +23,6 @@ private slots:
 
 private:
     WaterModel *waterModel;
-
-    // UI Elements
     QLabel *placeholder;
     QComboBox *pollutantFilter;
     QComboBox *timeRangeFilter;
