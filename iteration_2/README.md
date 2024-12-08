@@ -10,3 +10,13 @@ TODO:
 - Implement pages!!!
 - Translate to French
 - Improve styling further, responsivity, better help and tooltips, WCAG accessibility, bottom toolbar saying which file's loaded, etc.
+
+Iteration 1:
+- Loads data
+- Error validation for CSV
+- Allows reloading data
+- Template tabs
+- Displays data table
+
+- No pages implemented
+- No translation logic
