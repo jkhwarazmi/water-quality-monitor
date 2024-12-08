@@ -140,10 +140,66 @@ double WaterModel::getDeterminandThreshold(const QString& Determinand) const {
     {"Endrin", 0.0002},
     {"PhenoxytcAcd", 0.02},
     {"MCPB", 0.01},
-    {"Mn- Filtered", 15.0}
+    {"Mn- Filtered", 15.0},
+    {"11Cl-PF3OUdS", 0.1},
+    {"3:3 FTCA", 0.05},
+    {"4:2 FTSA", 0.07},
+    {"5:3 FTCA", 0.06},
+    {"6:2 FTSA", 0.08},
+    {"7:3 FTCA", 0.09},
+    {"8:2 FTSA", 0.1},
+    {"9Cl-PF3ONS", 0.1},
+    {"ADONA", 0.1},
+    {"B-[b]-fluora", 0.1},
+    {"B-[k]-fluora", 0.1},
+    {"EtFOSA", 0.05},
+    {"EtFOSAA-B", 0.07},
+    {"EtFOSAA-L", 0.07},
+    {"FBSA", 0.08},
+    {"FLUORENE", 0.2},
+    {"FOSA", 0.07},
+    {"Fluoranthene", 0.1},
+    {"Fluoride - F", 1.5},  // WHO guideline value
+    {"Fluoroxypyr", 0.5},
+    {"HFPO-DA", 0.07},      // Similar to PFOA/PFOS
+    {"MeFOSAA-B", 0.07},
+    {"MeFOSAA-L", 0.07},
+    {"N-MeFOSA", 0.07},
+    {"NFDHA", 0.05},
+    {"PFBA", 0.1},
+    {"PFBS", 0.1},
+    {"PFDS", 0.1},
+    {"PFDoS", 0.1},
+    {"PFEESA", 0.1},
+    {"PFHpS", 0.1},
+    {"PFHxS-B", 0.1},
+    {"PFHxS-L", 0.1},
+    {"PFHxSA", 0.1},
+    {"PFMOBA", 0.1},
+    {"PFMOPrA", 0.1},
+    {"PFNS", 0.1},
+    {"PFODA", 0.1},
+    {"PFOS", 0.005},
+    {"PFOS (B)", 0.1},
+    {"PFOS (L)", 0.1},
+    {"PFPeS", 0.1},
+    {"PFTrDA", 0.1},
+    {"PFUnDS", 0.1},
+    {"PFdecncAcid", 0.1},
+    {"PFdodencAcid", 0.1},
+    {"PFecHS", 0.1},
+    {"PFheptncAcid", 0.1},
+    {"PFhexncAcid", 0.07},
+    {"PFnonncAcid", 0.07},
+    {"PFoctncAcid", 0.07},
+    {"PFpentncAcid", 0.07},
+    {"PFtetdncAcid", 0.07},
+    {"PFundencAcid", 0.07},
+    {"TrCFMethan", 0.07},
+    {"pFoctanoate", 0.07}
   };
 
-  return thresholds.value(Determinand, 0.0);
+  return thresholds.value(Determinand, 0.005);
 }
 
 void WaterModel::dataProcessing() {
@@ -151,6 +207,14 @@ void WaterModel::dataProcessing() {
   QSet<QString> uniqueDeterminands;
 
   complianceSamples = qMakePair(0, 0);
+
+  pollutantData.clear();
+  samplingPointData.clear();
+
+  fluorPollutantData.clear();
+  fluorLocations.clear();
+
+  pollutantToLocations.clear(); // Clear previous mappings
 
   QMap<QString, int> tmpSampleLocations;
   sampleLocations.clear();
@@ -162,8 +226,14 @@ void WaterModel::dataProcessing() {
   
   // Iterate through the data and calculate summary statistics
   for(int i = 0; i < dataset.size(); i++) {
+
+    bool isFluor = dataset[i].getDeterminandDefinition().contains("fluor", Qt::CaseInsensitive) ||
+                       dataset[i].getDeterminand().contains("fluor", Qt::CaseInsensitive);
+
     uniqueLocations.insert(dataset[i].getLocation());
     uniqueDeterminands.insert(dataset[i].getDeterminandDefinition());
+
+    pollutantToLocations[dataset[i].getDeterminand()].insert(dataset[i].getLocation()); // OR SWITCH TO DEFINITION??
 
     if (dataset[i].isComplianceSample()) {
       complianceSamples.first++;
@@ -174,6 +244,20 @@ void WaterModel::dataProcessing() {
     tmpSampleLocations[dataset[i].getLocation()]++;
     tmpDeterminandCounts[dataset[i].getDeterminandDefinition()]++;
     sampleDates[dataset[i].getDateTime().date()]++;
+
+    pollutantData[dataset[i].getDeterminand()].append(dataset[i].getResult());
+
+    // Store data in samplingPointData
+    samplingPointData[dataset[i].getLocation()].append(
+      QPair<QString, double>(dataset[i].getDeterminand(), dataset[i].getResult())
+    );
+
+    if (isFluor) {
+      // Store in fluor-specific structures
+      fluorPollutantData[dataset[i].getDeterminand()].append(dataset[i].getResult());
+      fluorLocations[dataset[i].getLocation()].append(
+        QPair<QString, double>(dataset[i].getDeterminand(), dataset[i].getResult()));
+    }
   }
 
   QVector<QPair<QString, int>> sortedLocations;

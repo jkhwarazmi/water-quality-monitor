@@ -28,6 +28,8 @@ class WaterModel: public QAbstractTableModel
     void dataProcessing();
 
     // Getters for chart data
+    QMap<QString, QVector<double>> getPollutantData() const { return pollutantData; }
+    QMap<QString, QVector<QPair<QString, double>>> getSamplingPointData() const { return samplingPointData; }
     int getLocationCount() const { return locationCount; }
     int getDeterminandCount() const { return determinandCount; }
     QPair<int, int> getComplianceSampleCount() const { return complianceSamples; }
@@ -35,12 +37,23 @@ class WaterModel: public QAbstractTableModel
     QMap<QString, int> getDeterminandCounts() const { return determinandCounts; }
     QMap<QDate, int> getSampleDates() const { return sampleDates; }
 
+    QMap<QString, QVector<double>> getFluorPollutantData() const { return fluorPollutantData; }
+    QMap<QString, QVector<QPair<QString, double>>> getFluorLocations() const { return fluorLocations; }
+    const QMap<QString, QSet<QString>>& getPollutantToLocations() const { return pollutantToLocations; }
+
   private:
     WaterDataset dataset;
 
     // Variables for chart data
     int locationCount = 0;
     int determinandCount = 0;
+    QMap<QString, QVector<double>> pollutantData;
+    QMap<QString, QVector<QPair<QString, double>>> samplingPointData; // Corrected type
+
+    QMap<QString, QVector<double>> fluorPollutantData;              // Stores pollutants with "fluor"
+    QMap<QString, QVector<QPair<QString, double>>> fluorLocations; // Stores locations for "fluor" pollutants
+    QMap<QString, QSet<QString>> pollutantToLocations; // Maps pollutant to associated locations
+
     QPair<int, int> complianceSamples = qMakePair(0, 0);
     QMap<QString, int> sampleLocations = QMap<QString, int>();
     QMap<QString, int> determinandCounts = QMap<QString, int>();
