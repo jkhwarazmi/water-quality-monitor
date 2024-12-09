@@ -268,7 +268,7 @@ void WaterModel::dataProcessing() {
     pollutantToLocations[dataset[i].getDeterminand()].insert(dataset[i].getLocation()); // OR SWITCH TO DEFINITION??
 
     // should contain the 20 items with litter testing @MF
-    if (dataset[i].getResult()!=0 && (dataset[i].getDeterminandDefinition() == "Tarry residues"  || dataset[i].getDeterminandDefinition() == "Bathing Water Profile : Other Litter (incl. plastics)" || dataset[i].getDeterminandDefinition() == "Sewage debris")) { // add the rest later and dataset[i] != 0
+    if (dataset[i].getResult() != 0 && (dataset[i].getDeterminandDefinition() == "Tarry residues"  || dataset[i].getDeterminandDefinition() == "Bathing Water Profile : Other Litter (incl. plastics)" || dataset[i].getDeterminandDefinition() == "Sewage debris")) { // add the rest later and dataset[i] != 0
       // if statement for the litterLocation aka bar chart
       if (!litterLocation.contains(dataset[i].getLocation())) {
         litterLocation[dataset[i].getLocation()] = new QMap<QString, int>();
@@ -276,7 +276,8 @@ void WaterModel::dataProcessing() {
       } else if (!litterLocation[dataset[i].getLocation()]->contains(dataset[i].getDeterminandDefinition())) {
         litterLocation[dataset[i].getLocation()]->insert(dataset[i].getDeterminandDefinition(), (dataset[i].getResult()));
       } else {
-        litterLocation[dataset[i].getLocation()]->insert(dataset[i].getDeterminandDefinition(), litterLocation[dataset[i].getLocation()]->value(dataset[i].getDeterminandDefinition())+(dataset[i].getResult()));      }
+        litterLocation[dataset[i].getLocation()]->insert(dataset[i].getDeterminandDefinition(), litterLocation[dataset[i].getLocation()]->value(dataset[i].getDeterminandDefinition())+(dataset[i].getResult()));      
+      }
       // if statement for the litterWaterType aka pie chart NEW
       if (!litterWaterType.contains(dataset[i].getMaterialType())) {
         litterWaterType[dataset[i].getMaterialType()] = new QMap<QString, int>();
@@ -284,7 +285,8 @@ void WaterModel::dataProcessing() {
       } else if (!litterWaterType[dataset[i].getMaterialType()]->contains(dataset[i].getDeterminandDefinition())) {
         litterWaterType[dataset[i].getMaterialType()]->insert(dataset[i].getDeterminandDefinition(), (dataset[i].getResult()));
       } else {
-        litterWaterType[dataset[i].getMaterialType()]->insert(dataset[i].getDeterminandDefinition(), litterWaterType[dataset[i].getMaterialType()]->value(dataset[i].getDeterminandDefinition())+(dataset[i].getResult()));      }
+        litterWaterType[dataset[i].getMaterialType()]->insert(dataset[i].getDeterminandDefinition(), litterWaterType[dataset[i].getMaterialType()]->value(dataset[i].getDeterminandDefinition())+(dataset[i].getResult()));      
+      }
     }
     if (dataset[i].isComplianceSample()) {
       complianceSamples.first++;
@@ -296,7 +298,11 @@ void WaterModel::dataProcessing() {
     tmpDeterminandCounts[dataset[i].getDeterminandDefinition()]++;
     sampleDates[dataset[i].getDateTime().date()]++;
 
-    pollutantData[dataset[i].getDeterminand()].append(QPair<QDateTime, double>(dataset[i].getDateTime(), dataset[i].getResult()));
+    // Append the pollutant data with QDateTime and Result
+    QDateTime dateTime = dataset[i].getDateTime();
+    if (dateTime.isValid() && !qIsNaN(dataset[i].getResult())) {
+      pollutantData[dataset[i].getDeterminand()].append(QPair<QDateTime, double>(dataset[i].getDateTime(), dataset[i].getResult()));
+    }
 
     // Store data in samplingPointData
     samplingPointData[dataset[i].getLocation()].append(
@@ -328,12 +334,6 @@ void WaterModel::dataProcessing() {
     sampleLocations[sortedLocations[i].first] = sortedLocations[i].second;
   }
 
-  QDateTime dateTime = dataset[i].getDateTime();
-  if (dateTime.isValid() && !qIsNaN(dataset[i].getResult())) {
-      pollutantData[dataset[i].getDeterminand()].append(QPair<QDateTime, double>(dataset[i].getDateTime(), dataset[i].getResult()));
-  }
-
-
   QVector<QPair<QString, int>> sortedDeterminands;
   for(auto i = tmpDeterminandCounts.constBegin(); i != tmpDeterminandCounts.constEnd(); i++) {
     sortedDeterminands.append(qMakePair(i.key(), i.value()));
@@ -354,6 +354,7 @@ void WaterModel::dataProcessing() {
   locationCount = uniqueLocations.size();
   determinandCount = uniqueDeterminands.size();
 
+  // Assign pollutantTimeSeries to pollutantData after processing
   this->pollutantData = pollutantTimeSeries;
 }
 
