@@ -149,15 +149,13 @@ void Tab2::populateData()
     chart->setTitle("Pollutant Levels Over Time");
 
     // Customize chart appearance
-    auto* axisX = new QValueAxis();
+    auto* axisX = new QValueAxis(); // Ensure QValueAxis is recognized
     axisX->setTitleText("Time");
-    axisX->setLabelsFont(QFont("Arial", 10, QFont::Bold));
     chart->addAxis(axisX, Qt::AlignBottom);
     series->attachAxis(axisX);
 
-    auto* axisY = new QValueAxis();
+    auto* axisY = new QValueAxis(); // Ensure QValueAxis is recognized
     axisY->setTitleText("Concentration (ppm)");
-    axisY->setLabelsFont(QFont("Arial", 10, QFont::Bold));
     chart->addAxis(axisY, Qt::AlignLeft);
     series->attachAxis(axisY);
 
@@ -199,29 +197,17 @@ void Tab2::populateData()
     // Color code compliance column
     for (int row = 0; row < tableModel->rowCount(); ++row) {
         QString compliance = tableModel->item(row, 3)->text();
-        QColor color;
-
         if (compliance == "Green") {
-            color = QColor(0, 128, 0);  // Darker green
+            tableModel->item(row, 3)->setBackground(Qt::green);
         } else if (compliance == "Amber") {
-            color = QColor(255, 165, 0);  // Orange
+            tableModel->item(row, 3)->setBackground(Qt::yellow);
         } else if (compliance == "Red") {
-            color = QColor(255, 0, 0);  // Bright red
+            tableModel->item(row, 3)->setBackground(Qt::red);
         }
-
-        tableModel->item(row, 3)->setBackground(color);
-        tableModel->item(row, 3)->setForeground(Qt::white);  // White text on colored background
-        tableModel->item(row, 3)->setFont(QFont("Arial", 10, QFont::Bold));  // Bold text
     }
 
     dataTable->setModel(tableModel); // Set model for the table view
-
-    // Style table headers
-    dataTable->horizontalHeader()->setFont(QFont("Arial", 11, QFont::Bold));
-    dataTable->horizontalHeader()->setStyleSheet("QHeaderView::section { background-color: lightgray; }");
-    dataTable->setAlternatingRowColors(true);  // Alternating row colors for readability
 }
-
 
 void Tab2::filterTable(const QString& searchText)
 {
