@@ -11,8 +11,10 @@
 #include <QtWidgets/QLabel>
 #include <QtWidgets/QLineEdit>
 #include <QStandardItemModel>
-#include  <QtCharts/QValueAxis>
+#include <QtCharts/QValueAxis>
 #include <QtWidgets/QToolTip>
+#include <QFile>
+#include <QTextStream>
 #include "styles.hpp"
 #include "tab2.hpp"
 
@@ -67,13 +69,13 @@ void Tab2::createWidgets()
     dataTable = new QTableView(this);
 
     // Placeholder label
-    title = new QLabel(tr("Pollutant Overview"));
+    placeholder = new QLabel(tr("Pollutant Overview"));
     QFont labelFont;
-    labelFont.setPointSize(32);
+    labelFont.setPointSize(20);
     labelFont.setBold(true);
-    title->setFont(labelFont);
-    title->setAlignment(Qt::AlignCenter);
-    title->setObjectName("titleLabel");
+    placeholder->setFont(labelFont);
+    placeholder->setAlignment(Qt::AlignCenter);
+    placeholder->setObjectName("placeholderLabel");
 }
 
 void Tab2::createLayout()
@@ -87,7 +89,6 @@ void Tab2::createLayout()
     filterLayout->addWidget(new QLabel("Time Range:", this));
     filterLayout->addWidget(timeRangeFilter);
 
-    layout->addWidget(title); // Add title
     layout->addWidget(searchBar); // Add search bar
     layout->addLayout(filterLayout);
 
@@ -120,94 +121,71 @@ void Tab2::setupStyles()
     this->setStyleSheet(styleSheet);
 }
 
-#include <QtCharts/QValueAxis> // Include for QValueAxis
-#include <QtWidgets/QToolTip>  // Include for QToolTip
-
 void Tab2::populateData()
 {
-    // Populate chart with example data
+    // Open the CSV file
+    QFile file("data.csv"); // Replace with the correct path to your data.csv file
+    if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
+        qDebug() << "Error: Cannot open file" << file.errorString();
+        return;
+    }
+
     QChart* chart = chartView->chart();
     chart->removeAllSeries();
 
     QLineSeries* series = new QLineSeries();
-    series->setName("CO Level");
+    series->setName("Pollutant Levels");
 
-    // Example data points with compliance levels
-    QVector<QPointF> points = {
-        {0, 0},    // Default
-        {1, 3},    // Green (within compliance)
-        {2, 5},    // Amber (close to threshold)
-        {3, 8}     // Red (exceeds compliance)
-    };
-
-    // Set data points
-    for (const QPointF& point : points) {
-        series->append(point);
+    if (!tableModel) {
+        tableModel = new QStandardItemModel(this);
     }
+    tableModel->clear();
+    tableModel->setHorizontalHeaderLabels({"@id", "Sampling Point", "Notation", "Label"}); // Adjust headers
+
+    QTextStream in(&file);
+    bool isHeader = true;
+    int row = 0;
+
+    while (!in.atEnd()) {
+        QString line = in.readLine();
+        QStringList values = line.split(',');
+
+        if (isHeader) {
+            isHeader = false; // Skip the header row
+            continue;
+        }
+
+        if (values.size() < 4) continue; // Ensure sufficient columns
+
+        // Extract data (adjust column indices as needed)
+        QString id = values[0];
+        QString samplingPoint = values[1];
+        QString notation = values[2];
+        QString label = values[3];
+
+        // Add row to the table
+        tableModel->appendRow({
+            new QStandardItem(id),
+            new QStandardItem(samplingPoint),
+            new QStandardItem(notation),
+            new QStandardItem(label)
+        });
+
+        // Populate chart (example using notation as a numeric value)
+        bool ok;
+        double value = notation.toDouble(&ok); // Adjust column index
+        if (ok) {
+            series->append(row++, value);
+        }
+    }
+
+    file.close();
 
     chart->addSeries(series);
     chart->createDefaultAxes();
     chart->setTitle("Pollutant Levels Over Time");
 
-    // Customize chart appearance
-    auto* axisX = new QValueAxis(); // Ensure QValueAxis is recognized
-    axisX->setTitleText("Time");
-    chart->addAxis(axisX, Qt::AlignBottom);
-    series->attachAxis(axisX);
-
-    auto* axisY = new QValueAxis(); // Ensure QValueAxis is recognized
-    axisY->setTitleText("Concentration (ppm)");
-    chart->addAxis(axisY, Qt::AlignLeft);
-    series->attachAxis(axisY);
-
-    // Add tooltips for points
-    connect(series, &QLineSeries::hovered, this, [=](const QPointF& point, bool state) {
-        if (state) {
-            QToolTip::showText(QCursor::pos(),
-                               QString("Concentration: %1 ppm\nCompliance: %2")
-                                   .arg(point.y())
-                                   .arg(point.y() < 4 ? "Green" : (point.y() < 7 ? "Amber" : "Red")));
-        } else {
-            QToolTip::hideText();
-        }
-    });
-
-    // Set up table model
-    if (!tableModel) {
-        tableModel = new QStandardItemModel(this);
-    }
-    tableModel->clear();
-    tableModel->setHorizontalHeaderLabels({"Date", "Pollutant", "Concentration", "Compliance"});
-
-    // Populate table with example data
-    tableModel->appendRow({new QStandardItem("2024-01-01"),
-                           new QStandardItem("CO"),
-                           new QStandardItem("3.5 ppm"),
-                           new QStandardItem("Green")});
-
-    tableModel->appendRow({new QStandardItem("2024-01-02"),
-                           new QStandardItem("NO2"),
-                           new QStandardItem("5.1 ppm"),
-                           new QStandardItem("Amber")});
-
-    tableModel->appendRow({new QStandardItem("2024-01-03"),
-                           new QStandardItem("PM2.5"),
-                           new QStandardItem("8.0 ppm"),
-                           new QStandardItem("Red")});
-
-    // Color code compliance column
-    for (int row = 0; row < tableModel->rowCount(); ++row) {
-        QString compliance = tableModel->item(row, 3)->text();
-        if (compliance == "Green") {
-            tableModel->item(row, 3)->setBackground(Qt::green);
-        } else if (compliance == "Amber") {
-            tableModel->item(row, 3)->setBackground(Qt::yellow);
-        } else if (compliance == "Red") {
-            tableModel->item(row, 3)->setBackground(Qt::red);
-        }
-    }
-
-    dataTable->setModel(tableModel); // Set model for the table view
+    dataTable->setModel(tableModel);
 }
 
 void Tab2::filterTable(const QString& searchText)
