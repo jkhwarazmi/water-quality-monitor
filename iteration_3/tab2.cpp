@@ -11,11 +11,12 @@
 #include <QtWidgets/QLabel>
 #include <QtWidgets/QLineEdit>
 #include <QStandardItemModel>
-#include  <QtCharts/QValueAxis>
+#include <QtCharts/QValueAxis>
 #include <QtWidgets/QToolTip>
 #include <QtWidgets/QPushButton>
 #include <QtWidgets/QDialog>
 #include <QtWidgets/QTableWidget>
+#include <QtWidgets/QHeaderView> // Explicitly include QHeaderView
 #include "styles.hpp"
 #include "tab2.hpp"
 
@@ -222,7 +223,6 @@ void Tab2::populateData()
     dataTable->setAlternatingRowColors(true);  // Alternating row colors for readability
 }
 
-
 void Tab2::filterTable(const QString& searchText)
 {
     if (!tableModel) return; // Ensure the model is initialized
@@ -239,4 +239,3 @@ void Tab2::filterTable(const QString& searchText)
         dataTable->setRowHidden(row, !match);
     }
 }
-
