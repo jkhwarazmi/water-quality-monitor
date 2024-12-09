@@ -11,7 +11,7 @@
 #include <QtWidgets/QLabel>
 #include <QtWidgets/QLineEdit>
 #include <QStandardItemModel>
-#inclue  <QtCharts/QValueAxis>
+#include  <QtCharts/QValueAxis>
 #include <QtWidgets/QToolTip>
 #include "styles.hpp"
 #include "tab2.hpp"
