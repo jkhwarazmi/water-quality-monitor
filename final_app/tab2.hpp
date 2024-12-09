@@ -2,43 +2,42 @@
 
 #include <QtWidgets/QWidget>
 #include <QtCharts/QChartView>
+#include <QtCharts/QLineSeries>
+#include <QtWidgets/QComboBox>
 #include <QtWidgets/QTableView>
 #include <QtWidgets/QLineEdit>
 #include <QStandardItemModel>
-#include <QtWidgets/QComboBox>
 #include "model.hpp"
-
-class QLabel;
+#include <QLabel>
 
 class Tab2 : public QWidget {
     Q_OBJECT
 
 public:
-    Tab2(WaterModel* model, QWidget* parent = nullptr);
+    explicit Tab2(WaterModel* model, QWidget* parent = nullptr);
 
     // Function to update charts (called from window.cpp)
-    void updateCharts();  // Keep this public if it's called externally (in window.cpp)
+    void updateCharts();
 
 private slots:
-    void filterTable(const QString& searchText); // For search bar
-    void onPollutantSelectionChanged(int index);  // Slot for pollutant selection change
+    void filterTable(const QString& searchText);
+    void onPollutantSelectionChanged(int index);
 
 private:
-    // Private methods
     void createWidgets();
     void createLayout();
     void setupStyles();
-    void loadData();  // Method to load data from CSV file
-    void updateTableAndChart(); // Method to update table and chart with data
+    void updateTableAndChart();  // Update table and chart based on selected pollutant
+    void loadData();  // Load data from CSV file into model (if required)
 
-    // Private member variables
-    WaterModel* waterModel;
-    QLabel* placeholder;
-    QComboBox* pollutantFilter;
-    QChartView* chartView;
-    QTableView* dataTable;
-    QLineEdit* searchBar;
-    QStandardItemModel* tableModel;
-    QStringList pollutants;  // Store list of pollutants loaded from CSV
-    QList<QStringList> csvData;  // Store all rows from the CSV data
+    WaterModel* waterModel;  // Pointer to model to fetch pollutant data
+    QLabel* title;           // Title label
+    QComboBox* pollutantFilter; // Dropdown filter for pollutants
+    QComboBox* timeRangeFilter;  // Dropdown for time ranges (Last week, month, etc.)
+    QChartView* chartView;     // Chart view for graphical representation
+    QTableView* dataTable;     // Table view for tabular data
+    QLineEdit* searchBar;     // Search bar for filtering table data
+    QStandardItemModel* tableModel;  // Model for the table
+    QStringList pollutants;   // List to hold pollutants (loaded dynamically)
+    QList<QStringList> csvData; // CSV data for table population (if required)
 };
