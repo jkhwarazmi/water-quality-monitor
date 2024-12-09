@@ -33,7 +33,7 @@ class WaterModel: public QAbstractTableModel
     void dataProcessing();
 
     // Getters for chart data
-    QMap<QString, QVector<double>> getPollutantData() const { return pollutantData; }
+    QMap<QString, QVector<QPair<QDateTime, double>>> getPollutantData() const { return pollutantData; }
     QMap<QString, QVector<QPair<QString, double>>> getSamplingPointData() const { return samplingPointData; }
     int getLocationCount() const { return locationCount; }
     int getDeterminandCount() const { return determinandCount; }
