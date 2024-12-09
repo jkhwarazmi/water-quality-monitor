@@ -1,0 +1,42 @@
+file(REMOVE_RECURSE
+  "CMakeFiles/watermonitor_autogen.dir/AutogenUsed.txt"
+  "CMakeFiles/watermonitor_autogen.dir/ParseCache.txt"
+  "watermonitor_autogen"
+  "CMakeFiles/watermonitor.dir/dataset.cpp.o"
+  "CMakeFiles/watermonitor.dir/dataset.cpp.o.d"
+  "CMakeFiles/watermonitor.dir/loaddatawidget.cpp.o"
+  "CMakeFiles/watermonitor.dir/loaddatawidget.cpp.o.d"
+  "CMakeFiles/watermonitor.dir/main.cpp.o"
+  "CMakeFiles/watermonitor.dir/main.cpp.o.d"
+  "CMakeFiles/watermonitor.dir/model.cpp.o"
+  "CMakeFiles/watermonitor.dir/model.cpp.o.d"
+  "CMakeFiles/watermonitor.dir/sample.cpp.o"
+  "CMakeFiles/watermonitor.dir/sample.cpp.o.d"
+  "CMakeFiles/watermonitor.dir/tab1.cpp.o"
+  "CMakeFiles/watermonitor.dir/tab1.cpp.o.d"
+  "CMakeFiles/watermonitor.dir/tab2.cpp.o"
+  "CMakeFiles/watermonitor.dir/tab2.cpp.o.d"
+  "CMakeFiles/watermonitor.dir/tab3.cpp.o"
+  "CMakeFiles/watermonitor.dir/tab3.cpp.o.d"
+  "CMakeFiles/watermonitor.dir/tab4.cpp.o"
+  "CMakeFiles/watermonitor.dir/tab4.cpp.o.d"
+  "CMakeFiles/watermonitor.dir/tab5.cpp.o"
+  "CMakeFiles/watermonitor.dir/tab5.cpp.o.d"
+  "CMakeFiles/watermonitor.dir/tab6.cpp.o"
+  "CMakeFiles/watermonitor.dir/tab6.cpp.o.d"
+  "CMakeFiles/watermonitor.dir/tab7.cpp.o"
+  "CMakeFiles/watermonitor.dir/tab7.cpp.o.d"
+  "CMakeFiles/watermonitor.dir/watermonitor_autogen/mocs_compilation.cpp.o"
+  "CMakeFiles/watermonitor.dir/watermonitor_autogen/mocs_compilation.cpp.o.d"
+  "CMakeFiles/watermonitor.dir/window.cpp.o"
+  "CMakeFiles/watermonitor.dir/window.cpp.o.d"
+  "watermonitor"
+  "watermonitor.pdb"
+  "watermonitor_autogen/mocs_compilation.cpp"
+  "watermonitor_autogen/timestamp"
+)
+
+# Per-language clean rules from dependency scanning.
+foreach(lang CXX)
+  include(CMakeFiles/watermonitor.dir/cmake_clean_${lang}.cmake OPTIONAL)
+endforeach()

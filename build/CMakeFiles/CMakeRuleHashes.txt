@@ -1,0 +1,4 @@
+# Hashes of file build rules.
+5c95c3a422e1ac0ca5f4dfc287239890 CMakeFiles/watermonitor_autogen
+5c95c3a422e1ac0ca5f4dfc287239890 CMakeFiles/watermonitor_autogen_timestamp_deps
+7368d7bc9b957beb3e17a35940e086c0 watermonitor_autogen/timestamp
