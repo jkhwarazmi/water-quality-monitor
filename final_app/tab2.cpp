@@ -34,6 +34,10 @@ void Tab2::createWidgets()
     // Dropdown filter for pollutants
     pollutantFilter = new QComboBox(this);
 
+    // Dropdown for time ranges (optional)
+    timeRangeFilter = new QComboBox(this);
+    timeRangeFilter->addItems({"Last Week", "Last Month", "Last Year"});
+
     // Chart view for graphical representation
     chartView = new QChartView(new QChart(), this);
     chartView->setRenderHint(QPainter::Antialiasing);
@@ -41,7 +45,7 @@ void Tab2::createWidgets()
     // Table view for tabular data
     dataTable = new QTableView(this);
 
-    // Placeholder label
+    // Title label
     title = new QLabel(tr("Pollutant Overview"));
     QFont labelFont;
     labelFont.setPointSize(32);
@@ -97,7 +101,7 @@ void Tab2::setupStyles()
 
 void Tab2::loadData()
 {
-    QFile file("data/data.csv"); // Assuming CSV is in a 'data' folder
+    QFile file("data/data.csv"); // Assuming CSV is in the 'data' folder
     if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
         qDebug() << "Error: Cannot open file" << file.errorString();
         return;
@@ -118,7 +122,7 @@ void Tab2::loadData()
         if (values.size() < 5) continue; // Ensure sufficient columns
 
         // Populate pollutants dropdown dynamically
-        QString pollutant = values[3]; // Assuming the pollutant is in column 3
+        QString pollutant = values[3]; // Assuming pollutant is in column 3
         if (!pollutants.contains(pollutant)) {
             pollutants.append(pollutant);
             pollutantFilter->addItem(pollutant);
