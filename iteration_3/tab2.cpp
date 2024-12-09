@@ -239,3 +239,36 @@ void Tab2::filterTable(const QString& searchText)
         dataTable->setRowHidden(row, !match);
     }
 }
+
+void Tab2::showRawDataDialog() {
+    // Create a dialog to display raw data
+    QDialog *dialog = new QDialog(this);
+    dialog->setWindowTitle("Raw Data");
+    dialog->resize(600, 400);
+
+    // Create a table widget to display raw data
+    QTableWidget *rawDataTable = new QTableWidget(dialog);
+    rawDataTable->setColumnCount(tableModel->columnCount());
+    rawDataTable->setRowCount(tableModel->rowCount());
+    rawDataTable->setHorizontalHeaderLabels({"Date", "Pollutant", "Concentration", "Compliance"});
+
+    // Copy data from the QStandardItemModel to the QTableWidget
+    for (int row = 0; row < tableModel->rowCount(); ++row) {
+        for (int col = 0; col < tableModel->columnCount(); ++col) {
+            QTableWidgetItem *item = new QTableWidgetItem(tableModel->item(row, col)->text());
+            rawDataTable->setItem(row, col, item);
+        }
+    }
+
+    rawDataTable->resizeColumnsToContents();
+    rawDataTable->setAlternatingRowColors(true);
+
+    // Create a layout for the dialog
+    QVBoxLayout *dialogLayout = new QVBoxLayout(dialog);
+    dialogLayout->addWidget(rawDataTable);
+
+    dialog->setLayout(dialogLayout);
+    dialog->exec(); // Show the dialog modally
+}
+
+
