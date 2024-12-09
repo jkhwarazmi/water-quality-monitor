@@ -251,6 +251,8 @@ void WaterModel::dataProcessing() {
   determinandCounts.clear();
 
   sampleDates.clear();
+  litterLocation.clear(); //@MF
+  litterWaterType.clear(); //@MF
   
   // Iterate through the data and calculate summary statistics
   for(int i = 0; i < dataset.size(); i++) {
@@ -263,6 +265,25 @@ void WaterModel::dataProcessing() {
 
     pollutantToLocations[dataset[i].getDeterminand()].insert(dataset[i].getLocation()); // OR SWITCH TO DEFINITION??
 
+    // should contain the 20 items with litter testing @MF
+    if (dataset[i].getResult()!=0 && (dataset[i].getDeterminandDefinition() == "Tarry residues"  || dataset[i].getDeterminandDefinition() == "Bathing Water Profile : Other Litter (incl. plastics)" || dataset[i].getDeterminandDefinition() == "Sewage debris")) { // add the rest later and dataset[i] != 0
+      // if statement for the litterLocation aka bar chart
+      if (!litterLocation.contains(dataset[i].getLocation())) {
+        litterLocation[dataset[i].getLocation()] = new QMap<QString, int>();
+        litterLocation[dataset[i].getLocation()]->insert(dataset[i].getDeterminandDefinition(), (dataset[i].getResult()));
+      } else if (!litterLocation[dataset[i].getLocation()]->contains(dataset[i].getDeterminandDefinition())) {
+        litterLocation[dataset[i].getLocation()]->insert(dataset[i].getDeterminandDefinition(), (dataset[i].getResult()));
+      } else {
+        litterLocation[dataset[i].getLocation()]->insert(dataset[i].getDeterminandDefinition(), litterLocation[dataset[i].getLocation()]->value(dataset[i].getDeterminandDefinition())+(dataset[i].getResult()));      }
+      // if statement for the litterWaterType aka pie chart NEW
+      if (!litterWaterType.contains(dataset[i].getMaterialType())) {
+        litterWaterType[dataset[i].getMaterialType()] = new QMap<QString, int>();
+        litterWaterType[dataset[i].getMaterialType()]->insert(dataset[i].getDeterminandDefinition(), (dataset[i].getResult()));
+      } else if (!litterWaterType[dataset[i].getMaterialType()]->contains(dataset[i].getDeterminandDefinition())) {
+        litterWaterType[dataset[i].getMaterialType()]->insert(dataset[i].getDeterminandDefinition(), (dataset[i].getResult()));
+      } else {
+        litterWaterType[dataset[i].getMaterialType()]->insert(dataset[i].getDeterminandDefinition(), litterWaterType[dataset[i].getMaterialType()]->value(dataset[i].getDeterminandDefinition())+(dataset[i].getResult()));      }
+    }
     if (dataset[i].isComplianceSample()) {
       complianceSamples.first++;
     } else {

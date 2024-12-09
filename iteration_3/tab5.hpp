@@ -40,6 +40,7 @@ private slots:
 
 private:
     WaterModel* waterModel;
+    QLabel *title;
     QLabel* pollutantLabel;
     QLabel* locationLabel;
     QLabel* definitionLabel;

@@ -124,6 +124,14 @@ bool Tab4::eventFilter(QObject* watched, QEvent* event)
 
 void Tab4::createWidgets()
 {
+    title = new QLabel(tr("Fluorinated Compounds"));
+    QFont titleFont;
+    titleFont.setPointSize(32);
+    titleFont.setBold(true);
+    title->setFont(titleFont);
+    title->setAlignment(Qt::AlignCenter);
+    title->setObjectName("titleLabel");
+
     // Dropdown's labels
     pollutantLabel = new QLabel(tr("Select a Unique Pollutant:"));
     locationLabel = new QLabel(tr("Select a Unique Location:"));
@@ -148,6 +156,7 @@ void Tab4::createWidgets()
 void Tab4::createLayout()
 {
     QVBoxLayout* layout = new QVBoxLayout;
+    layout->addWidget(title);
     layout->addWidget(pollutantLabel);
     layout->addWidget(pollutantDropdown);
     layout->addWidget(locationLabel);

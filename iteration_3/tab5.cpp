@@ -56,6 +56,14 @@ bool Tab5::eventFilter(QObject* watched, QEvent* event)
 
 void Tab5::createWidgets()
 {
+    title = new QLabel(tr("Compliance Information"));
+    QFont titleFont;
+    titleFont.setPointSize(32);
+    titleFont.setBold(true);
+    title->setFont(titleFont);
+    title->setAlignment(Qt::AlignCenter);
+    title->setObjectName("titleLabel");
+
     // Dropdown's labels
     pollutantLabel = new QLabel(tr("Select a Unique Pollutant:"));
     locationLabel = new QLabel(tr("Select a Unique Location:"));
@@ -149,6 +157,7 @@ void Tab5::createLayout()
 {
     // Main layout for Tab5
     QVBoxLayout* mainLayout = new QVBoxLayout;
+    mainLayout->addWidget(title);
 
     // Add pollutant and location dropdowns
     mainLayout->addWidget(pollutantLabel);

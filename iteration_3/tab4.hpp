@@ -29,6 +29,7 @@ private:
     QLabel* pollutantLabel;
     QLabel* locationLabel;
     QChartView* currentChartView; //Holds current view
+    QLabel *title;
 
     void createWidgets();
     void createLayout();

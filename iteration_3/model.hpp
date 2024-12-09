@@ -45,6 +45,9 @@ class WaterModel: public QAbstractTableModel
     QMap<QString, QVector<double>> getFluorPollutantData() const { return fluorPollutantData; }
     QMap<QString, QVector<QPair<QString, double>>> getFluorLocations() const { return fluorLocations; }
     const QMap<QString, QSet<QString>>& getPollutantToLocations() const { return pollutantToLocations; }
+  
+    QMap<QString, QMap<QString, int>*> getLitterLocation() const { return litterLocation;}
+    QMap<QString, QMap<QString, int>*> getLitterWaterType() const { return litterWaterType;}
 
   private:
     WaterDataset dataset;
@@ -63,4 +66,8 @@ class WaterModel: public QAbstractTableModel
     QMap<QString, int> sampleLocations = QMap<QString, int>();
     QMap<QString, int> determinandCounts = QMap<QString, int>();
     QMap<QDate, int> sampleDates = QMap<QDate, int>();
+
+    QMap<QString, QMap<QString, int>*> litterLocation = QMap<QString, QMap<QString, int>*>();
+    QMap<QString, QMap<QString, int>*> litterWaterType = QMap<QString, QMap<QString, int>*>();
+
 };
