@@ -251,3 +251,10 @@ void Tab2::filterTable(const QString& searchText)
         dataTable->setRowHidden(row, !match);
     }
 }
+
+void Tab2::onPollutantSelectionChanged(int index)
+{
+    Q_UNUSED(index);
+    updateCharts();  // Update chart and table when pollutant is selected
+}
+
