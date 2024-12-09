@@ -241,6 +241,12 @@ void Tab2::filterTable(const QString& searchText)
 }
 
 void Tab2::showRawDataDialog() {
+    // Check if tableModel is initialized
+    if (!tableModel) {
+        qDebug() << "Table model is not initialized!";
+        return;
+    }
+
     // Create a dialog to display raw data
     QDialog *dialog = new QDialog(this);
     dialog->setWindowTitle("Raw Data");
@@ -250,13 +256,16 @@ void Tab2::showRawDataDialog() {
     QTableWidget *rawDataTable = new QTableWidget(dialog);
     rawDataTable->setColumnCount(tableModel->columnCount());
     rawDataTable->setRowCount(tableModel->rowCount());
-    rawDataTable->setHorizontalHeaderLabels({"Date", "Pollutant", "Concentration", "Compliance"});
+    rawDataTable->setHorizontalHeaderLabels(
+        {"Date", "Pollutant", "Concentration", "Compliance"});
 
     // Copy data from the QStandardItemModel to the QTableWidget
     for (int row = 0; row < tableModel->rowCount(); ++row) {
         for (int col = 0; col < tableModel->columnCount(); ++col) {
-            QTableWidgetItem *item = new QTableWidgetItem(tableModel->item(row, col)->text());
-            rawDataTable->setItem(row, col, item);
+            QStandardItem *item = tableModel->item(row, col);
+            if (item) {
+                rawDataTable->setItem(row, col, new QTableWidgetItem(item->text()));
+            }
         }
     }
 
@@ -270,5 +279,3 @@ void Tab2::showRawDataDialog() {
     dialog->setLayout(dialogLayout);
     dialog->exec(); // Show the dialog modally
 }
-
-
