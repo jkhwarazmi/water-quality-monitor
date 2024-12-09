@@ -23,6 +23,11 @@ class WaterModel: public QAbstractTableModel
     
     QVariant data(const QModelIndex&, int) const;
     QVariant headerData(int, Qt::Orientation, int) const;
+    QString getDeterminandDefinition(const QString& pollutant) const;
+    //New
+    QVector<QPair<QString, double>> getTopLocationsByPollutant(const QString& pollutant) const;
+
+
 
     // Add additional processing inside here
     void dataProcessing();
