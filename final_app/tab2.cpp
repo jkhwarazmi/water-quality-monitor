@@ -106,7 +106,7 @@ void Tab2::setupStyles()
 
 void Tab2::loadData()
 {
-    QFile file("data.csv"); // Replace with the correct path to your data.csv file
+    QFile file("../data/data.csv"); // Adjusted path to the data folder
     if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
         qDebug() << "Error: Cannot open file" << file.errorString();
         return;
