@@ -36,21 +36,15 @@ class WaterWindow: public QMainWindow
 
     WaterModel model;
     QString dataLocation;
-    QTranslator translator;
 
     void createMainWidget();
     void createMenus();
-    void createLanguageMenu();
     void switchToTabView();
     void loadData(const QString& path);
-    void setupStyles();
-    bool eventFilter(QObject *watched, QEvent *event) override;
 
   private slots:
     void setDataLocation();
     void setPath();
     void switchToLoadView();
     void about();
-    void changeLanguage(const QString &);
-    void handleLanguageAction(QAction *);
 };

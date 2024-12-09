@@ -15,19 +15,26 @@ class WaterModel: public QAbstractTableModel
     WaterModel(QObject* parent = nullptr): QAbstractTableModel(parent) {}
       
     void updateFromFile(const QString&);
-    bool hasData() const { return dataset.size() > 0; } //
-    double getDeterminandThreshold(const QString&) const; // i dont have threshold
+    bool hasData() const { return dataset.size() > 0; }
+    double getDeterminandThreshold(const QString&) const;
       
     int rowCount(const QModelIndex& index) const { return dataset.size(); }
     int columnCount(const QModelIndex& index) const { return 11; }
     
     QVariant data(const QModelIndex&, int) const;
     QVariant headerData(int, Qt::Orientation, int) const;
+    QString getDeterminandDefinition(const QString& pollutant) const;
+    //New
+    QVector<QPair<QString, double>> getTopLocationsByPollutant(const QString& pollutant) const;
+
+
 
     // Add additional processing inside here
     void dataProcessing();
 
     // Getters for chart data
+    QMap<QString, QVector<double>> getPollutantData() const { return pollutantData; }
+    QMap<QString, QVector<QPair<QString, double>>> getSamplingPointData() const { return samplingPointData; }
     int getLocationCount() const { return locationCount; }
     int getDeterminandCount() const { return determinandCount; }
     QPair<int, int> getComplianceSampleCount() const { return complianceSamples; }
@@ -35,14 +42,12 @@ class WaterModel: public QAbstractTableModel
     QMap<QString, int> getDeterminandCounts() const { return determinandCounts; }
     QMap<QDate, int> getSampleDates() const { return sampleDates; }
 
-    // getters for tab3 COPY
-    // QSet<QString> getUniqueLitters() const {return uniqueLitters;}
-    // QMap<QString, QVector<double>> litterData;
-    // Qmap<QString, QString> pollutantUnits;
-    // end getters for tab3 COPY
+    QMap<QString, QVector<double>> getFluorPollutantData() const { return fluorPollutantData; }
+    QMap<QString, QVector<QPair<QString, double>>> getFluorLocations() const { return fluorLocations; }
+    const QMap<QString, QSet<QString>>& getPollutantToLocations() const { return pollutantToLocations; }
+  
     QMap<QString, QMap<QString, int>*> getLitterLocation() const { return litterLocation;}
     QMap<QString, QMap<QString, int>*> getLitterWaterType() const { return litterWaterType;}
-
 
   private:
     WaterDataset dataset;
@@ -50,22 +55,19 @@ class WaterModel: public QAbstractTableModel
     // Variables for chart data
     int locationCount = 0;
     int determinandCount = 0;
+    QMap<QString, QVector<double>> pollutantData;
+    QMap<QString, QVector<QPair<QString, double>>> samplingPointData; // Corrected type
+
+    QMap<QString, QVector<double>> fluorPollutantData;              // Stores pollutants with "fluor"
+    QMap<QString, QVector<QPair<QString, double>>> fluorLocations; // Stores locations for "fluor" pollutants
+    QMap<QString, QSet<QString>> pollutantToLocations; // Maps pollutant to associated locations
+
     QPair<int, int> complianceSamples = qMakePair(0, 0);
     QMap<QString, int> sampleLocations = QMap<QString, int>();
     QMap<QString, int> determinandCounts = QMap<QString, int>();
     QMap<QDate, int> sampleDates = QMap<QDate, int>();
-   
-    // // variables for tab3 COPY
-    // QSet<QString> uniqueLitters;
-    // QMap<QString, QVector<double>> litterData;
-    // Qmap<QString, QString> pollutantUnits;
-    // //QMap<QString, QVector<QString>> litterLocation;
-    // QMap<QString, QVector<QString>> litterWaterType;
-    // QMap<QString, QVector<double>> litterByLocation;
-    // QMap<QString, int> litterCompliance;
-    // // end variables for tab3 COPY
+
     QMap<QString, QMap<QString, int>*> litterLocation = QMap<QString, QMap<QString, int>*>();
     QMap<QString, QMap<QString, int>*> litterWaterType = QMap<QString, QMap<QString, int>*>();
-
 
 };

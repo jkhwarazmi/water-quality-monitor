@@ -287,10 +287,15 @@ void WaterWindow::loadData(const QString &path)
       QMessageBox::critical(this, tr("Data Error"), tr("The selected file contains no valid data."));
       return;
     }
+
+    model.dataProcessing();
+
+    // Add chart update methods below
+    tab1->updateCharts();
+    tab3->updateCharts();
+    tab4->updateCharts();
+    tab5->updateCharts();
     
-    tab1->initCharts(); // ADDED IT HERE
-    tab4->updatePollutantList(); // ADDED IT HERE
-    tab4->updateLocationList();
     switchToTabView();
 
   } catch (const std::exception& error) {

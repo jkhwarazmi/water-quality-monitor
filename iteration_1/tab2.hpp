@@ -1,13 +1,11 @@
+// Sample header for second first card - Tab1
+
 #pragma once
 
 #include <QWidget>
-#include <QComboBox>
-#include <QChartView>
-#include <QTableView>
 #include "model.hpp"
 
-QT_CHARTS_USE_NAMESPACE
-
+class QPushButton;
 class QLabel;
 
 class Tab2: public QWidget
@@ -19,18 +17,8 @@ class Tab2: public QWidget
 
   private:
     WaterModel* waterModel;
+    QLabel *placeholder;
 
-    // UI Elements
-    QLabel *placeholder; // Placeholder label (can be removed if not needed anymore)
-    QComboBox *pollutantFilter;
-    QComboBox *timeRangeFilter;
-    QChartView *chartView;
-    QTableView *dataTable;
-
-    // Private methods
     void createWidgets();
     void createLayout();
-    void setupStyles();
-    void populateData();
-    bool eventFilter(QObject *watched, QEvent *event) override;
 };

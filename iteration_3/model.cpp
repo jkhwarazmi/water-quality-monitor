@@ -4,6 +4,9 @@
 #include <QColor>
 #include <QFont>
 #include <QBrush>
+#include <QMap>
+#include <QVector>
+#include <algorithm>
 
 enum Column {
   Easting = 0,
@@ -108,6 +111,17 @@ QVariant WaterModel::data(const QModelIndex& index, int role) const {
   return QVariant();
 }
 
+// determinand.label
+QString WaterModel::getDeterminandDefinition(const QString& pollutant) const {
+    for (int i = 0; i < rowCount(QModelIndex()); ++i) {
+        QString samplePollutant = data(index(i, 4), Qt::DisplayRole).toString(); // Column 4 for pollutant
+        if (samplePollutant == pollutant) {
+            return data(index(i, 5), Qt::DisplayRole).toString(); // Column 5 for definition
+        }
+    }
+    return QString(); // Return an empty string if no definition is found
+}
+
 QVariant WaterModel::headerData(int section, Qt::Orientation orientation, int role) const {
   if (role != Qt::DisplayRole) {
     return QVariant();
@@ -137,20 +151,98 @@ QVariant WaterModel::headerData(int section, Qt::Orientation orientation, int ro
 double WaterModel::getDeterminandThreshold(const QString& Determinand) const {
   // Example thresholds - replace with actual values
   static const QMap<QString, double> thresholds = {
+    // Sarah
+    {"Ammonia(N)", 0.2},
+    {"BOD ATU", 5.0},
+    {"Sld Sus@105C", 20.0},
+    {"O Diss %sat", 5.0},
+    {"Orthophospht", 0.1},
+    {"N Oxidised", 1.0},
+    {"Nitrite-N", 0.1},
+    {"Nitrate-N", 5.0},
+    {"NH3 un-ion", 0.2},
+    {"COD as O2", 20.0},
+    {"Phosphorus-P", 0.1},
+    {"Nitrogen - N", 5.0},
+    // Yusuf
     {"Endrin", 0.0002},
     {"PhenoxytcAcd", 0.02},
     {"MCPB", 0.01},
-    {"Mn- Filtered", 15.0}
+    {"Mn- Filtered", 15.0},
+    {"11Cl-PF3OUdS", 0.1},
+    {"3:3 FTCA", 0.05},
+    {"4:2 FTSA", 0.07},
+    {"5:3 FTCA", 0.06},
+    {"6:2 FTSA", 0.08},
+    {"7:3 FTCA", 0.09},
+    {"8:2 FTSA", 0.1},
+    {"9Cl-PF3ONS", 0.1},
+    {"ADONA", 0.1},
+    {"B-[b]-fluora", 0.1},
+    {"B-[k]-fluora", 0.1},
+    {"EtFOSA", 0.05},
+    {"EtFOSAA-B", 0.07},
+    {"EtFOSAA-L", 0.07},
+    {"FBSA", 0.08},
+    {"FLUORENE", 0.2},
+    {"FOSA", 0.07},
+    {"Fluoranthene", 0.1},
+    {"Fluoride - F", 1.5},  // WHO guideline value
+    {"Fluoroxypyr", 0.5},
+    {"HFPO-DA", 0.07},      // Similar to PFOA/PFOS
+    {"MeFOSAA-B", 0.07},
+    {"MeFOSAA-L", 0.07},
+    {"N-MeFOSA", 0.07},
+    {"NFDHA", 0.05},
+    {"PFBA", 0.1},
+    {"PFBS", 0.1},
+    {"PFDS", 0.1},
+    {"PFDoS", 0.1},
+    {"PFEESA", 0.1},
+    {"PFHpS", 0.1},
+    {"PFHxS-B", 0.1},
+    {"PFHxS-L", 0.1},
+    {"PFHxSA", 0.1},
+    {"PFMOBA", 0.1},
+    {"PFMOPrA", 0.1},
+    {"PFNS", 0.1},
+    {"PFODA", 0.1},
+    {"PFOS", 0.005},
+    {"PFOS (B)", 0.1},
+    {"PFOS (L)", 0.1},
+    {"PFPeS", 0.1},
+    {"PFTrDA", 0.1},
+    {"PFUnDS", 0.1},
+    {"PFdecncAcid", 0.1},
+    {"PFdodencAcid", 0.1},
+    {"PFecHS", 0.1},
+    {"PFheptncAcid", 0.1},
+    {"PFhexncAcid", 0.07},
+    {"PFnonncAcid", 0.07},
+    {"PFoctncAcid", 0.07},
+    {"PFpentncAcid", 0.07},
+    {"PFtetdncAcid", 0.07},
+    {"PFundencAcid", 0.07},
+    {"TrCFMethan", 0.07},
+    {"pFoctanoate", 0.07}
   };
 
-  return thresholds.value(Determinand, 0.0);
+  return thresholds.value(Determinand, 0.005);
 }
 
-void WaterModel:: dataProcessing() {
+void WaterModel::dataProcessing() {
   QSet<QString> uniqueLocations;
   QSet<QString> uniqueDeterminands;
 
   complianceSamples = qMakePair(0, 0);
+
+  pollutantData.clear();
+  samplingPointData.clear();
+
+  fluorPollutantData.clear();
+  fluorLocations.clear();
+
+  pollutantToLocations.clear(); // Clear previous mappings
 
   QMap<QString, int> tmpSampleLocations;
   sampleLocations.clear();
@@ -164,8 +256,14 @@ void WaterModel:: dataProcessing() {
   
   // Iterate through the data and calculate summary statistics
   for(int i = 0; i < dataset.size(); i++) {
+
+    bool isFluor = dataset[i].getDeterminandDefinition().contains("fluor", Qt::CaseInsensitive) ||
+                       dataset[i].getDeterminand().contains("fluor", Qt::CaseInsensitive);
+
     uniqueLocations.insert(dataset[i].getLocation());
     uniqueDeterminands.insert(dataset[i].getDeterminandDefinition());
+
+    pollutantToLocations[dataset[i].getDeterminand()].insert(dataset[i].getLocation()); // OR SWITCH TO DEFINITION??
 
     // should contain the 20 items with litter testing @MF
     if (dataset[i].getResult()!=0 && (dataset[i].getDeterminandDefinition() == "Tarry residues"  || dataset[i].getDeterminandDefinition() == "Bathing Water Profile : Other Litter (incl. plastics)" || dataset[i].getDeterminandDefinition() == "Sewage debris")) { // add the rest later and dataset[i] != 0
@@ -186,7 +284,6 @@ void WaterModel:: dataProcessing() {
       } else {
         litterWaterType[dataset[i].getMaterialType()]->insert(dataset[i].getDeterminandDefinition(), litterWaterType[dataset[i].getMaterialType()]->value(dataset[i].getDeterminandDefinition())+(dataset[i].getResult()));      }
     }
-
     if (dataset[i].isComplianceSample()) {
       complianceSamples.first++;
     } else {
@@ -196,6 +293,20 @@ void WaterModel:: dataProcessing() {
     tmpSampleLocations[dataset[i].getLocation()]++;
     tmpDeterminandCounts[dataset[i].getDeterminandDefinition()]++;
     sampleDates[dataset[i].getDateTime().date()]++;
+
+    pollutantData[dataset[i].getDeterminand()].append(dataset[i].getResult());
+
+    // Store data in samplingPointData
+    samplingPointData[dataset[i].getLocation()].append(
+      QPair<QString, double>(dataset[i].getDeterminand(), dataset[i].getResult())
+    );
+
+    if (isFluor) {
+      // Store in fluor-specific structures
+      fluorPollutantData[dataset[i].getDeterminand()].append(dataset[i].getResult());
+      fluorLocations[dataset[i].getLocation()].append(
+        QPair<QString, double>(dataset[i].getDeterminand(), dataset[i].getResult()));
+    }
   }
 
   QVector<QPair<QString, int>> sortedLocations;
@@ -234,4 +345,32 @@ void WaterModel:: dataProcessing() {
   
   locationCount = uniqueLocations.size();
   determinandCount = uniqueDeterminands.size();
+}
+
+// Function to calculate top 5 locations with the highest result values for a selected pollutant
+QVector<QPair<QString, double>> WaterModel::getTopLocationsByPollutant(const QString& pollutant) const
+{
+    QVector<QPair<QString, double>> topLocations;
+
+    // Iterate through the data and gather concentrations for the selected pollutant
+    for (int i = 0; i < rowCount(QModelIndex()); ++i) {  // Fixed rowCount() call
+        QString currentPollutant = data(index(i, 4), Qt::DisplayRole).toString(); // Assuming pollutant is in column 4
+        if (currentPollutant == pollutant) {
+            QString location = data(index(i, 2), Qt::DisplayRole).toString(); // Assuming location is in column 2
+            double concentration = data(index(i, 6), Qt::DisplayRole).toDouble(); // Assuming concentration is in column 6
+            topLocations.append(qMakePair(location, concentration));
+        }
+    }
+
+    // Sort by concentration in descending order (top concentration first)
+    std::sort(topLocations.begin(), topLocations.end(), [](const QPair<QString, double>& a, const QPair<QString, double>& b) {
+        return a.second > b.second; // Sort by concentration (second element of QPair)
+    });
+
+    // Return top 5 locations
+    if (topLocations.size() > 5) {
+        topLocations.resize(5); // Limit to top 5
+    }
+
+    return topLocations;
 }

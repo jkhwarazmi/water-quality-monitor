@@ -73,22 +73,6 @@ QVariant WaterModel::data(const QModelIndex& index, int role) const {
           return int(Qt::AlignLeft | Qt::AlignVCenter);
       }
 
-    case Qt::BackgroundRole:
-      // Color coding for compliance and concentration
-      if (index.column() == Concentration) {
-        double value = sample.getResult();
-        double threshold = getPollutantThreshold(sample.getPollutant());
-        // Amber = 80% of red
-        if (value > threshold) {
-          return QBrush(QColor(204, 31, 40));  // Red
-        } else if (value > threshold * 0.8) {
-          return QBrush(QColor(253, 183, 0));  // Amber
-        } else {
-          return QBrush(QColor(32, 125, 32));  // Green
-        }
-      }
-      break;
-
     case Qt::ToolTipRole:
       // Add tooltips
       switch (index.column()) {

@@ -24,7 +24,7 @@ class Tab3: public QWidget
 
   private:
     WaterModel* waterModel;
-    QLabel *placeholder;
+    QLabel *title;
     //NEW
     // declares a private member variable *litterChartView* which is a pointer to a *QChartView* object
     QChartView *litterChartView;

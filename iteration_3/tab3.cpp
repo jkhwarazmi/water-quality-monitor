@@ -65,13 +65,13 @@ bool Tab3::eventFilter(QObject *watched, QEvent *event)
 
 void Tab3::createWidgets()
 {
-  placeholder = new QLabel(tr("Environmental Litter Indicators - Coming Soon (Mila)"));
+  title = new QLabel(tr("Environmental Litter Indicators"));
   QFont labelFont;
   labelFont.setPointSize(32);
   labelFont.setBold(true);
-  placeholder->setFont(labelFont);
-  placeholder->setAlignment(Qt::AlignCenter);
-  placeholder->setObjectName("placeholderLabel");
+  title->setFont(labelFont);
+  title->setAlignment(Qt::AlignCenter);
+  title->setObjectName("placeholderLabel");
 
   // filter button
 
@@ -203,7 +203,7 @@ void Tab3::createCharts() //STOLEN
 void Tab3::createLayout()
 {
   QVBoxLayout* layout = new QVBoxLayout;
-  layout->addWidget(placeholder);
+  layout->addWidget(title);
   layout->addStretch();
   layout->setSpacing(20);
   layout->setContentsMargins(30, 30, 30, 30);
