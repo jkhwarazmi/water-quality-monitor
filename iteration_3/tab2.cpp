@@ -149,32 +149,38 @@ void Tab2::populateData()
     chart->legend()->setAlignment(Qt::AlignBottom);
 
     // Populate table with example data
-    QStandardItemModel* model = new QStandardItemModel();
-    model->setHorizontalHeaderLabels({"Date", "Pollutant", "Concentration", "Compliance"});
+    if (!tableModel) {
+        tableModel = new QStandardItemModel(this); // Initialize the table model
+    }
+    tableModel->clear();
+    tableModel->setHorizontalHeaderLabels({"Date", "Pollutant", "Concentration", "Compliance"});
 
-    model->appendRow({new QStandardItem("2024-01-01"),
-                      new QStandardItem("CO"),
-                      new QStandardItem("3.5 ppm"),
-                      new QStandardItem("Green")});
+    tableModel->appendRow({new QStandardItem("2024-01-01"),
+                           new QStandardItem("CO"),
+                           new QStandardItem("3.5 ppm"),
+                           new QStandardItem("Green")});
 
-    model->appendRow({new QStandardItem("2024-01-02"),
-                      new QStandardItem("NO2"),
-                      new QStandardItem("5.1 ppm"),
-                      new QStandardItem("Amber")});
+    tableModel->appendRow({new QStandardItem("2024-01-02"),
+                           new QStandardItem("NO2"),
+                           new QStandardItem("5.1 ppm"),
+                           new QStandardItem("Amber")});
 
     // Color code compliance column
-    model->item(0, 3)->setBackground(Qt::green);  // Green
-    model->item(1, 3)->setBackground(Qt::yellow);  // Amber
+    tableModel->item(0, 3)->setBackground(Qt::green);  // Green
+    tableModel->item(1, 3)->setBackground(Qt::yellow); // Amber
 
-    dataTable->setModel(model);
+    dataTable->setModel(tableModel); // Set model for the table view
 }
 
 void Tab2::filterTable(const QString& searchText)
 {
+    if (!tableModel) return; // Ensure the model is initialized
+
     for (int row = 0; row < tableModel->rowCount(); ++row) {
         bool match = false;
         for (int column = 0; column < tableModel->columnCount(); ++column) {
-            if (tableModel->item(row, column)->text().contains(searchText, Qt::CaseInsensitive)) {
+            QStandardItem* item = tableModel->item(row, column);
+            if (item && item->text().contains(searchText, Qt::CaseInsensitive)) {
                 match = true;
                 break;
             }
@@ -182,3 +188,4 @@ void Tab2::filterTable(const QString& searchText)
         dataTable->setRowHidden(row, !match);
     }
 }
+
