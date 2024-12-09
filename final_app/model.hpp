@@ -48,6 +48,7 @@ class WaterModel: public QAbstractTableModel
   
     QMap<QString, QMap<QString, int>*> getLitterLocation() const { return litterLocation;}
     QMap<QString, QMap<QString, int>*> getLitterWaterType() const { return litterWaterType;}
+    QVector<QPair<QDateTime, double>> getDataForPollutant(const QString& pollutant) const;
 
   private:
     WaterDataset dataset;
@@ -69,5 +70,7 @@ class WaterModel: public QAbstractTableModel
 
     QMap<QString, QMap<QString, int>*> litterLocation = QMap<QString, QMap<QString, int>*>();
     QMap<QString, QMap<QString, int>*> litterWaterType = QMap<QString, QMap<QString, int>*>();
+    // Stores pollutant data with timestamp and concentration
+    QMap<QString, QVector<QPair<QDateTime, double>>> pollutantData;
 
 };

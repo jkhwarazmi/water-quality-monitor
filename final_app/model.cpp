@@ -253,6 +253,8 @@ void WaterModel::dataProcessing() {
   sampleDates.clear();
   litterLocation.clear(); //@MF
   litterWaterType.clear(); //@MF
+
+  QMap<QString, QVector<QPair<QDateTime, double>>> pollutantTimeSeries;
   
   // Iterate through the data and calculate summary statistics
   for(int i = 0; i < dataset.size(); i++) {
@@ -326,6 +328,12 @@ void WaterModel::dataProcessing() {
     sampleLocations[sortedLocations[i].first] = sortedLocations[i].second;
   }
 
+  QDateTime dateTime = dataset[i].getDateTime();
+  if (dateTime.isValid() && !qIsNaN(dataset[i].getResult())) {
+      pollutantTimeSeries[dataset[i].getDeterminand()].append(qMakePair(dateTime, dataset[i].getResult()));
+  }
+
+
   QVector<QPair<QString, int>> sortedDeterminands;
   for(auto i = tmpDeterminandCounts.constBegin(); i != tmpDeterminandCounts.constEnd(); i++) {
     sortedDeterminands.append(qMakePair(i.key(), i.value()));
@@ -345,6 +353,8 @@ void WaterModel::dataProcessing() {
   
   locationCount = uniqueLocations.size();
   determinandCount = uniqueDeterminands.size();
+
+  this->pollutantData = pollutantTimeSeries;
 }
 
 // Function to calculate top 5 locations with the highest result values for a selected pollutant
@@ -373,4 +383,9 @@ QVector<QPair<QString, double>> WaterModel::getTopLocationsByPollutant(const QSt
     }
 
     return topLocations;
+}
+
+QVector<QPair<QDateTime, double>> WaterModel::getDataForPollutant(const QString& pollutant) const
+{
+    return pollutantData.value(pollutant);
 }

@@ -1,6 +1,3 @@
-// Implementation for the second card - Pollutant Overview
-// Nicolas
-
 #include <QtWidgets>
 #include <QtCharts>
 #include <QFile>
@@ -21,20 +18,10 @@ Tab2::Tab2(WaterModel* model, QWidget* parent)
 
     // Connect signals for dropdown and search functionality
     connect(searchBar, &QLineEdit::textChanged, this, &Tab2::filterTable);
-    connect(pollutantFilter, &QComboBox::currentIndexChanged, this, &Tab2::onPollutantSelectionChanged);
+    connect(pollutantFilter, &QComboBox::currentIndexChanged, this, &Tab2::updateCharts);
 
-    // Load data and populate initial view
-    loadData();
-    updateTableAndChart();
-}
-
-bool Tab2::eventFilter(QObject* watched, QEvent* event)
-{
-    if (watched == qApp && event->type() == QEvent::ApplicationPaletteChange) {
-        setupStyles();
-        return true;
-    }
-    return QWidget::eventFilter(watched, event);
+    // Initialize dropdown options and populate chart
+    updateCharts();
 }
 
 void Tab2::createWidgets()
@@ -104,81 +91,38 @@ void Tab2::setupStyles()
     this->setStyleSheet(styleSheet);
 }
 
-void Tab2::loadData()
-{
-    QFile file("../data/data.csv"); // Adjusted path to the data folder
-    if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
-        qDebug() << "Error: Cannot open file" << file.errorString();
-        return;
-    }
-
-    QTextStream in(&file);
-    bool isHeader = true;
-
-    while (!in.atEnd()) {
-        QString line = in.readLine();
-        QStringList values = line.split(',');
-
-        if (isHeader) {
-            isHeader = false; // Skip the header row
-            continue;
-        }
-
-        if (values.size() < 5) continue; // Ensure sufficient columns
-
-        QString pollutant = values[3]; // Assuming pollutant label is in column 3
-        if (!pollutants.contains(pollutant)) {
-            pollutants.append(pollutant);
-            pollutantFilter->addItem(pollutant);
-        }
-
-        csvData.append(values); // Store the entire row for filtering later
-    }
-
-    file.close();
-}
-
-void Tab2::updateTableAndChart()
+void Tab2::updateCharts()
 {
     QString selectedPollutant = pollutantFilter->currentText();
-
-    // Update table
-    if (!tableModel) {
-        tableModel = new QStandardItemModel(this);
-    }
-    tableModel->clear();
-    tableModel->setHorizontalHeaderLabels({"@id", "Sampling Point", "Notation", "Label", "Concentration"});
-
     QChart* chart = chartView->chart();
     chart->removeAllSeries();
 
     QLineSeries* series = new QLineSeries();
     series->setName(selectedPollutant + " Levels");
 
-    int row = 0;
-    for (const QStringList& rowData : csvData) {
-        if (rowData[3] == selectedPollutant) { // Filter rows based on the pollutant
-            tableModel->appendRow({
-                new QStandardItem(rowData[0]),
-                new QStandardItem(rowData[1]),
-                new QStandardItem(rowData[2]),
-                new QStandardItem(rowData[3]),
-                new QStandardItem(rowData[4])
-            });
-
-            // Add points to the chart
-            bool ok;
-            double concentration = rowData[4].toDouble(&ok);
-            if (ok) {
-                series->append(row++, concentration);
-            }
-        }
+    // Retrieve data from the model
+    auto dataPoints = waterModel->getDataForPollutant(selectedPollutant);
+    for (const auto& point : dataPoints) {
+        series->append(point.first.toMSecsSinceEpoch(), point.second);
     }
 
     chart->addSeries(series);
     chart->createDefaultAxes();
-    chart->setTitle("Pollutant Levels Over Time (" + selectedPollutant + ")");
+    chart->setTitle(tr("Levels Over Time: %1").arg(selectedPollutant));
 
+    // Update table data
+    if (!tableModel) {
+        tableModel = new QStandardItemModel(this);
+    }
+    tableModel->clear();
+    tableModel->setHorizontalHeaderLabels({"Date/Time", "Concentration"});
+
+    for (const auto& point : dataPoints) {
+        QList<QStandardItem*> row;
+        row << new QStandardItem(point.first.toString("dd-MM-yyyy"))
+            << new QStandardItem(QString::number(point.second));
+        tableModel->appendRow(row);
+    }
     dataTable->setModel(tableModel);
 }
 
@@ -197,10 +141,4 @@ void Tab2::filterTable(const QString& searchText)
         }
         dataTable->setRowHidden(row, !match);
     }
-}
-
-void Tab2::onPollutantSelectionChanged(int index)
-{
-    Q_UNUSED(index);
-    updateTableAndChart();
 }

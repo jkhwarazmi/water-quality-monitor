@@ -1,15 +1,11 @@
-// Header for second card - Pollutant Overview
-// Nicolas
-
 #pragma once
 
 #include <QtWidgets/QWidget>
 #include <QtCharts/QChartView>
-#include <QtCharts/QLineSeries>
-#include <QtWidgets/QComboBox>
 #include <QtWidgets/QTableView>
-#include <QtWidgets/QLineEdit> // For search bar
+#include <QtWidgets/QLineEdit>
 #include <QStandardItemModel>
+#include <QtWidgets/QComboBox>
 #include "model.hpp"
 
 class QLabel;
@@ -18,24 +14,29 @@ class Tab2 : public QWidget {
     Q_OBJECT
 
 public:
-    Tab2(WaterModel *model, QWidget *parent = nullptr);
+    Tab2(WaterModel* model, QWidget* parent = nullptr);
+
+    // Function to update charts (called from window.cpp)
+    void updateCharts();
 
 private slots:
-    void populateData();
     void filterTable(const QString& searchText);
+    void onPollutantSelectionChanged(int index);
 
 private:
-    WaterModel *waterModel;
-    QLabel *title;
-    QComboBox *pollutantFilter;
-    QComboBox *timeRangeFilter;
-    QChartView *chartView;
-    QTableView *dataTable;
-    QLineEdit *searchBar; // Search bar
-    QStandardItemModel *tableModel;
-
     void createWidgets();
     void createLayout();
     void setupStyles();
-    bool eventFilter(QObject *watched, QEvent *event) override;
+    void loadData(); // Load data from CSV file
+    void updateTableAndChart(); // Update table and chart with filtered data
+
+    WaterModel* waterModel;
+    QLabel* placeholder;
+    QComboBox* pollutantFilter;
+    QChartView* chartView;
+    QTableView* dataTable;
+    QLineEdit* searchBar;
+    QStandardItemModel* tableModel;
+    QStringList pollutants;
+    QList<QStringList> csvData;
 };
