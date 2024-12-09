@@ -18,7 +18,8 @@ Tab2::Tab2(WaterModel* model, QWidget* parent)
 
     // Connect signals for dropdown and search functionality
     connect(searchBar, &QLineEdit::textChanged, this, &Tab2::filterTable);
-    co
+    connect(pollutantFilter, &QComboBox::currentIndexChanged, this, &Tab2::onPollutantSelectionChanged);
+
 
     // Initialize dropdown options and populate chart
     updateCharts();
