@@ -1,34 +1,13 @@
 // Implementation for the second card - Pollutant Overview
 // Nicolas
 
-#include <QtWidgets/QWidget>
-#include <QtWidgets/QComboBox>
-#include <QtCharts/QChartView>
-#include <QtCharts/QLineSeries>
-#include <QtWidgets/QTableView>
-#include <QtWidgets/QVBoxLayout>
-#include <QtWidgets/QHBoxLayout>
-#include <QtWidgets/QLabel>
-#include <QtWidgets/QLineEdit>
-#include <QStandardItemModel>
-#include <QtCharts/QValueAxis>
-#include <QtWidgets/QToolTip>
+#include <QtWidgets>
+#include <QtCharts>
 #include <QFile>
 #include <QTextStream>
-#include <QSet> // For handling unique pollutants
-#include <QDateTime>
 #include <QDebug>
 #include "styles.hpp"
 #include "tab2.hpp"
-
-// Structure to hold CSV data entries
-struct DataEntry {
-    QString date;
-    QString samplingPoint;
-    QString pollutant;
-    double concentration;
-    QString compliance;
-};
 
 Tab2::Tab2(WaterModel* model, QWidget* parent)
     : waterModel(model), QWidget(parent)
@@ -40,24 +19,16 @@ Tab2::Tab2(WaterModel* model, QWidget* parent)
     // Install event filter for theme changes
     qApp->installEventFilter(this);
 
-    // Connect signals for search functionality
+    // Connect signals for dropdown and search functionality
     connect(searchBar, &QLineEdit::textChanged, this, &Tab2::filterTable);
+    connect(pollutantFilter, &QComboBox::currentIndexChanged, this, &Tab2::onPollutantSelectionChanged);
 
-    // Connect signals to update data dynamically
-    connect(pollutantFilter, &QComboBox::currentTextChanged, this, &Tab2::populateData);
-    connect(timeRangeFilter, &QComboBox::currentTextChanged, this, &Tab2::populateData);
-
-    // Load data from CSV
-    loadDataFromCSV();
-
-    // Populate pollutant dropdown
-    populatePollutantFilter();
-
-    // Initial data population
-    populateData();
+    // Load data and populate initial view
+    loadData();
+    updateTableAndChart();
 }
 
-bool Tab2::eventFilter(QObject *watched, QEvent *event)
+bool Tab2::eventFilter(QObject* watched, QEvent* event)
 {
     if (watched == qApp && event->type() == QEvent::ApplicationPaletteChange) {
         setupStyles();
@@ -72,11 +43,8 @@ void Tab2::createWidgets()
     searchBar = new QLineEdit(this);
     searchBar->setPlaceholderText("Search pollutants...");
 
-    // Dropdown filters for pollutants and time ranges
+    // Dropdown filter for pollutants
     pollutantFilter = new QComboBox(this);
-
-    timeRangeFilter = new QComboBox(this);
-    timeRangeFilter->addItems({"All Time", "Last Week", "Last Month", "Last Year"});
 
     // Chart view for graphical representation
     chartView = new QChartView(new QChart(), this);
@@ -93,9 +61,6 @@ void Tab2::createWidgets()
     placeholder->setFont(labelFont);
     placeholder->setAlignment(Qt::AlignCenter);
     placeholder->setObjectName("placeholderLabel");
-
-    // Initialize data model
-    tableModel = new QStandardItemModel(this);
 }
 
 void Tab2::createLayout()
@@ -106,8 +71,6 @@ void Tab2::createLayout()
     QHBoxLayout* filterLayout = new QHBoxLayout;
     filterLayout->addWidget(new QLabel("Pollutant:", this));
     filterLayout->addWidget(pollutantFilter);
-    filterLayout->addWidget(new QLabel("Time Range:", this));
-    filterLayout->addWidget(timeRangeFilter);
 
     layout->addWidget(searchBar); // Add search bar
     layout->addLayout(filterLayout);
@@ -141,10 +104,9 @@ void Tab2::setupStyles()
     this->setStyleSheet(styleSheet);
 }
 
-void Tab2::loadDataFromCSV()
+void Tab2::loadData()
 {
-    // Open the CSV file
-    QFile file("data.csv"); // Ensure the file path is correct
+    QFile file("data.csv"); // Replace with the correct path to your data.csv file
     if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
         qDebug() << "Error: Cannot open file" << file.errorString();
         return;
@@ -152,8 +114,6 @@ void Tab2::loadDataFromCSV()
 
     QTextStream in(&file);
     bool isHeader = true;
-
-    dataEntries.clear();
 
     while (!in.atEnd()) {
         QString line = in.readLine();
@@ -166,121 +126,60 @@ void Tab2::loadDataFromCSV()
 
         if (values.size() < 5) continue; // Ensure sufficient columns
 
-        // Extract data (adjust column indices based on your CSV)
-        QString date = values[0];
-        QString samplingPoint = values[1];
-        QString pollutant = values[2];
-        QString concentrationStr = values[3];
-        QString compliance = values[4];
+        QString pollutant = values[3]; // Assuming pollutant label is in column 3
+        if (!pollutants.contains(pollutant)) {
+            pollutants.append(pollutant);
+            pollutantFilter->addItem(pollutant);
+        }
 
-        bool ok;
-        double concentration = concentrationStr.toDouble(&ok);
-        if (!ok) concentration = 0.0;
-
-        dataEntries.append({ date, samplingPoint, pollutant, concentration, compliance });
+        csvData.append(values); // Store the entire row for filtering later
     }
 
     file.close();
 }
 
-void Tab2::populatePollutantFilter()
-{
-    // Get unique pollutants from dataEntries
-    QSet<QString> pollutantsSet;
-    for (const DataEntry& entry : dataEntries) {
-        pollutantsSet.insert(entry.pollutant);
-    }
-
-    QStringList pollutantsList = pollutantsSet.toList();
-    pollutantsList.sort();
-
-    pollutantFilter->clear();
-    pollutantFilter->addItems(pollutantsList);
-}
-
-void Tab2::populateData()
+void Tab2::updateTableAndChart()
 {
     QString selectedPollutant = pollutantFilter->currentText();
-    QString selectedTimeRange = timeRangeFilter->currentText();
 
-    // Filter dataEntries based on selected pollutant and time range
-    QList<DataEntry> filteredData;
-    QDateTime now = QDateTime::currentDateTime();
-
-    for (const DataEntry& entry : dataEntries) {
-        if (entry.pollutant != selectedPollutant)
-            continue;
-
-        // Parse date
-        QDateTime entryDate = QDateTime::fromString(entry.date, Qt::ISODate);
-        if (!entryDate.isValid())
-            continue;
-
-        // Apply time range filter
-        if (selectedTimeRange == "Last Week" && entryDate < now.addDays(-7))
-            continue;
-        else if (selectedTimeRange == "Last Month" && entryDate < now.addMonths(-1))
-            continue;
-        else if (selectedTimeRange == "Last Year" && entryDate < now.addYears(-1))
-            continue;
-
-        filteredData.append(entry);
+    // Update table
+    if (!tableModel) {
+        tableModel = new QStandardItemModel(this);
     }
+    tableModel->clear();
+    tableModel->setHorizontalHeaderLabels({"@id", "Sampling Point", "Notation", "Label", "Concentration"});
 
-    // Update chart
     QChart* chart = chartView->chart();
     chart->removeAllSeries();
 
     QLineSeries* series = new QLineSeries();
     series->setName(selectedPollutant + " Levels");
 
-    // Sort data by date
-    std::sort(filteredData.begin(), filteredData.end(), [](const DataEntry& a, const DataEntry& b) {
-        return QDateTime::fromString(a.date, Qt::ISODate) < QDateTime::fromString(b.date, Qt::ISODate);
-    });
+    int row = 0;
+    for (const QStringList& rowData : csvData) {
+        if (rowData[3] == selectedPollutant) { // Filter rows based on the pollutant
+            tableModel->appendRow({
+                new QStandardItem(rowData[0]),
+                new QStandardItem(rowData[1]),
+                new QStandardItem(rowData[2]),
+                new QStandardItem(rowData[3]),
+                new QStandardItem(rowData[4])
+            });
 
-    // Populate chart series
-    for (const DataEntry& entry : filteredData) {
-        QDateTime dateTime = QDateTime::fromString(entry.date, Qt::ISODate);
-        qint64 timestamp = dateTime.toMSecsSinceEpoch();
-        series->append(timestamp, entry.concentration);
+            // Add points to the chart
+            bool ok;
+            double concentration = rowData[4].toDouble(&ok);
+            if (ok) {
+                series->append(row++, concentration);
+            }
+        }
     }
 
     chart->addSeries(series);
-
-    // Configure axes
-    QDateTimeAxis* axisX = new QDateTimeAxis;
-    axisX->setFormat("dd MMM yyyy");
-    axisX->setTitleText("Date");
-    chart->addAxis(axisX, Qt::AlignBottom);
-    series->attachAxis(axisX);
-
-    QValueAxis* axisY = new QValueAxis;
-    axisY->setTitleText("Concentration");
-    chart->addAxis(axisY, Qt::AlignLeft);
-    series->attachAxis(axisY);
-
+    chart->createDefaultAxes();
     chart->setTitle("Pollutant Levels Over Time (" + selectedPollutant + ")");
 
-    // Update table
-    tableModel->clear();
-    tableModel->setHorizontalHeaderLabels({ "Date", "Sampling Point", "Pollutant", "Concentration", "Compliance" });
-
-    for (const DataEntry& entry : filteredData) {
-        QList<QStandardItem*> rowItems;
-        rowItems << new QStandardItem(entry.date)
-                 << new QStandardItem(entry.samplingPoint)
-                 << new QStandardItem(entry.pollutant)
-                 << new QStandardItem(QString::number(entry.concentration))
-                 << new QStandardItem(entry.compliance);
-
-        tableModel->appendRow(rowItems);
-    }
-
     dataTable->setModel(tableModel);
-
-    // Apply search filter if any
-    filterTable(searchBar->text());
 }
 
 void Tab2::filterTable(const QString& searchText)
@@ -298,4 +197,10 @@ void Tab2::filterTable(const QString& searchText)
         }
         dataTable->setRowHidden(row, !match);
     }
+}
+
+void Tab2::onPollutantSelectionChanged(int index)
+{
+    Q_UNUSED(index);
+    updateTableAndChart();
 }
