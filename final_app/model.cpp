@@ -296,7 +296,7 @@ void WaterModel::dataProcessing() {
     tmpDeterminandCounts[dataset[i].getDeterminandDefinition()]++;
     sampleDates[dataset[i].getDateTime().date()]++;
 
-    pollutantData[dataset[i].getDeterminand()].append(dataset[i].getResult());
+    pollutantData[dataset[i].getDeterminand()].append(QPair<QDateTime, double>(dataset[i].getDateTime(), dataset[i].getResult()));
 
     // Store data in samplingPointData
     samplingPointData[dataset[i].getLocation()].append(
@@ -330,7 +330,7 @@ void WaterModel::dataProcessing() {
 
   QDateTime dateTime = dataset[i].getDateTime();
   if (dateTime.isValid() && !qIsNaN(dataset[i].getResult())) {
-      pollutantTimeSeries[dataset[i].getDeterminand()].append(qMakePair(dateTime, dataset[i].getResult()));
+      pollutantData[dataset[i].getDeterminand()].append(QPair<QDateTime, double>(dataset[i].getDateTime(), dataset[i].getResult()));
   }
 
 
