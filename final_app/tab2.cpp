@@ -16,11 +16,12 @@ Tab2::Tab2(WaterModel* model, QWidget* parent)
     // Install event filter for theme changes
     qApp->installEventFilter(this);
 
-    // Connect signals for search functionality
+    // Connect signals for search and filter functionality
     connect(searchBar, &QLineEdit::textChanged, this, &Tab2::filterTable);
-    connect(pollutantFilter, &QComboBox::currentIndexChanged, this, &Tab2::onPollutantSelectionChanged);
+    connect(pollutantFilter, &QComboBox::currentIndexChanged, this, &Tab2::updateCharts);
+    connect(timeRangeFilter, &QComboBox::currentIndexChanged, this, &Tab2::updateCharts);
 
-    // Initialize dropdown options and populate chart
+    // Load data and populate the UI
     loadData();
     updateCharts();
 }
@@ -34,9 +35,9 @@ void Tab2::createWidgets()
     // Dropdown filter for pollutants
     pollutantFilter = new QComboBox(this);
 
-    // Dropdown for time ranges (optional)
+    // Dropdown filter for time ranges
     timeRangeFilter = new QComboBox(this);
-    timeRangeFilter->addItems({"Last Week", "Last Month", "Last Year"});
+    timeRangeFilter->addItems({"Last Week", "Last Month", "Last Year", "All Time"});
 
     // Chart view for graphical representation
     chartView = new QChartView(new QChart(), this);
@@ -137,35 +138,100 @@ void Tab2::loadData()
 void Tab2::updateCharts()
 {
     QString selectedPollutant = pollutantFilter->currentText();
+    QString selectedTimeRange = timeRangeFilter->currentText();
     QChart* chart = chartView->chart();
     chart->removeAllSeries();
 
     QLineSeries* series = new QLineSeries();
     series->setName(selectedPollutant + " Levels");
 
-    // Retrieve data for selected pollutant
-    const auto& dataPoints = waterModel->getPollutantData().value(selectedPollutant);
-    for (const auto& point : dataPoints) {
-        series->append(point.first.toMSecsSinceEpoch(), point.second);
+    QDateTime now = QDateTime::currentDateTime();
+    QDateTime startTime;
+    if (selectedTimeRange == "Last Week") {
+        startTime = now.addDays(-7);
+    } else if (selectedTimeRange == "Last Month") {
+        startTime = now.addMonths(-1);
+    } else if (selectedTimeRange == "Last Year") {
+        startTime = now.addYears(-1);
+    } else {
+        startTime = QDateTime(); // All Time
+    }
+
+    // Retrieve data for selected pollutant and filter by time range
+    for (const QStringList& row : csvData) {
+        if (row[3] == selectedPollutant) {
+            QDateTime dateTime = QDateTime::fromString(row[0], "yyyy-MM-dd HH:mm");
+            if (dateTime.isValid() && dateTime >= startTime) {
+                bool ok;
+                double concentration = row[4].toDouble(&ok);
+                if (ok) {
+                    series->append(dateTime.toMSecsSinceEpoch(), concentration);
+                }
+            }
+        }
     }
 
     chart->addSeries(series);
     chart->createDefaultAxes();
     chart->setTitle(tr("Levels Over Time: %1").arg(selectedPollutant));
 
+    // Customize chart appearance
+    auto* axisX = new QDateTimeAxis();
+    axisX->setFormat("dd-MM-yyyy");
+    axisX->setTitleText("Date/Time");
+    chart->addAxis(axisX, Qt::AlignBottom);
+    series->attachAxis(axisX);
+
+    auto* axisY = new QValueAxis();
+    axisY->setTitleText("Concentration");
+    chart->addAxis(axisY, Qt::AlignLeft);
+    series->attachAxis(axisY);
+
+    // Add tooltips for compliance
+    connect(series, &QLineSeries::hovered, this, [=](const QPointF& point, bool state) {
+        if (state) {
+            QToolTip::showText(QCursor::pos(),
+                               QString("Concentration: %1 ppm\nCompliance: %2")
+                                   .arg(point.y())
+                                   .arg(point.y() < 4 ? "Green" : (point.y() < 7 ? "Amber" : "Red")));
+        } else {
+            QToolTip::hideText();
+        }
+    });
+
     // Update table with data for the selected pollutant
     if (!tableModel) {
         tableModel = new QStandardItemModel(this);
     }
     tableModel->clear();
-    tableModel->setHorizontalHeaderLabels({"Date/Time", "Concentration"});
+    tableModel->setHorizontalHeaderLabels({"Date/Time", "Concentration", "Compliance"});
 
-    for (const auto& point : dataPoints) {
-        QList<QStandardItem*> row;
-        row << new QStandardItem(point.first.toString("yyyy-MM-dd HH:mm"))
-            << new QStandardItem(QString::number(point.second));
-        tableModel->appendRow(row);
+    for (const QStringList& row : csvData) {
+        if (row[3] == selectedPollutant) {
+            QDateTime dateTime = QDateTime::fromString(row[0], "yyyy-MM-dd HH:mm");
+            if (dateTime.isValid() && dateTime >= startTime) {
+                bool ok;
+                double concentration = row[4].toDouble(&ok);
+                if (ok) {
+                    QString compliance = concentration < 4 ? "Green" : (concentration < 7 ? "Amber" : "Red");
+
+                    QList<QStandardItem*> tableRow;
+                    tableRow << new QStandardItem(dateTime.toString("dd-MM-yyyy HH:mm"))
+                             << new QStandardItem(QString::number(concentration))
+                             << new QStandardItem(compliance);
+
+                    tableModel->appendRow(tableRow);
+
+                    // Color code compliance
+                    QColor color = (compliance == "Green") ? Qt::green
+                                 : (compliance == "Amber") ? Qt::yellow
+                                                           : Qt::red;
+                    tableModel->item(tableModel->rowCount() - 1, 2)->setBackground(color);
+                }
+            }
+        }
     }
+
     dataTable->setModel(tableModel);
 }
 
@@ -184,10 +250,4 @@ void Tab2::filterTable(const QString& searchText)
         }
         dataTable->setRowHidden(row, !match);
     }
-}
-
-void Tab2::onPollutantSelectionChanged(int index)
-{
-    Q_UNUSED(index);
-    updateCharts();  // Update chart and table when pollutant is selected
 }
