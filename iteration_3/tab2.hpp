@@ -9,7 +9,6 @@
 #include <QtWidgets/QComboBox>
 #include <QtWidgets/QTableView>
 #include <QtWidgets/QLineEdit> // For search bar
-#include <QtWidgets/QPushButton> // For the "View Raw Data" button
 #include <QStandardItemModel>
 #include "model.hpp"
 
@@ -24,7 +23,6 @@ public:
 private slots:
     void populateData();
     void filterTable(const QString& searchText);
-    void showRawDataDialog(); // Slot to handle the "View Raw Data" button click
 
 private:
     WaterModel *waterModel;
@@ -34,7 +32,6 @@ private:
     QChartView *chartView;
     QTableView *dataTable;
     QLineEdit *searchBar; // Search bar
-    QPushButton *viewRawDataButton; // Button for viewing raw data
     QStandardItemModel *tableModel;
 
     void createWidgets();

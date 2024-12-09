@@ -11,12 +11,8 @@
 #include <QtWidgets/QLabel>
 #include <QtWidgets/QLineEdit>
 #include <QStandardItemModel>
-#include <QtCharts/QValueAxis>
+#include  <QtCharts/QValueAxis>
 #include <QtWidgets/QToolTip>
-#include <QtWidgets/QPushButton>
-#include <QtWidgets/QDialog>
-#include <QtWidgets/QTableWidget>
-#include <QtWidgets/QHeaderView> // Explicitly include QHeaderView
 #include "styles.hpp"
 #include "tab2.hpp"
 
@@ -123,6 +119,9 @@ void Tab2::setupStyles()
     this->setStyleSheet(styleSheet);
 }
 
+#include <QtCharts/QValueAxis> // Include for QValueAxis
+#include <QtWidgets/QToolTip>  // Include for QToolTip
+
 void Tab2::populateData()
 {
     // Populate chart with example data
@@ -223,6 +222,7 @@ void Tab2::populateData()
     dataTable->setAlternatingRowColors(true);  // Alternating row colors for readability
 }
 
+
 void Tab2::filterTable(const QString& searchText)
 {
     if (!tableModel) return; // Ensure the model is initialized
@@ -238,44 +238,4 @@ void Tab2::filterTable(const QString& searchText)
         }
         dataTable->setRowHidden(row, !match);
     }
-}
-
-void Tab2::showRawDataDialog() {
-    // Check if tableModel is initialized
-    if (!tableModel) {
-        qDebug() << "Table model is not initialized!";
-        return;
-    }
-
-    // Create a dialog to display raw data
-    QDialog *dialog = new QDialog(this);
-    dialog->setWindowTitle("Raw Data");
-    dialog->resize(600, 400);
-
-    // Create a table widget to display raw data
-    QTableWidget *rawDataTable = new QTableWidget(dialog);
-    rawDataTable->setColumnCount(tableModel->columnCount());
-    rawDataTable->setRowCount(tableModel->rowCount());
-    rawDataTable->setHorizontalHeaderLabels(
-        {"Date", "Pollutant", "Concentration", "Compliance"});
-
-    // Copy data from the QStandardItemModel to the QTableWidget
-    for (int row = 0; row < tableModel->rowCount(); ++row) {
-        for (int col = 0; col < tableModel->columnCount(); ++col) {
-            QStandardItem *item = tableModel->item(row, col);
-            if (item) {
-                rawDataTable->setItem(row, col, new QTableWidgetItem(item->text()));
-            }
-        }
-    }
-
-    rawDataTable->resizeColumnsToContents();
-    rawDataTable->setAlternatingRowColors(true);
-
-    // Create a layout for the dialog
-    QVBoxLayout *dialogLayout = new QVBoxLayout(dialog);
-    dialogLayout->addWidget(rawDataTable);
-
-    dialog->setLayout(dialogLayout);
-    dialog->exec(); // Show the dialog modally
 }
