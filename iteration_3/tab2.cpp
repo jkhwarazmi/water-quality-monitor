@@ -11,8 +11,11 @@
 #include <QtWidgets/QLabel>
 #include <QtWidgets/QLineEdit>
 #include <QStandardItemModel>
-#include  <QtCharts/QValueAxis>
+#include <QtCharts/QValueAxis>
 #include <QtWidgets/QToolTip>
+#include <QtWidgets/QPushButton>
+#include <QtWidgets/QDialog>
+#include <QtWidgets/QTableWidget>
 #include "styles.hpp"
 #include "tab2.hpp"
 
@@ -32,6 +35,9 @@ Tab2::Tab2(WaterModel* model, QWidget* parent)
     // Connect signals to update data dynamically
     connect(pollutantFilter, &QComboBox::currentTextChanged, this, &Tab2::populateData);
     connect(timeRangeFilter, &QComboBox::currentTextChanged, this, &Tab2::populateData);
+
+    // Connect "View Raw Data" button to its functionality
+    connect(viewRawDataButton, &QPushButton::clicked, this, &Tab2::showRawDataDialog);
 
     // Initial data population
     populateData();
@@ -66,6 +72,9 @@ void Tab2::createWidgets()
     // Table view for tabular data
     dataTable = new QTableView(this);
 
+    // "View Raw Data" button
+    viewRawDataButton = new QPushButton("View Raw Data", this);
+
     // Placeholder label
     placeholder = new QLabel(tr("Pollutant Overview"));
     QFont labelFont;
@@ -93,6 +102,7 @@ void Tab2::createLayout()
     // Add chart and table views
     layout->addWidget(chartView);
     layout->addWidget(dataTable);
+    layout->addWidget(viewRawDataButton); // Add "View Raw Data" button
 
     layout->setSpacing(20);
     layout->setContentsMargins(30, 30, 30, 30);
@@ -113,14 +123,16 @@ void Tab2::setupStyles()
             font-weight: bold;
             color: %1;
         }
+
+        QPushButton {
+            font-size: 14px;
+            padding: 6px 12px;
+        }
     )")
     .arg(Styles::textColor());
 
     this->setStyleSheet(styleSheet);
 }
-
-#include <QtCharts/QValueAxis> // Include for QValueAxis
-#include <QtWidgets/QToolTip>  // Include for QToolTip
 
 void Tab2::populateData()
 {
@@ -149,13 +161,15 @@ void Tab2::populateData()
     chart->setTitle("Pollutant Levels Over Time");
 
     // Customize chart appearance
-    auto* axisX = new QValueAxis(); // Ensure QValueAxis is recognized
+    auto* axisX = new QValueAxis();
     axisX->setTitleText("Time");
+    axisX->setLabelsFont(QFont("Arial", 10, QFont::Bold));
     chart->addAxis(axisX, Qt::AlignBottom);
     series->attachAxis(axisX);
 
-    auto* axisY = new QValueAxis(); // Ensure QValueAxis is recognized
+    auto* axisY = new QValueAxis();
     axisY->setTitleText("Concentration (ppm)");
+    axisY->setLabelsFont(QFont("Arial", 10, QFont::Bold));
     chart->addAxis(axisY, Qt::AlignLeft);
     series->attachAxis(axisY);
 
@@ -197,20 +211,28 @@ void Tab2::populateData()
     // Color code compliance column
     for (int row = 0; row < tableModel->rowCount(); ++row) {
         QString compliance = tableModel->item(row, 3)->text();
+        QColor color;
+
         if (compliance == "Green") {
-            tableModel->item(row, 3)->setBackground(Qt::green);
+            color = QColor(0, 128, 0);  // Darker green
         } else if (compliance == "Amber") {
-            tableModel->item(row, 3)->setBackground(Qt::yellow);
+            color = QColor(255, 165, 0);  // Orange
         } else if (compliance == "Red") {
-            tableModel->item(row, 3)->setBackground(Qt::red);
+            color = QColor(255, 0, 0);  // Bright red
         }
+
+        tableModel->item(row, 3)->setBackground(color);
+        tableModel->item(row, 3)->setForeground(Qt::white);  // White text on colored background
+        tableModel->item(row, 3)->setFont(QFont("Arial", 10, QFont::Bold));  // Bold text
     }
 
     dataTable->setModel(tableModel); // Set model for the table view
+
+    // Style table headers
+    dataTable->horizontalHeader()->setFont(QFont("Arial", 11, QFont::Bold));
+    dataTable->horizontalHeader()->setStyleSheet("QHeaderView::section { background-color: lightgray; }");
+    dataTable->setAlternatingRowColors(true);  // Alternating row colors for readability
 }
-
-
-
 
 void Tab2::filterTable(const QString& searchText)
 {
@@ -228,4 +250,29 @@ void Tab2::filterTable(const QString& searchText)
         dataTable->setRowHidden(row, !match);
     }
 }
+
+void Tab2::showRawDataDialog()
+{
+    QDialog* dialog = new QDialog(this);
+    dialog->setWindowTitle("Raw Data Viewer");
+
+    QTableWidget* rawDataTable = new QTableWidget(dialog);
+    rawDataTable->setColumnCount(tableModel->columnCount());
+    rawDataTable->setRowCount(tableModel->rowCount());
+    rawDataTable->setHorizontalHeaderLabels({"Date", "Pollutant", "Concentration", "Compliance"});
+
+    for (int row = 0; row < tableModel->rowCount(); ++row) {
+        for (int col = 0; col < tableModel->columnCount(); ++col) {
+            rawDataTable->setItem(row, col, new QTableWidgetItem(tableModel->item(row, col)->text()));
+        }
+    }
+
+    QVBoxLayout* layout = new QVBoxLayout(dialog);
+    layout->addWidget(rawDataTable);
+    dialog->setLayout(layout);
+
+    dialog->resize(600, 400);
+    dialog->exec();
+}
+
 
