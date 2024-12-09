@@ -126,35 +126,51 @@ void Tab2::populateData()
     QLineSeries* series = new QLineSeries();
     series->setName("CO Level");
 
-    // Add points with conditional coloring based on compliance level
-    series->append(0, 0);
-    series->append(1, 3);  // Green
-    series->append(2, 5);  // Amber
-    series->append(3, 8);  // Red
+    // Example data points with compliance levels
+    QVector<QPointF> points = {
+        {0, 0},    // Default
+        {1, 3},    // Green (within compliance)
+        {2, 5},    // Amber (close to threshold)
+        {3, 8}     // Red (exceeds compliance)
+    };
+
+    // Set data points
+    for (const QPointF& point : points) {
+        series->append(point);
+    }
 
     chart->addSeries(series);
     chart->createDefaultAxes();
     chart->setTitle("Pollutant Levels Over Time");
 
-    // Set up tooltips for chart
-    series->setPointLabelsVisible(true);
-    series->setPointLabelsFormat("@yPoint");
+    // Customize chart appearance
+    QValueAxis* axisX = new QValueAxis();
+    axisX->setTitleText("Time");
+    QValueAxis* axisY = new QValueAxis();
+    axisY->setTitleText("Concentration (ppm)");
+    chart->setAxisX(axisX, series);
+    chart->setAxisY(axisY, series);
 
-    // Enable pop-ups when hovering over points
-    series->setPointsVisible(true);
-    series->setPen(QPen(Qt::green)); // Default color for data points
+    // Add tooltips for points
+    connect(series, &QLineSeries::hovered, this, [=](const QPointF& point, bool state) {
+        if (state) {
+            QToolTip::showText(QCursor::pos(),
+                               QString("Concentration: %1 ppm\nCompliance: %2")
+                                   .arg(point.y())
+                                   .arg(point.y() < 4 ? "Green" : (point.y() < 7 ? "Amber" : "Red")));
+        } else {
+            QToolTip::hideText();
+        }
+    });
 
-    // Set up legend
-    chart->legend()->setVisible(true);
-    chart->legend()->setAlignment(Qt::AlignBottom);
-
-    // Populate table with example data
+    // Set up table model
     if (!tableModel) {
-        tableModel = new QStandardItemModel(this); // Initialize the table model
+        tableModel = new QStandardItemModel(this);
     }
     tableModel->clear();
     tableModel->setHorizontalHeaderLabels({"Date", "Pollutant", "Concentration", "Compliance"});
 
+    // Populate table with example data
     tableModel->appendRow({new QStandardItem("2024-01-01"),
                            new QStandardItem("CO"),
                            new QStandardItem("3.5 ppm"),
@@ -165,12 +181,27 @@ void Tab2::populateData()
                            new QStandardItem("5.1 ppm"),
                            new QStandardItem("Amber")});
 
+    tableModel->appendRow({new QStandardItem("2024-01-03"),
+                           new QStandardItem("PM2.5"),
+                           new QStandardItem("8.0 ppm"),
+                           new QStandardItem("Red")});
+
     // Color code compliance column
-    tableModel->item(0, 3)->setBackground(Qt::green);  // Green
-    tableModel->item(1, 3)->setBackground(Qt::yellow); // Amber
+    for (int row = 0; row < tableModel->rowCount(); ++row) {
+        QString compliance = tableModel->item(row, 3)->text();
+        if (compliance == "Green") {
+            tableModel->item(row, 3)->setBackground(Qt::green);
+        } else if (compliance == "Amber") {
+            tableModel->item(row, 3)->setBackground(Qt::yellow);
+        } else if (compliance == "Red") {
+            tableModel->item(row, 3)->setBackground(Qt::red);
+        }
+    }
 
     dataTable->setModel(tableModel); // Set model for the table view
 }
+
+
 
 void Tab2::filterTable(const QString& searchText)
 {
