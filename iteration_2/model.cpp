@@ -16,14 +16,14 @@ enum Column {
   Unit,
   SampleLocation,
   ComplianceSample,
-  SamplePurpose
+  SamplePurpose,
+  ColumnCount
 };
 
 
 void WaterModel::updateFromFile(const QString& filename) {
   beginResetModel();
   dataset.loadData(filename.toStdString());
-  processData();
   endResetModel();
 }
 
@@ -136,8 +136,7 @@ QVariant WaterModel::headerData(int section, Qt::Orientation orientation, int ro
 
 // Helper method to get threshold for a pollutant
 double WaterModel::getPollutantThreshold(const QString& pollutant) const {
-    // Example thresholds - complete and replace with actual values
-    // Link the source here when complete
+    // Example thresholds - replace with actual values
     static const QMap<QString, double> thresholds = {
         {"Endrin", 0.0002},
         {"PhenoxytcAcd", 0.02},
@@ -146,106 +145,4 @@ double WaterModel::getPollutantThreshold(const QString& pollutant) const {
     };
 
     return thresholds.value(pollutant, 0.0);
-}
-
-// NEW - Added method to populate data structures
-void WaterModel::processData() 
-{
-  // Clear existing data structures
-  pollutantData.clear();
-  pollutantUnits.clear();
-  samplingPointData.clear();
-  pollutantCategories.clear();
-  materialTypeCounts.clear();
-  pollutantsByLocation.clear();
-  uniquePollutants.clear();
-  complianceCounts.clear();
-  purposeCounts.clear();
-  topPollutants.clear();
-  categoryCounts.clear();
-
-  for (int i = 0; i < rowCount(QModelIndex()); i++) {
-    QString pollutant = data(index(i, Pollutant), Qt::DisplayRole).toString();
-    QString concentration = data(index(i, Concentration), Qt::DisplayRole).toString();
-    QString unit = data(index(i, Unit), Qt::DisplayRole).toString();
-    QString samplingPoint = data(index(i, Location), Qt::DisplayRole).toString();
-    QString materialType = data(index(i, SampleLocation), Qt::DisplayRole).toString();
-    QString definition = data(index(i, PollutantDefinition), Qt::DisplayRole).toString();
-    QString isCompliance = data(index(i, ComplianceSample), Qt::DisplayRole).toString();
-    QString purpose = data(index(i, SamplePurpose), Qt::DisplayRole).toString();
-    
-    // Count compliance
-    complianceCounts[isCompliance]++;
-
-    // Count purposes
-    purposeCounts[purpose]++;
-
-    // Count material types
-    materialTypeCounts[materialType]++;
-
-    // Track unique pollutants
-    uniquePollutants.insert(pollutant);
-
-    // Skip non-numeric values but track them
-    if (!concentration.startsWith("<")) {
-      double value = concentration.toDouble();
-      pollutantData[pollutant].append(value);
-      pollutantUnits[pollutant] = unit;
-      pollutantsByLocation[samplingPoint].append(value);
-
-      if (!samplingPointData.contains(samplingPoint)) {
-        samplingPointData[samplingPoint] = QVector<QString>();
-      }
-      samplingPointData[samplingPoint].append(pollutant + ":" + QString::number(value));
-    }
-
-    // Calculate averages
-    QMap<QString, double> averages;
-    for (auto it = pollutantData.begin(); it != pollutantData.end(); it++) {
-      if (!it.value().isEmpty()) {
-        double sum = 0;
-        for (double value : it.value()) {
-          sum += value;
-        }
-        averages[it.key()] = sum / it.value().size();
-      }
-    }
-
-    // Sort and store top pollutants
-    for (auto it = averages.begin(); it != averages.end(); ++it) {
-      topPollutants.append(qMakePair(it.key(), it.value()));
-    }
-    
-    std::sort(topPollutants.begin(), topPollutants.end(),
-      [](const QPair<QString, double>& a, const QPair<QString, double>& b) {
-        return a.second > b.second;
-      }
-    );
-
-    // Enhanced pollutant categorisation
-    categoriseData(pollutant, definition);
-
-    // Count categories
-    categoryCounts[pollutantCategories[pollutant]]++;
-  }
-}
-
-// NEW - Added method to categorise pollutants
-// This isn't very specific, you may have to look into the data more to see how
-// They actually categorise your specific pollutants
-void WaterModel::categoriseData(const QString& pollutant, const QString& definition) 
-{
-  if (definition.contains("Nitrogen", Qt::CaseInsensitive) || 
-    definition.contains("Phosphate", Qt::CaseInsensitive)) {
-    pollutantCategories[pollutant] = "Nutrients";
-  } else if (definition.contains("Carbon", Qt::CaseInsensitive) || 
-    definition.contains("Organic", Qt::CaseInsensitive)) {
-    pollutantCategories[pollutant] = "Organic Compounds";
-  } else if (definition.contains("chlor", Qt::CaseInsensitive)) {
-    pollutantCategories[pollutant] = "Chlorinated Compounds";
-  } else if (definition.contains("fluor", Qt::CaseInsensitive)) {
-    pollutantCategories[pollutant] = "Fluorinated Compounds";
-  } else {
-    pollutantCategories[pollutant] = "Other";
-  }
 }

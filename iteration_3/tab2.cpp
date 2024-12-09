@@ -67,13 +67,13 @@ void Tab2::createWidgets()
     dataTable = new QTableView(this);
 
     // Placeholder label
-    placeholder = new QLabel(tr("Pollutant Overview"));
+    title = new QLabel(tr("Pollutant Overview"));
     QFont labelFont;
-    labelFont.setPointSize(20);
+    labelFont.setPointSize(32);
     labelFont.setBold(true);
-    placeholder->setFont(labelFont);
-    placeholder->setAlignment(Qt::AlignCenter);
-    placeholder->setObjectName("placeholderLabel");
+    title->setFont(labelFont);
+    title->setAlignment(Qt::AlignCenter);
+    title->setObjectName("titleLabel");
 }
 
 void Tab2::createLayout()
@@ -87,6 +87,7 @@ void Tab2::createLayout()
     filterLayout->addWidget(new QLabel("Time Range:", this));
     filterLayout->addWidget(timeRangeFilter);
 
+    layout->addWidget(title); // Add title
     layout->addWidget(searchBar); // Add search bar
     layout->addLayout(filterLayout);
 

@@ -292,7 +292,10 @@ void WaterWindow::loadData(const QString &path)
 
     // Add chart update methods below
     tab1->updateCharts();
-        
+    tab3->updateCharts();
+    tab4->updateCharts();
+    tab5->updateCharts();
+    
     switchToTabView();
 
   } catch (const std::exception& error) {

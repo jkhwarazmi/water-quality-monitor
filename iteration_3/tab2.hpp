@@ -26,7 +26,7 @@ private slots:
 
 private:
     WaterModel *waterModel;
-    QLabel *placeholder;
+    QLabel *title;
     QComboBox *pollutantFilter;
     QComboBox *timeRangeFilter;
     QChartView *chartView;
