@@ -119,6 +119,9 @@ void Tab2::setupStyles()
     this->setStyleSheet(styleSheet);
 }
 
+#include <QtCharts/QValueAxis> // Include for QValueAxis
+#include <QtWidgets/QToolTip>  // Include for QToolTip
+
 void Tab2::populateData()
 {
     // Populate chart with example data
@@ -146,12 +149,15 @@ void Tab2::populateData()
     chart->setTitle("Pollutant Levels Over Time");
 
     // Customize chart appearance
-    QValueAxis* axisX = new QValueAxis();
+    auto* axisX = new QValueAxis(); // Ensure QValueAxis is recognized
     axisX->setTitleText("Time");
-    QValueAxis* axisY = new QValueAxis();
+    chart->addAxis(axisX, Qt::AlignBottom);
+    series->attachAxis(axisX);
+
+    auto* axisY = new QValueAxis(); // Ensure QValueAxis is recognized
     axisY->setTitleText("Concentration (ppm)");
-    chart->setAxisX(axisX, series);
-    chart->setAxisY(axisY, series);
+    chart->addAxis(axisY, Qt::AlignLeft);
+    series->attachAxis(axisY);
 
     // Add tooltips for points
     connect(series, &QLineSeries::hovered, this, [=](const QPointF& point, bool state) {
@@ -202,6 +208,7 @@ void Tab2::populateData()
 
     dataTable->setModel(tableModel); // Set model for the table view
 }
+
 
 
 
