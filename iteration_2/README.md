@@ -1,21 +1,22 @@
 ## Iteration 2 - Features
 
-To run:
-```
-mkdir build && cd build
-```
+Improvements:
+- Improved styling, added basic light and dark mode
+- Added placeholder pages
+- Added translation logic
+- Added placeholder compliance indicators for table
 
-```
-cmake ..
-```
+TODO:
+- Implement pages!!!
+- Translate to French
+- Improve styling further, responsivity, better help and tooltips, WCAG accessibility, bottom toolbar saying which file's loaded, etc.
 
-```
-make
-```
+Iteration 1:
+- Loads data
+- Error validation for CSV
+- Allows reloading data
+- Template tabs
+- Displays data table
 
-
-```
-./watermonitor
-```
-
-NOTE: This will not compile if your path has ANY spaces in it. To fix, just move the folder to a path without spaces, i.e. your Desktop
+- No pages implemented
+- No translation logic

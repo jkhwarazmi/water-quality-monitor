@@ -1,7 +1,6 @@
 // Modified COMP2811 Coursework 2 sample solution: main window
 
 #include <QtWidgets>
-#include "styles.hpp"
 #include "window.hpp"
 #include "loaddatawidget.hpp"
 #include "tab1.hpp"
@@ -16,29 +15,15 @@ WaterWindow::WaterWindow() : QMainWindow()
     
   createMainWidget();
   createMenus();
-  setupStyles();
   
   setMinimumWidth(800);
   setMinimumHeight(600);
   setWindowTitle(tr("Water Quality Monitor"));
-
-  // Install event filter for Styles changes
-  qApp->installEventFilter(this);
-}
-
-bool WaterWindow::eventFilter(QObject *watched, QEvent *event)
-{
-  if (watched == qApp && event->type() == QEvent::ApplicationPaletteChange) {
-    setupStyles();
-    return true;
-  }
-  return QMainWindow::eventFilter(watched, event);
 }
 
 void WaterWindow::createMainWidget()
 {
   stackedWidget = new QStackedWidget;
-  stackedWidget->setObjectName("mainStack");
 
   loadDataWidget = new LoadDataWidget(dataLocation);
 
@@ -46,8 +31,6 @@ void WaterWindow::createMainWidget()
   connect(loadDataWidget, SIGNAL(loadRequested()), this, SLOT(setPath()));
     
   tabWidget = new QTabWidget;
-  tabWidget->setObjectName("mainTabs");
-  
   tab1 = new Tab1(&model);
   tab2 = new Tab2(&model);
   tab3 = new Tab3(&model);
@@ -64,126 +47,6 @@ void WaterWindow::createMainWidget()
   setCentralWidget(stackedWidget);
     
   stackedWidget->setCurrentWidget(loadDataWidget);
-
-  connect(loadDataWidget, SIGNAL(languageChanged(QString)), this, SLOT(changeLanguage(QString)));
-}
-
-void WaterWindow::setupStyles()
-{
-  QString styleSheet = QString(R"(
-    QMainWindow {
-      background-color: %1;
-      color: %2;
-    }
-
-    QMenuBar {
-      background-color: %3;
-      color: %2;
-      border: none;
-      padding: %4px;
-    }
-
-    QMenuBar::item {
-      background-color: transparent;
-      padding: %4px %5px;
-      border-radius: %6px;
-      margin-right: %4px;
-    }
-
-    QMenuBar::item:selected {
-      background-color: %7;
-    }
-
-    QMenu {
-      background-color: %3;
-      color: %2;
-      border: 1px solid %8;
-      border-radius: %6px;
-      padding: %4px;
-    }
-
-    QMenu::item {
-      padding: %4px 30px %4px 20px;
-      border-radius: %6px;
-      margin: %9px;
-    }
-
-    QMenu::item:selected {
-      background-color: %7;
-    }
-
-    QTabWidget::pane {
-      border: 1px solid %8;
-      border-radius: %6px;
-      background-color: %10;
-      top: %11px;
-    }
-
-    QTabWidget::tab-bar {
-      alignment: center;
-      top: %11px;
-      left: %11px;
-    }
-
-    QTabBar::tab {
-      background-color: %10;
-      color: %2;
-      padding: %5px %12px;
-      border: none;
-      border-top-left-radius: %6px;
-      border-top-right-radius: %6px;
-      margin-right: %9px;
-      min-width: 100px;
-    }
-
-    QTabBar::tab:selected {
-      background-color: %13;
-      color: white;
-    }
-
-    QTabBar::tab:hover:!selected {
-      background-color: %7;
-    }
-
-    QProgressDialog {
-      background-color: %1;
-      color: %2;
-    }
-
-    QProgressDialog QLabel {
-      color: %2;
-      font-weight: bold;
-    }
-
-    QMessageBox {
-      background-color: %1;
-      color: %2;
-    }
-
-    QMessageBox QLabel {
-      color: %2;
-    }
-
-    QFileDialog {
-      background-color: %1;
-      color: %2;
-    }
-  )")
-  .arg(Styles::backgroundColor())              // %1
-  .arg(Styles::textColor())                    // %2
-  .arg(Styles::menuBackground())               // %3
-  .arg(Styles::PADDING_SMALL)                  // %4
-  .arg(Styles::PADDING_MEDIUM)                 // %5
-  .arg(Styles::BORDER_RADIUS)                  // %6
-  .arg(Styles::menuHover())                    // %7
-  .arg(Styles::borderColor())                  // %8
-  .arg(Styles::SPACING_SMALL)                  // %9
-  .arg(Styles::tabBackground())                // %10
-  .arg(Styles::PADDING_LARGE)                  // %11
-  .arg(Styles::PADDING_LARGE * 2)              // %12
-  .arg(Styles::selectedTabBackground());       // %13
-
-  this->setStyleSheet(styleSheet);
 }
 
 void WaterWindow::createMenus()
@@ -206,43 +69,6 @@ void WaterWindow::createMenus()
   QMenu *helpMenu = menuBar()->addMenu(tr("&Help"));
   helpMenu->addAction(aboutAction);
 
-  createLanguageMenu();
-}
-
-void WaterWindow::createLanguageMenu() 
-{
-  QMenu *languageMenu = menuBar()->addMenu(tr("&Language"));
-
-  QActionGroup *languageGroup = new QActionGroup(this);
-  QAction* englishAction = new QAction(tr("&English"), this);
-  englishAction->setCheckable(true);
-  englishAction->setData("English");
-    
-  QAction* frenchAction = new QAction(tr("&Français"), this);
-  frenchAction->setCheckable(true);
-  frenchAction->setData("French");
-
-  // Set current language
-  QString currentLocale = QLocale::system().name().split('_').first();
-  if (currentLocale == "fr") {
-    frenchAction->setChecked(true);
-  } else {
-    englishAction->setChecked(true);
-  }
-
-  languageGroup->addAction(englishAction);
-  languageGroup->addAction(frenchAction);
-    
-  languageMenu->addAction(englishAction);
-  languageMenu->addAction(frenchAction);
-
-  // Connect using a lambda to convert QAction* to QString
-  connect(languageGroup, SIGNAL(triggered(QAction *)), this, SLOT(handleLanguageAction(QAction *)));
-}
-
-void WaterWindow::handleLanguageAction(QAction *action)
-{
-  changeLanguage(action->data().toString());
 }
 
 void WaterWindow::setDataLocation()
@@ -294,30 +120,6 @@ void WaterWindow::switchToTabView()
 void WaterWindow::switchToLoadView()
 {
   stackedWidget->setCurrentWidget(loadDataWidget);
-}
-
-void WaterWindow::changeLanguage(const QString &language)
-{ 
-  QString code = "en";
-
-  if (language == "French") {
-    code = "fr";
-  }
-
-  qApp->removeTranslator(&translator);
-
-  if (translator.load("WaterQualityMonitor_" + code, ":/i18n")) {
-    qApp->installTranslator(&translator);
-  } else {
-    QMessageBox::critical(this, tr("Language Error"), tr("Could not load language file."));
-  }
-
-  QEvent event(QEvent::LanguageChange);
-  qApp->sendEvent(qApp, &event);
-
-  // Not everything translates properly, may need custom changeEvent in each
-  // Where we re-specify strings?
-  setWindowTitle(tr("Water Quality Monitor"));
 }
 
 void WaterWindow::about()
