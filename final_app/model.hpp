@@ -56,7 +56,6 @@ class WaterModel: public QAbstractTableModel
     // Variables for chart data
     int locationCount = 0;
     int determinandCount = 0;
-    QMap<QString, QVector<double>> pollutantData;
     QMap<QString, QVector<QPair<QString, double>>> samplingPointData; // Corrected type
 
     QMap<QString, QVector<double>> fluorPollutantData;              // Stores pollutants with "fluor"
