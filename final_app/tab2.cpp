@@ -144,6 +144,51 @@ void Tab2::filterTable(const QString& searchText)
     }
 }
 
+void Tab2::updateTableAndChart()
+{
+    QString selectedPollutant = pollutantFilter->currentText();
+
+    // Update table
+    if (!tableModel) {
+        tableModel = new QStandardItemModel(this);
+    }
+    tableModel->clear();
+    tableModel->setHorizontalHeaderLabels({"@id", "Sampling Point", "Notation", "Label", "Concentration"});
+
+    QChart* chart = chartView->chart();
+    chart->removeAllSeries();
+
+    QLineSeries* series = new QLineSeries();
+    series->setName(selectedPollutant + " Levels");
+
+    int row = 0;
+    for (const QStringList& rowData : csvData) {
+        if (rowData[3] == selectedPollutant) { // Filter rows based on the pollutant
+            tableModel->appendRow({
+                new QStandardItem(rowData[0]),
+                new QStandardItem(rowData[1]),
+                new QStandardItem(rowData[2]),
+                new QStandardItem(rowData[3]),
+                new QStandardItem(rowData[4])
+            });
+
+            // Add points to the chart
+            bool ok;
+            double concentration = rowData[4].toDouble(&ok);
+            if (ok) {
+                series->append(row++, concentration);
+            }
+        }
+    }
+
+    chart->addSeries(series);
+    chart->createDefaultAxes();
+    chart->setTitle("Pollutant Levels Over Time (" + selectedPollutant + ")");
+
+    dataTable->setModel(tableModel);
+}
+
+
 void Tab2::onPollutantSelectionChanged(int index)
 {
     Q_UNUSED(index);
