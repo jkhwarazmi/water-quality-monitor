@@ -29,7 +29,6 @@ Tab5::Tab5(WaterModel* model, QWidget* parent) : QWidget(parent), waterModel(mod
 void Tab5::onPollutantSelectionChanged(int index)
 {
     QString selectedPollutant = pollutantDropdown->itemText(index);
-    qDebug() << "Selected pollutant:" << selectedPollutant;
     updateComplianceStatus(selectedPollutant, locationDropdown->currentText());
 }
 
@@ -37,7 +36,6 @@ void Tab5::onLocationSelectionChanged(int index)
 {
     QString selectedLocation = locationDropdown->itemText(index);
     QString selectedPollutant = pollutantDropdown->currentText(); // Add this line to get the selected pollutant
-    qDebug() << "Selected location:" << selectedLocation;
 
     // Now you can use selectedPollutant in the updateComplianceStatus call
     updateComplianceStatus(selectedPollutant, selectedLocation);
@@ -232,8 +230,6 @@ void Tab5::updateCharts()
 
 void Tab5::updatePollutantList()
 {
-    qDebug() << "Updating pollutant dropdown in Tab5...";
-
     // Define the list of pollutants you want to select from the model
     QStringList selectedPollutants = {
     "Ammonia(N)", 
@@ -279,8 +275,6 @@ void Tab5::updatePollutantList()
 
 void Tab5::updateLocationList()
 {
-    qDebug() << "Updating location dropdown in Tab5...";
-
     if (!waterModel->hasData()) {
         locationDropdown->clear();
         locationDropdown->addItem(tr("No data available."));

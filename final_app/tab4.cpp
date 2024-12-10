@@ -88,17 +88,12 @@ void Tab4::updateTimeSeriesChart()
         layout->addWidget(chartView);
 
         currentChartView = chartView;
-
-        qDebug() << "Chart successfully created and added to layout.";
-    } else {
-        qDebug() << "No chart created.";
     }
 }
 
 void Tab4::onPollutantSelectionChanged(int index)
 {
     QString selectedPollutant = pollutantDropdown->itemText(index);
-    qDebug() << "Selected pollutant:" << selectedPollutant;
 
     // Update the location dropdown based on the selected pollutant
     updateLocationDropdown(selectedPollutant);
@@ -108,8 +103,6 @@ void Tab4::onPollutantSelectionChanged(int index)
 void Tab4::onLocationSelectionChanged(int index)
 {
     QString selectedLocation = locationDropdown->itemText(index);
-    qDebug() << "Selected location:" << selectedLocation;
-
     updateTimeSeriesChart();
 }
 
@@ -192,8 +185,6 @@ void Tab4::updateCharts()
 
 void Tab4::updatePollutantList()
 {
-    qDebug() << "Updating pollutant dropdown in Tab4...";
-
     pollutantDropdown->blockSignals(true); // Prevent triggering slot during update
     pollutantDropdown->clear();
 
@@ -217,7 +208,6 @@ void Tab4::updatePollutantList()
     // Populate the pollutant dropdown
     for (const auto& pollutant : uniquePollutants) {
         pollutantDropdown->addItem(pollutant);
-        qDebug() << pollutant;
     }
 
     pollutantDropdown->blockSignals(false);
@@ -232,8 +222,6 @@ void Tab4::updatePollutantList()
 
 void Tab4::updateLocationList()
 {
-    qDebug() << "Updating location dropdown in Tab4...";
-
     if (!waterModel->hasData()) {
         locationDropdown->clear();
         locationDropdown->addItem(tr("No data available."));
@@ -257,7 +245,6 @@ QChart* Tab4::createTimeSeriesChart(const QString& pollutant, const QString& loc
 {
     // Validate selections
     if (pollutant.isEmpty() || location.isEmpty()) {
-        qDebug() << "Pollutant or location not selected. Cannot create chart.";
         return nullptr;
     }
 
@@ -274,24 +261,19 @@ QChart* Tab4::createTimeSeriesChart(const QString& pollutant, const QString& loc
 
             // Validate data points
             if (!dateTime.isValid()) {
-                qDebug() << "Invalid QDateTime at row" << i << ". Skipping this data point.";
                 continue;
             }
 
             if (qIsNaN(concentration)) {
-                qDebug() << "NaN concentration at row" << i << ". Skipping this data point.";
                 continue;
             }
 
             dataPoints.append(qMakePair(dateTime, concentration));
         }
     }
-
-    qDebug() << "Total valid data points retrieved:" << dataPoints.size();
-
+    
     // Check if data points exist
     if (dataPoints.isEmpty()) {
-        qDebug() << "No valid data points available for the selected pollutant and location.";
         return nullptr;
     }
 
@@ -302,10 +284,8 @@ QChart* Tab4::createTimeSeriesChart(const QString& pollutant, const QString& loc
 
     // Retrieve threshold
     double threshold = waterModel->getDeterminandThreshold(pollutant);
-    qDebug() << "Threshold for" << pollutant << ":" << threshold;
 
     if (threshold <= 0.0) {
-        qDebug() << "Invalid threshold for" << pollutant << ". Threshold must be greater than 0.";
         return nullptr;
     }
 
@@ -364,10 +344,6 @@ QChart* Tab4::createTimeSeriesChart(const QString& pollutant, const QString& loc
         }
     }
 
-    qDebug() << "Compliant points:" << compliantCount;
-    qDebug() << "Near Threshold points:" << nearThresholdCount;
-    qDebug() << "Non-Compliant points:" << nonCompliantCount;
-
     // creat chart, add series
     QChart* chart = new QChart();
     chart->addSeries(lineSeries);
@@ -375,20 +351,13 @@ QChart* Tab4::createTimeSeriesChart(const QString& pollutant, const QString& loc
     // Only adds scatter series only if they have data points
     if (compliantSeries->count() > 0) {
         chart->addSeries(compliantSeries);
-    } else {
-        qDebug() << "No compliant data points to display.";
     }
 
     if (nearThresholdSeries->count() > 0) {
         chart->addSeries(nearThresholdSeries);
-    } else {
-        qDebug() << "No near threshold data points to display.";
     }
-
     if (nonCompliantSeries->count() > 0) {
         chart->addSeries(nonCompliantSeries);
-    } else {
-        qDebug() << "No non-compliant data points to display.";
     }
 
     chart->setTitle(tr("Time Series for %1 at %2").arg(pollutant, location));
@@ -495,9 +464,6 @@ QChart* Tab4::createTimeSeriesChart(const QString& pollutant, const QString& loc
     chart->setAnimationOptions(QChart::SeriesAnimations);
     chart->legend()->setVisible(true);
     chart->legend()->setAlignment(Qt::AlignBottom);
-
-    qDebug() << "Chart successfully created with title:" << chart->title();
-    qDebug() << "Chart has" << chart->series().size() << "series.";
 
     return chart;
 }
