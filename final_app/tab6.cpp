@@ -47,6 +47,9 @@ void Tab6::createWidgets()
   tableView->setObjectName("mainTable");
   tableView->setWordWrap(false);  // Prevent word wrapping to get accurate column widths
   
+  // Enable custom delegates for colour coding
+  tableView->setItemDelegate(new QStyledItemDelegate(this));
+  
   // Header settings
   QHeaderView* horizontalHeader = tableView->horizontalHeader();
   horizontalHeader->setStretchLastSection(true);
@@ -119,14 +122,9 @@ void Tab6::setupStyles()
     QHeaderView::section {
       background-color: black;
       color: white;
-      padding: %6px;
+      padding: %5px;
       border: none;
-      border-right: 1px solid white;
       font-weight: bold;
-    }
-    
-    QHeaderView::section:last {
-      border-right: none;
     }
     
     QHeaderView::section:first {
@@ -137,66 +135,85 @@ void Tab6::setupStyles()
       background-color: black;
     }
     
-    QTableView::item {
-      padding: %6px;
-      border: none;
-    }
-    
-    /* Selection styling takes precedence over alternate rows */
-    QTableView::item:selected,
-    QTableView::item:alternate:selected {
-      background-color: %5;
+    /* Selection styling */
+    QTableView::item:selected {
       color: white;
-      padding: %6px;
+      padding: %5px;
     }
     
-    /* Alternate row styling has lower precedence */
-    QTableView::item:alternate {
-      background-color: %8;
+    /* Alternate row styling - exclude concentration column */
+    QTableView::item:alternate:!focus:not([column="6"]) {
+      background-color: %6;
     }
     
+    /* Default item styling - exclude concentration column */
+    QTableView::item:!alternate:!focus:not([column="6"]) {
+      background-color: %2;
+    }
+
+    /* Vertical Scrollbar */
     QScrollBar:vertical {
-      border: none;
       background-color: transparent;
       width: 12px;
-      margin: 0px;
+      margin: 0;
     }
     
     QScrollBar::handle:vertical {
       background-color: %3;
-      border-radius: %4px;
+      border-radius: 6px;
       min-height: 20px;
+      margin: 2px;
     }
     
     QScrollBar::handle:vertical:hover {
       background-color: %7;
     }
     
+    QScrollBar::add-line:vertical,
+    QScrollBar::sub-line:vertical {
+      height: 0px;
+    }
+    
+    QScrollBar::add-page:vertical,
+    QScrollBar::sub-page:vertical {
+      background: none;
+    }
+
+    /* Horizontal Scrollbar */
     QScrollBar:horizontal {
-      border: none;
       background-color: transparent;
       height: 12px;
-      margin: 0px;
+      margin: 0;
     }
     
     QScrollBar::handle:horizontal {
       background-color: %3;
-      border-radius: %4px;
+      border-radius: 6px;
       min-width: 20px;
+      margin: 2px;
     }
     
     QScrollBar::handle:horizontal:hover {
       background-color: %7;
+    }
+    
+    QScrollBar::add-line:horizontal,
+    QScrollBar::sub-line:horizontal {
+      width: 0px;
+    }
+    
+    QScrollBar::add-page:horizontal,
+    QScrollBar::sub-page:horizontal {
+      background: none;
     }
   )")
   .arg(Styles::textColor())                    // %1
   .arg(Styles::backgroundColor())              // %2
   .arg(Styles::borderColor())                  // %3
   .arg(Styles::BORDER_RADIUS)                  // %4
-  .arg(Styles::actionButtonBackground())       // %5
-  .arg(Styles::PADDING_SMALL)                  // %6
-  .arg(Styles::actionButtonHover())            // %7
-  .arg(Styles::alternateRowBackground());      // %8
+  .arg(Styles::PADDING_SMALL)                  // %5
+  .arg(Styles::alternateRowBackground())       // %6
+  .arg(Styles::actionButtonHover());           // %7
 
   this->setStyleSheet(styleSheet);
 }
