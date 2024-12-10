@@ -40,7 +40,7 @@ void Tab6::createWidgets()
   
   // Table behavior settings
   tableView->setAlternatingRowColors(true);
-  tableView->setSortingEnabled(true);
+  tableView->setSortingEnabled(false); 
   tableView->setSelectionBehavior(QAbstractItemView::SelectRows);
   tableView->setSelectionMode(QAbstractItemView::SingleSelection);
   tableView->setShowGrid(true);
@@ -50,8 +50,8 @@ void Tab6::createWidgets()
   // Header settings
   QHeaderView* horizontalHeader = tableView->horizontalHeader();
   horizontalHeader->setStretchLastSection(true);
-  horizontalHeader->setSectionsClickable(true);
-  horizontalHeader->setHighlightSections(true);
+  horizontalHeader->setSectionsClickable(false);
+  horizontalHeader->setHighlightSections(false);  
   horizontalHeader->setObjectName("tableHeader");
   horizontalHeader->setDefaultAlignment(Qt::AlignLeft | Qt::AlignVCenter);
   
@@ -103,105 +103,100 @@ void Tab6::createLayout()
 
 void Tab6::setupStyles()
 {
-  // QString styleSheet = QString(R"(
-  //   QWidget {
-  //     background-color: transparent;
-  //     color: %1;
-  //   }
+  QString styleSheet = QString(R"(
+    QWidget {
+      background-color: transparent;
+      color: %1;
+    }
     
-  //   QTableView#mainTable {
-  //     background-color: %2;
-  //     border: 1px solid %3;
-  //     border-radius: %4px;
-  //     selection-background-color: %5;
-  //     selection-color: %6;
-  //     gridline-color: %7;
-  //   }
+    QTableView#mainTable {
+      background-color: %2;
+      border: 1px solid %3;
+      border-radius: %4px;
+      gridline-color: %3;
+    }
     
-  //   QHeaderView::section {
-  //     background-color: %8;
-  //     color: %9;
-  //     padding: %10px;
-  //     border: none;
-  //     font-weight: bold;
-  //   }
+    QHeaderView::section {
+      background-color: black;
+      color: white;
+      padding: %6px;
+      border: none;
+      border-right: 1px solid white;
+      font-weight: bold;
+    }
     
-  //   QHeaderView::section:first {
-  //     border-top-left-radius: %4px;
-  //   }
+    QHeaderView::section:last {
+      border-right: none;
+    }
     
-  //   QHeaderView::section:hover {
-  //     background-color: %11;
-  //   }
+    QHeaderView::section:first {
+      border-top-left-radius: %4px;
+    }
     
-  //   QTableView::item {
-  //     padding: %12px;
-  //     margin: 0;
-  //     border: none;
-  //   }
+    QHeaderView::section:hover {
+      background-color: black;
+    }
     
-  //   QTableView::item:selected {
-  //     background-color: %5;
-  //     color: %6;
-  //     padding: %12px;
-  //     margin: 0;
-  //     border: none;
-  //   }
+    QTableView::item {
+      padding: %6px;
+      border: none;
+    }
     
-  //   QTableView::item:alternate {
-  //     background-color: %13;
-  //     padding: %12px;
-  //     margin: 0;
-  //     border: none;
-  //   }
+    /* Selection styling takes precedence over alternate rows */
+    QTableView::item:selected,
+    QTableView::item:alternate:selected {
+      background-color: %5;
+      color: white;
+      padding: %6px;
+    }
     
-  //   QScrollBar:vertical {
-  //     border: none;
-  //     background-color: %2;
-  //     width: 12px;
-  //     margin: 0px;
-  //   }
+    /* Alternate row styling has lower precedence */
+    QTableView::item:alternate {
+      background-color: %8;
+    }
     
-  //   QScrollBar::handle:vertical {
-  //     background-color: %3;
-  //     border-radius: %4px;
-  //     min-height: 20px;
-  //   }
+    QScrollBar:vertical {
+      border: none;
+      background-color: transparent;
+      width: 12px;
+      margin: 0px;
+    }
     
-  //   QScrollBar::handle:vertical:hover {
-  //     background-color: %11;
-  //   }
+    QScrollBar::handle:vertical {
+      background-color: %3;
+      border-radius: %4px;
+      min-height: 20px;
+    }
     
-  //   QScrollBar:horizontal {
-  //     border: none;
-  //     background-color: %2;
-  //     height: 12px;
-  //     margin: 0px;
-  //   }
+    QScrollBar::handle:vertical:hover {
+      background-color: %7;
+    }
     
-  //   QScrollBar::handle:horizontal {
-  //     background-color: %3;
-  //     border-radius: %4px;
-  //     min-width: 20px;
-  //   }
+    QScrollBar:horizontal {
+      border: none;
+      background-color: transparent;
+      height: 12px;
+      margin: 0px;
+    }
     
-  //   QScrollBar::handle:horizontal:hover {
-  //     background-color: %11;
-  //   }
-  // )")
-  // .arg(Styles::textColor())                    // %1
-  // .arg(Styles::backgroundColor())              // %2
-  // .arg(Styles::borderColor())                  // %3
-  // .arg(Styles::BORDER_RADIUS)                  // %4
-  // .arg(Styles::selectionBackground())          // %5
-  // .arg(Styles::selectionText())                // %6
-  // .arg(Styles::gridColor())                    // %7
-  // .arg(Styles::tableHeaderBackground())        // %8
-  // .arg(Styles::tableHeaderText())              // %9
-  // .arg(Styles::PADDING_MEDIUM)                 // %10
-  // .arg(Styles::menuHover())                    // %11
-  // .arg(Styles::PADDING_SMALL)                  // %12
-  // .arg(Styles::alternateRowBackground());      // %13
+    QScrollBar::handle:horizontal {
+      background-color: %3;
+      border-radius: %4px;
+      min-width: 20px;
+    }
+    
+    QScrollBar::handle:horizontal:hover {
+      background-color: %7;
+    }
+  )")
+  .arg(Styles::textColor())                    // %1
+  .arg(Styles::backgroundColor())              // %2
+  .arg(Styles::borderColor())                  // %3
+  .arg(Styles::BORDER_RADIUS)                  // %4
+  .arg(Styles::actionButtonBackground())       // %5
+  .arg(Styles::PADDING_SMALL)                  // %6
+  .arg(Styles::actionButtonHover())            // %7
+  .arg(Styles::alternateRowBackground());      // %8
 
-  // this->setStyleSheet(styleSheet);
+  this->setStyleSheet(styleSheet);
 }
