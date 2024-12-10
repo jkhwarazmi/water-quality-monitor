@@ -176,14 +176,38 @@ void WaterWindow::cancelLoad()
 
 void WaterWindow::loadData(const QString &path)
 {
-  QProgressDialog progress(tr("Loading data..."), tr("Cancel"), 0, 0, this);
-  progress.setWindowModality(Qt::WindowModal);
-  progress.show();
+  // Create custom loading dialog
+  QDialog loadingDialog(this);
+  loadingDialog.setWindowTitle(tr("Loading"));
+  loadingDialog.setWindowFlags(Qt::Dialog | Qt::CustomizeWindowHint | Qt::WindowTitleHint);
+  loadingDialog.setFixedSize(300, 100);
+  loadingDialog.setModal(true);
+  
+  QVBoxLayout *layout = new QVBoxLayout(&loadingDialog);
+  
+  QLabel *loadingLabel = new QLabel(tr("Loading data..."));
+  loadingLabel->setAlignment(Qt::AlignCenter);
+  QFont font = loadingLabel->font();
+  font.setPointSize(12);
+  loadingLabel->setFont(font);
+  
+  QProgressBar *progressBar = new QProgressBar();
+  progressBar->setMinimum(0);
+  progressBar->setMaximum(0);
+  progressBar->setTextVisible(false);
+  
+  layout->addWidget(loadingLabel);
+  layout->addWidget(progressBar);
+  
+  // Show dialog and process events to ensure it appears
+  loadingDialog.show();
+  QCoreApplication::processEvents();
 
   try {
     model.updateFromFile(path);
       
     if (!model.hasData()) {
+      loadingDialog.close();
       QMessageBox::critical(this, tr("Data Error"), tr("The selected file contains no valid data."));
       return;
     }
@@ -200,10 +224,11 @@ void WaterWindow::loadData(const QString &path)
     loadDataWidget->setDataLoaded(true);
 
   } catch (const std::exception& error) {
+    loadingDialog.close();
     QMessageBox::critical(this, tr("CSV File Error"), error.what());
   }
     
-  progress.close();
+  loadingDialog.close();
 }
 
 void WaterWindow::switchToTabView()
