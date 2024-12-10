@@ -48,6 +48,8 @@ public:
     QMap<QString, QMap<QString, int>*> getLitterWaterType() const { return litterWaterType;}
 
     QVector<QPair<QDateTime, double>> getDataForPollutant(const QString& pollutant) const;
+    QVector<QPair<QDateTime, double>> getTimeRangeData(const QString& pollutant, const QString& timeRange) const;
+
 
 private:
     WaterDataset dataset;
