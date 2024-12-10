@@ -1,4 +1,3 @@
-
 #include <QtWidgets>
 #include <QtCharts>
 #include <QFile>
@@ -29,25 +28,19 @@ Tab2::Tab2(WaterModel* model, QWidget* parent)
 
 void Tab2::createWidgets()
 {
-    // Search bar
     searchBar = new QLineEdit(this);
     searchBar->setPlaceholderText("Search pollutants...");
 
-    // Dropdown filter for pollutants
     pollutantFilter = new QComboBox(this);
 
-    // Dropdown filter for time ranges
     timeRangeFilter = new QComboBox(this);
     timeRangeFilter->addItems({"Last Week", "Last Month", "Last Year", "All Time"});
 
-    // Chart view for graphical representation
     chartView = new QChartView(new QChart(), this);
     chartView->setRenderHint(QPainter::Antialiasing);
 
-    // Table view for tabular data
     dataTable = new QTableView(this);
 
-    // Title label
     title = new QLabel(tr("Pollutant Overview"));
     QFont labelFont;
     labelFont.setPointSize(32);
@@ -60,19 +53,16 @@ void Tab2::createWidgets()
 void Tab2::createLayout()
 {
     QVBoxLayout* layout = new QVBoxLayout;
-
-    // Filter layout
     QHBoxLayout* filterLayout = new QHBoxLayout;
+
     filterLayout->addWidget(new QLabel("Pollutant:", this));
     filterLayout->addWidget(pollutantFilter);
     filterLayout->addWidget(new QLabel("Time Range:", this));
     filterLayout->addWidget(timeRangeFilter);
 
-    layout->addWidget(title); // Add title
-    layout->addWidget(searchBar); // Add search bar
+    layout->addWidget(title);
+    layout->addWidget(searchBar);
     layout->addLayout(filterLayout);
-
-    // Add chart and table views
     layout->addWidget(chartView);
     layout->addWidget(dataTable);
 
@@ -89,7 +79,6 @@ void Tab2::setupStyles()
             background-color: transparent;
             color: %1;
         }
-
         QLabel#titleLabel {
             font-size: 32px;
             font-weight: bold;
@@ -103,7 +92,7 @@ void Tab2::setupStyles()
 
 void Tab2::loadData()
 {
-    QFile file("data/data.csv"); // Assuming CSV is in the 'data' folder
+    QFile file("data/data.csv");
     if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
         qDebug() << "Error: Cannot open file" << file.errorString();
         return;
@@ -121,19 +110,22 @@ void Tab2::loadData()
             continue;
         }
 
-        if (values.size() < 5) continue; // Ensure sufficient columns
+        if (values.size() < 5) continue;
 
-        // Populate pollutants dropdown dynamically
-        QString pollutant = values[3]; // Assuming pollutant is in column 3
+        QString pollutant = values[3];
         if (!pollutants.contains(pollutant)) {
             pollutants.append(pollutant);
             pollutantFilter->addItem(pollutant);
         }
 
-        csvData.append(values); // Store the row data for later filtering
+        csvData.append(values);
     }
 
     file.close();
+
+    if (pollutants.isEmpty()) {
+        qDebug() << "No pollutants found in the dataset.";
+    }
 }
 
 void Tab2::updateCharts()
@@ -143,22 +135,25 @@ void Tab2::updateCharts()
     QChart* chart = chartView->chart();
     chart->removeAllSeries();
 
+    if (selectedPollutant.isEmpty()) {
+        qDebug() << "No pollutant selected.";
+        return;
+    }
+
     QLineSeries* series = new QLineSeries();
     series->setName(selectedPollutant + " Levels");
 
     QDateTime now = QDateTime::currentDateTime();
     QDateTime startTime;
+
     if (selectedTimeRange == "Last Week") {
         startTime = now.addDays(-7);
     } else if (selectedTimeRange == "Last Month") {
         startTime = now.addMonths(-1);
     } else if (selectedTimeRange == "Last Year") {
         startTime = now.addYears(-1);
-    } else {
-        startTime = QDateTime(); // All Time
     }
 
-    // Retrieve data for selected pollutant and filter by time range
     for (const QStringList& row : csvData) {
         if (row[3] == selectedPollutant) {
             QDateTime dateTime = QDateTime::fromString(row[0], "yyyy-MM-dd HH:mm");
@@ -174,21 +169,18 @@ void Tab2::updateCharts()
 
     chart->addSeries(series);
     chart->createDefaultAxes();
-    chart->setTitle(tr("Levels Over Time: %1").arg(selectedPollutant));
 
-    // Customize chart appearance
-    auto* axisX = new QDateTimeAxis();
+    QDateTimeAxis* axisX = new QDateTimeAxis();
     axisX->setFormat("dd-MM-yyyy");
     axisX->setTitleText("Date/Time");
     chart->addAxis(axisX, Qt::AlignBottom);
     series->attachAxis(axisX);
 
-    auto* axisY = new QValueAxis();
+    QValueAxis* axisY = new QValueAxis();
     axisY->setTitleText("Concentration");
     chart->addAxis(axisY, Qt::AlignLeft);
     series->attachAxis(axisY);
 
-    // Add tooltips for compliance
     connect(series, &QLineSeries::hovered, this, [=](const QPointF& point, bool state) {
         if (state) {
             QToolTip::showText(QCursor::pos(),
@@ -200,17 +192,17 @@ void Tab2::updateCharts()
         }
     });
 
-    // Update table with data for the selected pollutant
     if (!tableModel) {
         tableModel = new QStandardItemModel(this);
     }
+
     tableModel->clear();
     tableModel->setHorizontalHeaderLabels({"Date/Time", "Concentration", "Compliance"});
 
     for (const QStringList& row : csvData) {
         if (row[3] == selectedPollutant) {
             QDateTime dateTime = QDateTime::fromString(row[0], "yyyy-MM-dd HH:mm");
-            if (dateTime.isValid() && dateTime >= startTime) {
+            if (dateTime.isValid()) {
                 bool ok;
                 double concentration = row[4].toDouble(&ok);
                 if (ok) {
@@ -223,7 +215,6 @@ void Tab2::updateCharts()
 
                     tableModel->appendRow(tableRow);
 
-                    // Color code compliance
                     QColor color = (compliance == "Green") ? Qt::green
                                  : (compliance == "Amber") ? Qt::yellow
                                                            : Qt::red;
@@ -238,7 +229,7 @@ void Tab2::updateCharts()
 
 void Tab2::filterTable(const QString& searchText)
 {
-    if (!tableModel) return; // Ensure the model is initialized
+    if (!tableModel) return;
 
     for (int row = 0; row < tableModel->rowCount(); ++row) {
         bool match = false;
@@ -256,5 +247,6 @@ void Tab2::filterTable(const QString& searchText)
 void Tab2::onPollutantSelectionChanged(int index)
 {
     Q_UNUSED(index);
-    updateCharts();  // Update chart and table when pollutant is selected
+    updateCharts();
 }
+
