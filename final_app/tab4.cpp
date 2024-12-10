@@ -223,42 +223,16 @@ void Tab4::setupGeneralStyles()
 void Tab4::setupComboBoxStyles()
 {
     QString styleSheet = QString(R"(
-        QComboBox#dataDropdown {
-            background-color: %1;
-            border: 1px solid %2;
-            border-radius: %3px;
-            padding: 5px 10px;
-            color: white;
-            font-size: 14px;
-            min-width: 200px;
-        }
-
-        QComboBox#dataDropdown:hover {
-            background-color: %4;
-        }
-
-        QComboBox#dataDropdown::drop-down {
-            border: none;
-            width: 30px;
-        }
-
-        QComboBox#dataDropdown::down-arrow {
-            image: url(:/icons/dropdown-arrow.png);
-            width: 12px;
-            height: 12px;
-        }
-
-        QComboBox#dataDropdown QAbstractItemView {
-            background-color: %1;
-            border: 1px solid %2;
-            selection-background-color: %4;
-            selection-color: white;
-        }
-    )")
-    .arg(Styles::backgroundColor())              // %1
-    .arg(Styles::borderColor())                  // %2
-    .arg(Styles::BORDER_RADIUS)                  // %3
-    .arg(Styles::actionButtonHover());           // %4
+        QComboBox {
+            font-size: 16px;
+            padding: 5px;
+            background-color: %2;  /* Dropdown background color */
+            color: %1;  /* Text color in dropdown */
+            border: 1px solid %3;  /* Border color */
+        })")
+    .arg(Styles::textColor())  // Text color
+    .arg(Styles::backgroundColor())  // Dropdown background color
+    .arg(Styles::borderColor());  // Border color for dropdown
 
     this->setStyleSheet(this->styleSheet() + styleSheet);
 }
