@@ -6,6 +6,8 @@
 #include "model.hpp"
 
 class QLabel;
+class QScrollArea;
+class QVBoxLayout;
 
 class Tab7: public QWidget
 {
@@ -16,7 +18,9 @@ class Tab7: public QWidget
 
   private:
     WaterModel* waterModel;
-    QLabel *placeholder;
+    QLabel *title;
+    QScrollArea *scrollArea;
+    QWidget *contentContainer;
 
     void createWidgets();
     void createLayout();
