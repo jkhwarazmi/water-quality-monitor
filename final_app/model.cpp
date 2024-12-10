@@ -425,3 +425,15 @@ QVector<QPair<QDateTime, double>> WaterModel::getTimeRangeData(const QString& po
     return filteredData;
 }
 
+QStringList WaterModel::getPollutantList() const {
+    QStringList pollutants;
+
+    // Iterate through the pollutantData map to collect unique pollutant names
+    for (const auto& key : pollutantData.keys()) {
+        pollutants.append(key);
+    }
+
+    return pollutants;
+}
+
+
