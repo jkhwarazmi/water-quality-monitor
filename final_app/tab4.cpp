@@ -133,7 +133,7 @@ void Tab4::createWidgets()
     title->setObjectName("titleLabel");
 
     description = new QLabel(tr("Monitor fluorinated compound concentrations in water samples over time. "
-                               "Select a pollutant and location to view detailed time series data with compliance indicators."));
+                               "Select a compound and location to view detailed time series data with compliance indicators."));
     description->setWordWrap(true);
     description->setAlignment(Qt::AlignCenter);
     description->setObjectName("descriptionLabel");

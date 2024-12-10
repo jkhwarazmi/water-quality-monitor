@@ -24,16 +24,14 @@ class WaterModel: public QAbstractTableModel
     QVariant data(const QModelIndex&, int) const;
     QVariant headerData(int, Qt::Orientation, int) const;
     QString getDeterminandDefinition(const QString& pollutant) const;
-    //New
+
     QVector<QPair<QString, double>> getTopLocationsByPollutant(const QString& pollutant) const;
-
-
 
     // Add additional processing inside here
     void dataProcessing();
 
     // Getters for chart data
-    QMap<QString, QVector<double>> getPollutantData() const { return pollutantData; }
+    QMap<QString, QVector<QPair<QDateTime, double>>> getPollutantData() const { return pollutantData; }
     QMap<QString, QVector<QPair<QString, double>>> getSamplingPointData() const { return samplingPointData; }
     int getLocationCount() const { return locationCount; }
     int getDeterminandCount() const { return determinandCount; }
@@ -49,13 +47,16 @@ class WaterModel: public QAbstractTableModel
     QMap<QString, QMap<QString, int>*> getLitterLocation() const { return litterLocation;}
     QMap<QString, QMap<QString, int>*> getLitterWaterType() const { return litterWaterType;}
 
+    QVector<QPair<QDateTime, double>> getDataForSpecificPollutants(const QString& pollutant) const;
+    QMap<QString, QVector<QPair<QDateTime, double>>> getYourPollutantData() const { return pollutantData; }
+    QMap<QString, QSet<QString>> getYourPollutantLocations() const { return pollutantLocations; }
   private:
     WaterDataset dataset;
 
     // Variables for chart data
     int locationCount = 0;
     int determinandCount = 0;
-    QMap<QString, QVector<double>> pollutantData;
+
     QMap<QString, QVector<QPair<QString, double>>> samplingPointData; // Corrected type
 
     QMap<QString, QVector<double>> fluorPollutantData;              // Stores pollutants with "fluor"
@@ -70,4 +71,6 @@ class WaterModel: public QAbstractTableModel
     QMap<QString, QMap<QString, int>*> litterLocation = QMap<QString, QMap<QString, int>*>();
     QMap<QString, QMap<QString, int>*> litterWaterType = QMap<QString, QMap<QString, int>*>();
 
+    QMap<QString, QVector<QPair<QDateTime, double>>> pollutantData;
+    QMap<QString, QSet<QString>> pollutantLocations;
 };
