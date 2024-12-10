@@ -231,6 +231,17 @@ double WaterModel::getDeterminandThreshold(const QString& Determinand) const {
 }
 
 void WaterModel::dataProcessing() {
+  // Clear existing maps and their pointers first
+  for (auto map : litterLocation.values()) {
+    delete map;
+  }
+  litterLocation.clear();
+
+  for (auto map : litterWaterType.values()) {
+    delete map;
+  }
+  litterWaterType.clear();
+
   QSet<QString> uniqueLocations;
   QSet<QString> uniqueDeterminands;
 
@@ -317,12 +328,15 @@ void WaterModel::dataProcessing() {
   // Sort by count in descending order
   std::sort(sortedLocations.begin(), sortedLocations.end(),
     [](const QPair<QString, int>& a, const QPair<QString, int>& b) {
-      return a.second > b.second;
+      if (a.second != b.second) {
+        return a.second > b.second;  // Sort by count first (descending)
+      }
+      return a.first < b.first;     // If counts are equal, sort by name (ascending)
   });
 
   // Take only top 5 for sampleLocations
-  int n = qMin(5, sortedLocations.size());
-  for(int i = 0; i < n; ++i) {
+  int locations = qMin(5, sortedLocations.size());
+  for(int i = 0; i < locations; ++i) {
     sampleLocations[sortedLocations[i].first] = sortedLocations[i].second;
   }
 
@@ -334,12 +348,15 @@ void WaterModel::dataProcessing() {
   // Sort by count in descending order
   std::sort(sortedDeterminands.begin(), sortedDeterminands.end(),
     [](const QPair<QString, int>& a, const QPair<QString, int>& b) {
-      return a.second > b.second;
+      if (a.second != b.second) {
+        return a.second > b.second;  // Sort by count first (descending)
+      }
+      return a.first < b.first;     // If counts are equal, sort by name (ascending)
   });
 
   // Take only top 5 for determinandCounts
-  n = qMin(5, sortedDeterminands.size());
-  for(int i = 0; i < n; ++i) {
+  int determinands = qMin(5, sortedDeterminands.size());
+  for(int i = 0; i < determinands; ++i) {
     determinandCounts[sortedDeterminands[i].first] = sortedDeterminands[i].second;
   }
   

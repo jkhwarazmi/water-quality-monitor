@@ -1,25 +1,26 @@
-// Sample header for the table view card - Raw Data
+// Header for Tab 7 - Help
 
 #pragma once
 
 #include <QWidget>
 #include "model.hpp"
 
-class QTableView;
+class QLabel;
+class QScrollArea;
+class QVBoxLayout;
 
-class Tab7 : public QWidget
+class Tab7: public QWidget
 {
   Q_OBJECT
 
   public:
-    Tab7(WaterModel* model, QWidget* parent = nullptr);
-
-  private slots:
-    void adjustColumnWidths();
+    Tab7(WaterModel *model, QWidget *parent = nullptr);
 
   private:
     WaterModel* waterModel;
-    QTableView* tableView;
+    QLabel *title;
+    QScrollArea *scrollArea;
+    QWidget *contentContainer;
 
     void createWidgets();
     void createLayout();

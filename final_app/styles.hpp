@@ -25,7 +25,7 @@ namespace Styles {
 
   // Interactive element colors
   inline QString primaryButtonBackground() {
-    return isDarkMode() ? "#34495e" : "#f8f9fa";
+    return isDarkMode() ? "#34495e" : "#e2e8f0";
   }
 
   inline QString primaryButtonBorder() {
@@ -66,7 +66,7 @@ namespace Styles {
   }
 
   inline QString tabBackground() {
-    return isDarkMode() ? "#2c3e50" : "#f8f9fa";
+    return isDarkMode() ? "#2c3e50" : "#e2e8f0";
   }
 
   inline QString selectedTabBackground() {
