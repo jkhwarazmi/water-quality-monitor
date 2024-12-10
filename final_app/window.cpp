@@ -77,11 +77,11 @@ void WaterWindow::createMainWidget()
   tabWidget->addTab(tab5, tr("Compliance"));
   tabWidget->setTabToolTip(4, tr("Check compliance of detected pollutants with UK regulations"));
 
-  tabWidget->addTab(tab6, tr("Hotspots"));
-  tabWidget->setTabToolTip(5, tr("Identify pollution hotspots"));
+  tabWidget->addTab(tab6, tr("Raw Data"));
+  tabWidget->setTabToolTip(5, tr("View data from the CSV file as a table"));
 
-  tabWidget->addTab(tab7, tr("Raw Data"));
-  tabWidget->setTabToolTip(6, tr("View data from the CSV file as a table"));
+  tabWidget->addTab(tab7, tr("Help"));
+  tabWidget->setTabToolTip(6, tr("Get help using the application"));
     
   stackedWidget->addWidget(loadDataWidget);
   stackedWidget->addWidget(tabWidget);
@@ -106,10 +106,24 @@ void WaterWindow::createMenus()
   fileMenu->addAction(closeAction);
 
   QAction *aboutAction = new QAction(tr("&About"), this);
-  connect(aboutAction, &QAction::triggered, this, &WaterWindow::about);
+  connect(aboutAction, SIGNAL(triggered()), this, SLOT(about()));
+
+  QAction *findDataAction = new QAction(tr("&Get data sources"), this);
+  findDataAction->setShortcut(QKeySequence(Qt::CTRL | Qt::Key_G));
+  connect(findDataAction, &QAction::triggered, this, []{
+    QDesktopServices::openUrl(QUrl("https://environment.data.gov.uk/water-quality/view/download"));
+  });
+
+  QAction *understandDataAction = new QAction(tr("Understanding the &data"), this);
+  understandDataAction->setShortcut(QKeySequence(Qt::CTRL | Qt::Key_D));
+  connect(understandDataAction, &QAction::triggered, this, []{
+    QDesktopServices::openUrl(QUrl("https://environment.data.gov.uk/water-quality/view/doc/reference"));
+  });
 
   QMenu *helpMenu = menuBar()->addMenu(tr("&Help"));
   helpMenu->addAction(aboutAction);
+  helpMenu->addAction(findDataAction);
+  helpMenu->addAction(understandDataAction);
 }
 
 void WaterWindow::setDataLocation()
