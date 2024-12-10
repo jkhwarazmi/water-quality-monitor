@@ -32,6 +32,7 @@ void Tab1::createWidgets()
   reloadButton->setMinimumHeight(45);
   reloadButton->setCursor(Qt::PointingHandCursor);
   reloadButton->setObjectName("actionButton");
+  reloadButton->setToolTip(tr("Click to load data from a different file"));
   connect(reloadButton, SIGNAL(clicked()), this, SIGNAL(reloadRequested()));
 
   title = new QLabel(tr("Dashboard"));

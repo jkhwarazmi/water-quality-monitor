@@ -231,6 +231,17 @@ double WaterModel::getDeterminandThreshold(const QString& Determinand) const {
 }
 
 void WaterModel::dataProcessing() {
+  // Clear existing maps and their pointers first
+  for (auto map : litterLocation.values()) {
+    delete map;
+  }
+  litterLocation.clear();
+
+  for (auto map : litterWaterType.values()) {
+    delete map;
+  }
+  litterWaterType.clear();
+
   QSet<QString> uniqueLocations;
   QSet<QString> uniqueDeterminands;
 
