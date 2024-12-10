@@ -1,7 +1,7 @@
 #include <QtWidgets>
 #include <QtCharts>
 #include "styles.hpp"
-#include "Tab2.hpp"
+#include "tab2.hpp"
 
 Tab2::Tab2(WaterModel* model, QWidget* parent) : waterModel(model), QWidget(parent), currentChartView(nullptr)
 {
