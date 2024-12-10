@@ -58,6 +58,7 @@ class WaterWindow: public QMainWindow
     void setDataLocation();
     void setPath();
     void switchToLoadView();
+    void cancelLoad();
     void about();
     void changeLanguage(const QString &);
     void handleLanguageAction(QAction *);

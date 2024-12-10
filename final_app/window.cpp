@@ -47,6 +47,8 @@ void WaterWindow::createMainWidget()
 
   connect(loadDataWidget, SIGNAL(dataFileSelected()), this, SLOT(setDataLocation()));
   connect(loadDataWidget, SIGNAL(loadRequested()), this, SLOT(setPath()));
+  connect(loadDataWidget, SIGNAL(languageChanged(QString)), this, SLOT(changeLanguage(QString)));
+  connect(loadDataWidget, SIGNAL(cancelRequested()), this, SLOT(cancelLoad()));
     
   tabWidget = new QTabWidget;
   tabWidget->setObjectName("mainTabs");
@@ -75,8 +77,162 @@ void WaterWindow::createMainWidget()
   setCentralWidget(stackedWidget);
     
   stackedWidget->setCurrentWidget(loadDataWidget);
+}
 
-  connect(loadDataWidget, SIGNAL(languageChanged(QString)), this, SLOT(changeLanguage(QString)));
+void WaterWindow::createMenus()
+{
+  QAction *locAction = new QAction(tr("Set Data &Location"), this);
+  locAction->setShortcut(QKeySequence(Qt::CTRL | Qt::Key_L));
+  connect(locAction, SIGNAL(triggered()), this, SLOT(switchToLoadView()));
+
+  QAction *closeAction = new QAction(tr("Quit"), this);
+  closeAction->setShortcut(QKeySequence::Close);
+  connect(closeAction, SIGNAL(triggered()), this, SLOT(close()));
+
+  QMenu *fileMenu = menuBar()->addMenu(tr("&File"));
+  fileMenu->addAction(locAction);
+  fileMenu->addAction(closeAction);
+
+  QAction *aboutAction = new QAction(tr("&About"), this);
+  connect(aboutAction, &QAction::triggered, this, &WaterWindow::about);
+
+  QMenu *helpMenu = menuBar()->addMenu(tr("&Help"));
+  helpMenu->addAction(aboutAction);
+
+  createLanguageMenu();
+}
+
+void WaterWindow::createLanguageMenu() 
+{
+  QMenu *languageMenu = menuBar()->addMenu(tr("&Language"));
+
+  QActionGroup *languageGroup = new QActionGroup(this);
+  QAction* englishAction = new QAction(tr("&English"), this);
+  englishAction->setCheckable(true);
+  englishAction->setData("English");
+    
+  QAction* frenchAction = new QAction(tr("&Français"), this);
+  frenchAction->setCheckable(true);
+  frenchAction->setData("French");
+
+  // Set current language
+  QString currentLocale = QLocale::system().name().split('_').first();
+  if (currentLocale == "fr") {
+    frenchAction->setChecked(true);
+  } else {
+    englishAction->setChecked(true);
+  }
+
+  languageGroup->addAction(englishAction);
+  languageGroup->addAction(frenchAction);
+    
+  languageMenu->addAction(englishAction);
+  languageMenu->addAction(frenchAction);
+
+  // Connect using a lambda to convert QAction* to QString
+  connect(languageGroup, SIGNAL(triggered(QAction *)), this, SLOT(handleLanguageAction(QAction *)));
+}
+
+void WaterWindow::handleLanguageAction(QAction *action)
+{
+  changeLanguage(action->data().toString());
+}
+
+void WaterWindow::setDataLocation()
+{
+  QString directory = QFileDialog::getOpenFileName(this, tr("Select Data File"), dataLocation, tr("CSV files (*.csv)"));
+
+  if (!directory.isEmpty()) {
+    dataLocation = directory;
+    loadDataWidget->updatePath(dataLocation);
+  } else {
+    QMessageBox::critical(this, tr("Data Error"), tr("No file selected."));
+  }
+}
+
+void WaterWindow::setPath()
+{
+  dataLocation = loadDataWidget->getPath();
+  loadData(dataLocation);
+}
+
+void WaterWindow::cancelLoad()
+{
+  switchToTabView();
+}
+
+void WaterWindow::loadData(const QString &path)
+{
+  QProgressDialog progress(tr("Loading data..."), tr("Cancel"), 0, 0, this);
+  progress.setWindowModality(Qt::WindowModal);
+  progress.show();
+
+  try {
+    model.updateFromFile(path);
+      
+    if (!model.hasData()) {
+      QMessageBox::critical(this, tr("Data Error"), tr("The selected file contains no valid data."));
+      return;
+    }
+
+    model.dataProcessing();
+
+    // Add chart update methods below
+    tab1->updateCharts();
+    tab3->updateCharts();
+    tab4->updateCharts();
+    tab5->updateCharts();
+    
+    switchToTabView();
+    loadDataWidget->setDataLoaded(true);
+
+  } catch (const std::exception& error) {
+    QMessageBox::critical(this, tr("CSV File Error"), error.what());
+  }
+    
+  progress.close();
+}
+
+void WaterWindow::switchToTabView()
+{
+  stackedWidget->setCurrentWidget(tabWidget);
+}
+
+void WaterWindow::switchToLoadView()
+{
+  stackedWidget->setCurrentWidget(loadDataWidget);
+}
+
+void WaterWindow::changeLanguage(const QString &language)
+{ 
+  QString code = "en";
+
+  if (language == "French") {
+    code = "fr";
+  }
+
+  qApp->removeTranslator(&translator);
+
+  if (translator.load("WaterQualityMonitor_" + code, ":/i18n")) {
+    qApp->installTranslator(&translator);
+  } else {
+    QMessageBox::critical(this, tr("Language Error"), tr("Could not load language file."));
+  }
+
+  QEvent event(QEvent::LanguageChange);
+  qApp->sendEvent(qApp, &event);
+
+  // Not everything translates properly, may need custom changeEvent in each
+  // Where we re-specify strings?
+  setWindowTitle(tr("Water Quality Monitor"));
+}
+
+void WaterWindow::about()
+{
+  QMessageBox::about(this, tr("About Water Quality Monitor"),
+    tr("Water Quality Monitor displays water data loaded from "
+    "a CSV file produced by the UK Environment Agency.\n\n"
+    "(c) 2024 Nick Efford and Group 37"));
 }
 
 void WaterWindow::setupStyles()
@@ -196,157 +352,3 @@ void WaterWindow::setupStyles()
 
   this->setStyleSheet(styleSheet);
 }
-
-void WaterWindow::createMenus()
-{
-  QAction *locAction = new QAction(tr("Set Data &Location"), this);
-  locAction->setShortcut(QKeySequence(Qt::CTRL | Qt::Key_L));
-  connect(locAction, SIGNAL(triggered()), this, SLOT(switchToLoadView()));
-
-  QAction *closeAction = new QAction(tr("Quit"), this);
-  closeAction->setShortcut(QKeySequence::Close);
-  connect(closeAction, SIGNAL(triggered()), this, SLOT(close()));
-
-  QMenu *fileMenu = menuBar()->addMenu(tr("&File"));
-  fileMenu->addAction(locAction);
-  fileMenu->addAction(closeAction);
-
-  QAction *aboutAction = new QAction(tr("&About"), this);
-  connect(aboutAction, &QAction::triggered, this, &WaterWindow::about);
-
-  QMenu *helpMenu = menuBar()->addMenu(tr("&Help"));
-  helpMenu->addAction(aboutAction);
-
-  createLanguageMenu();
-}
-
-void WaterWindow::createLanguageMenu() 
-{
-  QMenu *languageMenu = menuBar()->addMenu(tr("&Language"));
-
-  QActionGroup *languageGroup = new QActionGroup(this);
-  QAction* englishAction = new QAction(tr("&English"), this);
-  englishAction->setCheckable(true);
-  englishAction->setData("English");
-    
-  QAction* frenchAction = new QAction(tr("&Français"), this);
-  frenchAction->setCheckable(true);
-  frenchAction->setData("French");
-
-  // Set current language
-  QString currentLocale = QLocale::system().name().split('_').first();
-  if (currentLocale == "fr") {
-    frenchAction->setChecked(true);
-  } else {
-    englishAction->setChecked(true);
-  }
-
-  languageGroup->addAction(englishAction);
-  languageGroup->addAction(frenchAction);
-    
-  languageMenu->addAction(englishAction);
-  languageMenu->addAction(frenchAction);
-
-  // Connect using a lambda to convert QAction* to QString
-  connect(languageGroup, SIGNAL(triggered(QAction *)), this, SLOT(handleLanguageAction(QAction *)));
-}
-
-void WaterWindow::handleLanguageAction(QAction *action)
-{
-  changeLanguage(action->data().toString());
-}
-
-void WaterWindow::setDataLocation()
-{
-  QString directory = QFileDialog::getOpenFileName(this, tr("Select Data File"), dataLocation, tr("CSV files (*.csv)"));
-
-  if (!directory.isEmpty()) {
-    dataLocation = directory;
-    loadDataWidget->updatePath(dataLocation);
-  } else {
-    QMessageBox::critical(this, tr("Data Error"), tr("No file selected."));
-  }
-}
-
-void WaterWindow::setPath()
-{
-  dataLocation = loadDataWidget->getPath();
-  loadData(dataLocation);
-}
-
-void WaterWindow::loadData(const QString &path)
-{
-  QProgressDialog progress(tr("Loading data..."), tr("Cancel"), 0, 0, this);
-  progress.setWindowModality(Qt::WindowModal);
-  progress.show();
-
-  try {
-    model.updateFromFile(path);
-      
-    if (!model.hasData()) {
-      QMessageBox::critical(this, tr("Data Error"), tr("The selected file contains no valid data."));
-      return;
-    }
-
-    model.dataProcessing();
-
-    // Add chart update methods below
-    tab1->updateCharts();
-    tab3->updateCharts();
-    tab4->updateCharts();
-    tab5->updateCharts();
-    
-    switchToTabView();
-
-  } catch (const std::exception& error) {
-    QMessageBox::critical(this, tr("CSV File Error"), error.what());
-  }
-    
-  progress.close();
-}
-
-void WaterWindow::switchToTabView()
-{
-  stackedWidget->setCurrentWidget(tabWidget);
-}
-
-void WaterWindow::switchToLoadView()
-{
-  stackedWidget->setCurrentWidget(loadDataWidget);
-}
-
-void WaterWindow::changeLanguage(const QString &language)
-{ 
-  QString code = "en";
-
-  if (language == "French") {
-    code = "fr";
-  }
-
-  qApp->removeTranslator(&translator);
-
-  if (translator.load("WaterQualityMonitor_" + code, ":/i18n")) {
-    qApp->installTranslator(&translator);
-  } else {
-    QMessageBox::critical(this, tr("Language Error"), tr("Could not load language file."));
-  }
-
-  QEvent event(QEvent::LanguageChange);
-  qApp->sendEvent(qApp, &event);
-
-  // Not everything translates properly, may need custom changeEvent in each
-  // Where we re-specify strings?
-  setWindowTitle(tr("Water Quality Monitor"));
-}
-
-void WaterWindow::about()
-{
-  QMessageBox::about(this, tr("About Water Quality Monitor"),
-    tr("Water Quality Monitor displays water data loaded from "
-    "a CSV file produced by the UK Environment Agency.\n\n"
-    "(c) 2024 Nick Efford and Group 37"));
-}
-
-// Add help menu option
-// Add horizontal scrollbar
-// Add file label at bottom of app

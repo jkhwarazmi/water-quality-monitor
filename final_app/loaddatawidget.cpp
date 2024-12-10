@@ -12,6 +12,9 @@ LoadDataWidget::LoadDataWidget(const QString& initialPath, QWidget* parent): QWi
   setupStyles();
   
   qApp->installEventFilter(this);
+
+  // Initially hide the cancel button
+  cancelButton->setVisible(false);
 }
 
 bool LoadDataWidget::eventFilter(QObject *watched, QEvent *event)
@@ -52,7 +55,7 @@ void LoadDataWidget::createWidgets()
   loadButton->setObjectName("actionButton");
   loadButton->setEnabled(currentPath.endsWith(".csv", Qt::CaseInsensitive));
 
-  cancelButton = new QPushButton(tr("Cancel"));
+  cancelButton = new QPushButton(tr("Cancel Reload"));
   cancelButton->setMinimumWidth(120);
   cancelButton->setMinimumHeight(40);
   cancelButton->setCursor(Qt::PointingHandCursor);
@@ -119,8 +122,22 @@ void LoadDataWidget::createLayout()
   connect(selectButton, SIGNAL(clicked()), this, SIGNAL(dataFileSelected()));
   connect(loadButton, SIGNAL(clicked()), this, SIGNAL(loadRequested()));
   connect(languageComboBox, SIGNAL(currentTextChanged(QString)), this, SIGNAL(languageChanged(QString)));
+  connect(cancelButton, SIGNAL(clicked()), this, SIGNAL(cancelRequested()));
   
   setLayout(mainLayout);
+}
+
+void LoadDataWidget::setDataLoaded(bool loaded)
+{
+  dataLoaded = loaded;
+  cancelButton->setVisible(dataLoaded);
+}
+
+void LoadDataWidget::updatePath(const QString& path)
+{
+  currentPath = path;
+  pathLabel->setText(path);
+  loadButton->setEnabled(currentPath.endsWith(".csv", Qt::CaseInsensitive));
 }
 
 void LoadDataWidget::setupStyles()
@@ -177,17 +194,18 @@ void LoadDataWidget::setupStyles()
     }
 
     QPushButton#secondaryButton {
-      background-color: %17;
+      background-color: #ff4d4d;
       border: none;
       border-radius: %3px;
       color: white;
+      font-weight: bold;
       padding: %7px %8px;
-      min-width: %9px;
-      min-height: %10px;
+      min-width: 120px;
+      min-height: 40px;
     }
 
     QPushButton#secondaryButton:hover {
-      background-color: %18;
+      background-color: #ff6666;
     }
 
     QComboBox#languageSelect {
@@ -235,16 +253,7 @@ void LoadDataWidget::setupStyles()
   .arg(Styles::ACTION_BUTTON_WIDTH)            // %13
   .arg(Styles::ACTION_BUTTON_HEIGHT)           // %14
   .arg(Styles::actionButtonHover())            // %15
-  .arg(Styles::actionButtonDisabled())         // %16
-  .arg(Styles::secondaryButtonBackground())    // %17
-  .arg(Styles::secondaryButtonHover());        // %18
+  .arg(Styles::actionButtonDisabled());        // %16
 
   this->setStyleSheet(styleSheet);
-}
-
-void LoadDataWidget::updatePath(const QString& path)
-{
-  currentPath = path;
-  pathLabel->setText(path);
-  loadButton->setEnabled(currentPath.endsWith(".csv", Qt::CaseInsensitive));
 }

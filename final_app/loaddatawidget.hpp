@@ -16,14 +16,17 @@ class LoadDataWidget : public QWidget
     LoadDataWidget(const QString& initialPath, QWidget* parent = nullptr);
     void updatePath(const QString& path);
     QString getPath() const { return currentPath; }
+    void setDataLoaded(bool loaded);
 
   signals:
     void dataFileSelected();
     void loadRequested();
     void languageChanged(QString);
+    void cancelRequested();
 
   private:
     QString currentPath;
+    bool dataLoaded = false;
     QLabel *titleLabel;
     QLabel *pathLabel;
     QLabel *languageLabel;
