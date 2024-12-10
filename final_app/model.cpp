@@ -26,6 +26,10 @@ enum Column {
 void WaterModel::updateFromFile(const QString& filename) {
   beginResetModel();
   dataset.loadData(filename.toStdString());
+  qDebug() << "File loaded: " << filename;
+
+  // Process the dataset for pollutants and time series
+  dataProcessing();
   endResetModel();
 }
 
@@ -231,131 +235,135 @@ double WaterModel::getDeterminandThreshold(const QString& Determinand) const {
 }
 
 void WaterModel::dataProcessing() {
-  QSet<QString> uniqueLocations;
-  QSet<QString> uniqueDeterminands;
+    QSet<QString> uniqueLocations;
+    QSet<QString> uniqueDeterminands;
 
-  complianceSamples = qMakePair(0, 0);
+    complianceSamples = qMakePair(0, 0);
 
-  pollutantData.clear();
-  samplingPointData.clear();
+    pollutantData.clear();
+    samplingPointData.clear();
 
-  fluorPollutantData.clear();
-  fluorLocations.clear();
+    fluorPollutantData.clear();
+    fluorLocations.clear();
 
-  pollutantToLocations.clear(); // Clear previous mappings
+    pollutantToLocations.clear(); // Clear previous mappings
 
-  QMap<QString, int> tmpSampleLocations;
-  sampleLocations.clear();
+    QMap<QString, int> tmpSampleLocations;
+    sampleLocations.clear();
 
-  QMap<QString, int> tmpDeterminandCounts;
-  determinandCounts.clear();
+    QMap<QString, int> tmpDeterminandCounts;
+    determinandCounts.clear();
 
-  sampleDates.clear();
-  litterLocation.clear(); //@MF
-  litterWaterType.clear(); //@MF
+    sampleDates.clear();
+    litterLocation.clear(); //@MF
+    litterWaterType.clear(); //@MF
 
-  QMap<QString, QVector<QPair<QDateTime, double>>> pollutantTimeSeries;
-  
-  // Iterate through the data and calculate summary statistics
-  for(int i = 0; i < dataset.size(); i++) {
+    QMap<QString, QVector<QPair<QDateTime, double>>> pollutantTimeSeries;
 
-    bool isFluor = dataset[i].getDeterminandDefinition().contains("fluor", Qt::CaseInsensitive) ||
-                       dataset[i].getDeterminand().contains("fluor", Qt::CaseInsensitive);
+    // Iterate through the data and calculate summary statistics
+    for (int i = 0; i < dataset.size(); i++) {
 
-    uniqueLocations.insert(dataset[i].getLocation());
-    uniqueDeterminands.insert(dataset[i].getDeterminandDefinition());
+        bool isFluor = dataset[i].getDeterminandDefinition().contains("fluor", Qt::CaseInsensitive) ||
+                           dataset[i].getDeterminand().contains("fluor", Qt::CaseInsensitive);
 
-    pollutantToLocations[dataset[i].getDeterminand()].insert(dataset[i].getLocation()); // OR SWITCH TO DEFINITION??
+        uniqueLocations.insert(dataset[i].getLocation());
+        uniqueDeterminands.insert(dataset[i].getDeterminandDefinition());
 
-    // should contain the 20 items with litter testing @MF
-    if (dataset[i].getResult() != 0 && (dataset[i].getDeterminandDefinition() == "Tarry residues"  || dataset[i].getDeterminandDefinition() == "Bathing Water Profile : Other Litter (incl. plastics)" || dataset[i].getDeterminandDefinition() == "Sewage debris")) { // add the rest later and dataset[i] != 0
-      // if statement for the litterLocation aka bar chart
-      if (!litterLocation.contains(dataset[i].getLocation())) {
-        litterLocation[dataset[i].getLocation()] = new QMap<QString, int>();
-        litterLocation[dataset[i].getLocation()]->insert(dataset[i].getDeterminandDefinition(), (dataset[i].getResult()));
-      } else if (!litterLocation[dataset[i].getLocation()]->contains(dataset[i].getDeterminandDefinition())) {
-        litterLocation[dataset[i].getLocation()]->insert(dataset[i].getDeterminandDefinition(), (dataset[i].getResult()));
-      } else {
-        litterLocation[dataset[i].getLocation()]->insert(dataset[i].getDeterminandDefinition(), litterLocation[dataset[i].getLocation()]->value(dataset[i].getDeterminandDefinition())+(dataset[i].getResult()));      
-      }
-      // if statement for the litterWaterType aka pie chart NEW
-      if (!litterWaterType.contains(dataset[i].getMaterialType())) {
-        litterWaterType[dataset[i].getMaterialType()] = new QMap<QString, int>();
-        litterWaterType[dataset[i].getMaterialType()]->insert(dataset[i].getDeterminandDefinition(), (dataset[i].getResult()));
-      } else if (!litterWaterType[dataset[i].getMaterialType()]->contains(dataset[i].getDeterminandDefinition())) {
-        litterWaterType[dataset[i].getMaterialType()]->insert(dataset[i].getDeterminandDefinition(), (dataset[i].getResult()));
-      } else {
-        litterWaterType[dataset[i].getMaterialType()]->insert(dataset[i].getDeterminandDefinition(), litterWaterType[dataset[i].getMaterialType()]->value(dataset[i].getDeterminandDefinition())+(dataset[i].getResult()));      
-      }
+        pollutantToLocations[dataset[i].getDeterminand()].insert(dataset[i].getLocation()); // OR SWITCH TO DEFINITION??
+
+        // Process litter data for charts (bar and pie charts) @MF
+        if (dataset[i].getResult() != 0 && (dataset[i].getDeterminandDefinition() == "Tarry residues" ||
+                                            dataset[i].getDeterminandDefinition() == "Bathing Water Profile : Other Litter (incl. plastics)" ||
+                                            dataset[i].getDeterminandDefinition() == "Sewage debris")) {
+            // Bar chart data
+            if (!litterLocation.contains(dataset[i].getLocation())) {
+                litterLocation[dataset[i].getLocation()] = new QMap<QString, int>();
+                litterLocation[dataset[i].getLocation()]->insert(dataset[i].getDeterminandDefinition(), (dataset[i].getResult()));
+            } else if (!litterLocation[dataset[i].getLocation()]->contains(dataset[i].getDeterminandDefinition())) {
+                litterLocation[dataset[i].getLocation()]->insert(dataset[i].getDeterminandDefinition(), (dataset[i].getResult()));
+            } else {
+                litterLocation[dataset[i].getLocation()]->insert(dataset[i].getDeterminandDefinition(), litterLocation[dataset[i].getLocation()]->value(dataset[i].getDeterminandDefinition()) + (dataset[i].getResult()));
+            }
+
+            // Pie chart data
+            if (!litterWaterType.contains(dataset[i].getMaterialType())) {
+                litterWaterType[dataset[i].getMaterialType()] = new QMap<QString, int>();
+                litterWaterType[dataset[i].getMaterialType()]->insert(dataset[i].getDeterminandDefinition(), (dataset[i].getResult()));
+            } else if (!litterWaterType[dataset[i].getMaterialType()]->contains(dataset[i].getDeterminandDefinition())) {
+                litterWaterType[dataset[i].getMaterialType()]->insert(dataset[i].getDeterminandDefinition(), (dataset[i].getResult()));
+            } else {
+                litterWaterType[dataset[i].getMaterialType()]->insert(dataset[i].getDeterminandDefinition(), litterWaterType[dataset[i].getMaterialType()]->value(dataset[i].getDeterminandDefinition()) + (dataset[i].getResult()));
+            }
+        }
+
+        if (dataset[i].isComplianceSample()) {
+            complianceSamples.first++;
+        } else {
+            complianceSamples.second++;
+        }
+
+        tmpSampleLocations[dataset[i].getLocation()]++;
+        tmpDeterminandCounts[dataset[i].getDeterminandDefinition()]++;
+        sampleDates[dataset[i].getDateTime().date()]++;
+
+        // Append the pollutant data with QDateTime and Result
+        QDateTime dateTime = dataset[i].getDateTime();
+        if (dateTime.isValid() && !qIsNaN(dataset[i].getResult())) {
+            pollutantData[dataset[i].getDeterminand()].append(QPair<QDateTime, double>(dataset[i].getDateTime(), dataset[i].getResult()));
+        }
+
+        // Store data in samplingPointData
+        samplingPointData[dataset[i].getLocation()].append(
+            QPair<QString, double>(dataset[i].getDeterminand(), dataset[i].getResult())
+        );
+
+        if (isFluor) {
+            // Store in fluor-specific structures
+            fluorPollutantData[dataset[i].getDeterminand()].append(dataset[i].getResult());
+            fluorLocations[dataset[i].getLocation()].append(
+                QPair<QString, double>(dataset[i].getDeterminand(), dataset[i].getResult()));
+        }
     }
-    if (dataset[i].isComplianceSample()) {
-      complianceSamples.first++;
-    } else {
-      complianceSamples.second++;
+
+    QVector<QPair<QString, int>> sortedLocations;
+    for (auto i = tmpSampleLocations.constBegin(); i != tmpSampleLocations.constEnd(); i++) {
+        sortedLocations.append(qMakePair(i.key(), i.value()));
     }
 
-    tmpSampleLocations[dataset[i].getLocation()]++;
-    tmpDeterminandCounts[dataset[i].getDeterminandDefinition()]++;
-    sampleDates[dataset[i].getDateTime().date()]++;
+    // Sort by count in descending order
+    std::sort(sortedLocations.begin(), sortedLocations.end(),
+        [](const QPair<QString, int>& a, const QPair<QString, int>& b) {
+            return a.second > b.second;
+    });
 
-    // Append the pollutant data with QDateTime and Result
-    QDateTime dateTime = dataset[i].getDateTime();
-    if (dateTime.isValid() && !qIsNaN(dataset[i].getResult())) {
-      pollutantData[dataset[i].getDeterminand()].append(QPair<QDateTime, double>(dataset[i].getDateTime(), dataset[i].getResult()));
+    // Take only top 5 for sampleLocations
+    int n = qMin(5, sortedLocations.size());
+    for (int i = 0; i < n; ++i) {
+        sampleLocations[sortedLocations[i].first] = sortedLocations[i].second;
     }
 
-    // Store data in samplingPointData
-    samplingPointData[dataset[i].getLocation()].append(
-      QPair<QString, double>(dataset[i].getDeterminand(), dataset[i].getResult())
-    );
-
-    if (isFluor) {
-      // Store in fluor-specific structures
-      fluorPollutantData[dataset[i].getDeterminand()].append(dataset[i].getResult());
-      fluorLocations[dataset[i].getLocation()].append(
-        QPair<QString, double>(dataset[i].getDeterminand(), dataset[i].getResult()));
+    QVector<QPair<QString, int>> sortedDeterminands;
+    for (auto i = tmpDeterminandCounts.constBegin(); i != tmpDeterminandCounts.constEnd(); i++) {
+        sortedDeterminands.append(qMakePair(i.key(), i.value()));
     }
-  }
 
-  QVector<QPair<QString, int>> sortedLocations;
-  for(auto i = tmpSampleLocations.constBegin(); i != tmpSampleLocations.constEnd(); i++) {
-    sortedLocations.append(qMakePair(i.key(), i.value()));
-  }
+    // Sort by count in descending order
+    std::sort(sortedDeterminands.begin(), sortedDeterminands.end(),
+        [](const QPair<QString, int>& a, const QPair<QString, int>& b) {
+            return a.second > b.second;
+    });
 
-  // Sort by count in descending order
-  std::sort(sortedLocations.begin(), sortedLocations.end(),
-    [](const QPair<QString, int>& a, const QPair<QString, int>& b) {
-      return a.second > b.second;
-  });
+    // Take only top 5 for determinandCounts
+    n = qMin(5, sortedDeterminands.size());
+    for (int i = 0; i < n; ++i) {
+        determinandCounts[sortedDeterminands[i].first] = sortedDeterminands[i].second;
+    }
 
-  // Take only top 5 for sampleLocations
-  int n = qMin(5, sortedLocations.size());
-  for(int i = 0; i < n; ++i) {
-    sampleLocations[sortedLocations[i].first] = sortedLocations[i].second;
-  }
+    locationCount = uniqueLocations.size();
+    determinandCount = uniqueDeterminands.size();
 
-  QVector<QPair<QString, int>> sortedDeterminands;
-  for(auto i = tmpDeterminandCounts.constBegin(); i != tmpDeterminandCounts.constEnd(); i++) {
-    sortedDeterminands.append(qMakePair(i.key(), i.value()));
-  }
-
-  // Sort by count in descending order
-  std::sort(sortedDeterminands.begin(), sortedDeterminands.end(),
-    [](const QPair<QString, int>& a, const QPair<QString, int>& b) {
-      return a.second > b.second;
-  });
-
-  // Take only top 5 for determinandCounts
-  n = qMin(5, sortedDeterminands.size());
-  for(int i = 0; i < n; ++i) {
-    determinandCounts[sortedDeterminands[i].first] = sortedDeterminands[i].second;
-  }
-  
-  locationCount = uniqueLocations.size();
-  determinandCount = uniqueDeterminands.size();
-
-  // Assign pollutantTimeSeries to pollutantData after processing
-  this->pollutantData = pollutantTimeSeries;
+    qDebug() << "Pollutant Data Processed: " << pollutantData.keys();
+    qDebug() << "Time Series Data: " << pollutantData;
 }
 
 // Function to calculate top 5 locations with the highest result values for a selected pollutant
