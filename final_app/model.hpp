@@ -70,4 +70,7 @@ private:
 
     QMap<QString, QMap<QString, int>*> litterLocation = QMap<QString, QMap<QString, int>*>();
     QMap<QString, QMap<QString, int>*> litterWaterType = QMap<QString, QMap<QString, int>*>();
+
+    QMap<QString, QList<QPair<QDateTime, double>>> pollutantData;
+
 };
