@@ -405,3 +405,39 @@ QVector<QPair<QDateTime, double>> WaterModel::getDataForSpecificPollutants(const
 
     return dataForPollutants;
 }
+
+QMap<QString, QVector<QPair<QDateTime, double>>> WaterModel::getYourPollutantData() const {
+    QMap<QString, QVector<QPair<QDateTime, double>>> pollutantData;
+
+    for (int i = 0; i < dataset.size(); ++i) {
+        QString pollutant = dataset[i].getDeterminand();  // Adjust column index if necessary
+        QDateTime dateTime = dataset[i].getDateTime();
+        double concentration = dataset[i].getResult();
+
+        // Validate data points
+        if (!dateTime.isValid() || qIsNaN(concentration)) {
+            continue;  // Skip invalid rows
+        }
+
+        pollutantData[pollutant].append(qMakePair(dateTime, concentration));
+    }
+
+    return pollutantData;
+}
+
+QMap<QString, QSet<QString>> WaterModel::getYourPollutantLocations() const {
+    QMap<QString, QSet<QString>> pollutantLocations;
+
+    for (int i = 0; i < dataset.size(); ++i) {
+        QString pollutant = dataset[i].getDeterminand();  // Adjust column index if necessary
+        QString location = dataset[i].getLocation();
+
+        // Ensure pollutant and location are valid
+        if (!pollutant.isEmpty() && !location.isEmpty()) {
+            pollutantLocations[pollutant].insert(location);
+        }
+    }
+
+    return pollutantLocations;
+}
+

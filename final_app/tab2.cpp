@@ -124,7 +124,7 @@ bool Tab2::eventFilter(QObject* watched, QEvent* event)
 
 void Tab2::createWidgets()
 {
-    title = new QLabel(tr("Fluorinated Compounds"));
+    title = new QLabel(tr("Pollutant Overview"));
     QFont titleFont;
     titleFont.setPointSize(32);
     titleFont.setBold(true);
@@ -204,7 +204,7 @@ void Tab2::updatePollutantList()
         return;
     }
 
-    const auto uniquePollutants = waterModel->getFluorPollutantData().keys();
+    const auto uniquePollutants = waterModel->getYourPollutantData().keys();
     pollutantDropdown->clear();
 
     if (uniquePollutants.isEmpty()) {
@@ -240,7 +240,7 @@ void Tab2::updateLocationList()
         return;
     }
 
-    const auto uniqueLocations = waterModel->getFluorLocations().keys();
+    const auto uniqueLocations = waterModel->getYourPollutantLocations().keys();
     locationDropdown->clear();
 
     if (uniqueLocations.isEmpty()) {

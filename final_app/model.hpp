@@ -73,4 +73,8 @@ private:
 
     QMap<QString, QList<QPair<QDateTime, double>>> pollutantData;
 
+    QMap<QString, QVector<QPair<QDateTime, double>>> getYourPollutantData() const;
+    QMap<QString, QSet<QString>> getYourPollutantLocations() const;
+
+
 };
