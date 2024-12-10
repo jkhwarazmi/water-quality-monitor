@@ -394,46 +394,14 @@ QVector<QPair<QString, double>> WaterModel::getTopLocationsByPollutant(const QSt
     return topLocations;
 }
 
-QVector<QPair<QDateTime, double>> WaterModel::getDataForPollutant(const QString& pollutant) const
-{
-    return pollutantData.value(pollutant);
-}
+QVector<QPair<QDateTime, double>> WaterModel::getDataForSpecificPollutants(const QString& pollutant) const {
+    QVector<QPair<QDateTime, double>> dataForPollutants;
 
-QVector<QPair<QDateTime, double>> WaterModel::getTimeRangeData(const QString& pollutant, const QString& timeRange) const {
-    QVector<QPair<QDateTime, double>> filteredData;
-
-    // Determine time range
-    QDateTime now = QDateTime::currentDateTime();
-    QDateTime startTime;
-    if (timeRange == "Last Week") {
-        startTime = now.addDays(-7);
-    } else if (timeRange == "Last Month") {
-        startTime = now.addMonths(-1);
-    } else if (timeRange == "Last Year") {
-        startTime = now.addYears(-1);
-    } else {
-        startTime = QDateTime(); // All Time
+    // Iterate through pollutantData and collect data for the specific pollutant
+    const auto& allData = pollutantData.value(pollutant);
+    for (const auto& record : allData) {
+        dataForPollutants.append(record); // Add each record to the result
     }
 
-    // Filter data by pollutant and time range
-    for (const auto& point : pollutantData.value(pollutant)) {
-        if (point.first >= startTime) {
-            filteredData.append(point);
-        }
-    }
-
-    return filteredData;
+    return dataForPollutants;
 }
-
-QStringList WaterModel::getPollutantList() const {
-    QStringList pollutants;
-
-    // Iterate through the pollutantData map to collect unique pollutant names
-    for (const auto& key : pollutantData.keys()) {
-        pollutants.append(key);
-    }
-
-    return pollutants;
-}
-
-

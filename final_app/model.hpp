@@ -24,7 +24,6 @@ public:
     QVariant data(const QModelIndex&, int) const;
     QVariant headerData(int, Qt::Orientation, int) const;
     QString getDeterminandDefinition(const QString& pollutant) const;
-    QStringList getPollutantList() const;
 
     QVector<QPair<QString, double>> getTopLocationsByPollutant(const QString& pollutant) const;
 
@@ -48,8 +47,8 @@ public:
     QMap<QString, QMap<QString, int>*> getLitterLocation() const { return litterLocation;}
     QMap<QString, QMap<QString, int>*> getLitterWaterType() const { return litterWaterType;}
 
-    QVector<QPair<QDateTime, double>> getDataForPollutant(const QString& pollutant) const;
-    QVector<QPair<QDateTime, double>> getTimeRangeData(const QString& pollutant, const QString& timeRange) const;
+    QVector<QPair<QDateTime, double>> getDataForSpecificPollutants(const QString& pollutant) const;
+
 
 
 private:
@@ -71,6 +70,4 @@ private:
 
     QMap<QString, QMap<QString, int>*> litterLocation = QMap<QString, QMap<QString, int>*>();
     QMap<QString, QMap<QString, int>*> litterWaterType = QMap<QString, QMap<QString, int>*>();
-
-    QMap<QString, QVector<QPair<QDateTime, double>>> pollutantData;
 };
