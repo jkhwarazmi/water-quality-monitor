@@ -41,12 +41,14 @@ void LoadDataWidget::createWidgets()
   pathLabel->setMinimumWidth(300);
   pathLabel->setObjectName("pathLabel");
   pathLabel->setAutoFillBackground(true);
+  pathLabel->setToolTip(tr("Current data file path"));
   
   selectButton = new QPushButton(tr("Select File"));
   selectButton->setMinimumWidth(120);
   selectButton->setMinimumHeight(40);
   selectButton->setCursor(Qt::PointingHandCursor);
   selectButton->setObjectName("primaryButton");
+  selectButton->setToolTip(tr("Choose a CSV file to load"));
 
   loadButton = new QPushButton(tr("Load Data"));
   loadButton->setMinimumWidth(200);
@@ -54,12 +56,16 @@ void LoadDataWidget::createWidgets()
   loadButton->setCursor(Qt::PointingHandCursor);
   loadButton->setObjectName("actionButton");
   loadButton->setEnabled(currentPath.endsWith(".csv", Qt::CaseInsensitive));
+  loadButton->setToolTip(loadButton->isEnabled() ? 
+    tr("Load the selected data file") : 
+    tr("No data file selected"));
 
   cancelButton = new QPushButton(tr("Cancel Reload"));
   cancelButton->setMinimumWidth(120);
   cancelButton->setMinimumHeight(40);
   cancelButton->setCursor(Qt::PointingHandCursor);
   cancelButton->setObjectName("secondaryButton");
+  cancelButton->setToolTip(tr("Return to viewing current data"));
   cancelButton->hide();
 
   languageLabel = new QLabel(tr("Language:"));
@@ -71,6 +77,7 @@ void LoadDataWidget::createWidgets()
   languageComboBox->addItem("English", "en");
   languageComboBox->addItem("French", "fr");
   languageComboBox->setObjectName("languageSelect");
+  languageComboBox->setToolTip(tr("Change application language"));
 
   // Set initial language based on current locale
   QString currentLocale = QLocale::system().name().split('_').first();
@@ -137,7 +144,11 @@ void LoadDataWidget::updatePath(const QString& path)
 {
   currentPath = path;
   pathLabel->setText(path);
-  loadButton->setEnabled(currentPath.endsWith(".csv", Qt::CaseInsensitive));
+  bool isEnabled = currentPath.endsWith(".csv", Qt::CaseInsensitive);
+  loadButton->setEnabled(isEnabled);
+  loadButton->setToolTip(isEnabled ? 
+    tr("Load the selected data file") : 
+    tr("No data file selected"));
 }
 
 void LoadDataWidget::setupStyles()
