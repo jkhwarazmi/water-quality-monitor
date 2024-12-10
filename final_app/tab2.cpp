@@ -1,3 +1,4 @@
+
 #include <QtWidgets>
 #include <QtCharts>
 #include <QFile>
@@ -257,4 +258,3 @@ void Tab2::onPollutantSelectionChanged(int index)
     Q_UNUSED(index);
     updateCharts();  // Update chart and table when pollutant is selected
 }
-
