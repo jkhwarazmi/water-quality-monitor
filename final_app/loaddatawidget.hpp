@@ -29,6 +29,9 @@ class LoadDataWidget : public QWidget
     bool dataLoaded = false;
     QLabel *titleLabel;
     QLabel *pathLabel;
+    QLabel *helpLabel;
+    QLabel *urlLabel;
+    QLabel *infoLabel;
     QLabel *languageLabel;
     QPushButton *selectButton;
     QPushButton *loadButton;

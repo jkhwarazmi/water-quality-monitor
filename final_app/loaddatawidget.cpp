@@ -62,7 +62,7 @@ void LoadDataWidget::createWidgets()
 
   cancelButton = new QPushButton(tr("Cancel Reload"));
   cancelButton->setMinimumWidth(120);
-  cancelButton->setMinimumHeight(40);
+  cancelButton->setMinimumHeight(45);
   cancelButton->setCursor(Qt::PointingHandCursor);
   cancelButton->setObjectName("secondaryButton");
   cancelButton->setToolTip(tr("Return to viewing current data"));
@@ -87,6 +87,30 @@ void LoadDataWidget::createWidgets()
   } else {
     languageComboBox->setCurrentIndex(0);
   }
+
+  helpLabel = new QLabel(tr("Load water quality data from a CSV file. Datasets can be downloaded from:"));
+  helpLabel->setWordWrap(true);
+  helpLabel->setObjectName("helpLabel");
+  helpLabel->setAlignment(Qt::AlignCenter);
+  
+  urlLabel = new QLabel("<a href='https://environment.data.gov.uk/water-quality/view/download'>The UK Environment Agency</a>");
+  urlLabel->setTextFormat(Qt::RichText);
+  urlLabel->setTextInteractionFlags(Qt::TextBrowserInteraction);
+  urlLabel->setOpenExternalLinks(true);
+  urlLabel->setObjectName("urlLabel");
+  urlLabel->setAlignment(Qt::AlignCenter);
+  urlLabel->setCursor(Qt::PointingHandCursor);
+  urlLabel->setToolTip(tr("Click to download sample datasets"));
+
+  infoLabel = new QLabel(tr("More information on the datasets can be found ") + 
+                        "<a href='https://environment.data.gov.uk/water-quality/view/doc/reference'>here</a>");
+  infoLabel->setTextFormat(Qt::RichText);
+  infoLabel->setTextInteractionFlags(Qt::TextBrowserInteraction);
+  infoLabel->setOpenExternalLinks(true);
+  infoLabel->setObjectName("helpLabel");
+  infoLabel->setAlignment(Qt::AlignCenter);
+  infoLabel->setCursor(Qt::PointingHandCursor);
+  infoLabel->setToolTip(tr("Click for more information about the datasets"));
 }
 
 void LoadDataWidget::createLayout()
@@ -117,6 +141,11 @@ void LoadDataWidget::createLayout()
   // Main layout
   QVBoxLayout* mainLayout = new QVBoxLayout;
   mainLayout->addWidget(titleLabel);
+  mainLayout->addSpacing(10);
+  mainLayout->addWidget(helpLabel);
+  mainLayout->addWidget(urlLabel);
+  mainLayout->addSpacing(5);
+  mainLayout->addWidget(infoLabel);
   mainLayout->addSpacing(30);
   mainLayout->addLayout(pathLayout);
   mainLayout->addSpacing(20);
@@ -247,6 +276,20 @@ void LoadDataWidget::setupStyles()
       border: 2px solid %6;
       color: %1;
       selection-background-color: %11;
+    }
+
+    QLabel#helpLabel {
+      color: %1;
+      font-size: 14px;
+    }
+
+    QLabel#urlLabel {
+      color: #3498db;
+      font-size: 14px;
+    }
+
+    QLabel#urlLabel:hover {
+      color: #2980b9;
     }
   )")
   .arg(Styles::textColor())                    // %1
