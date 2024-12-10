@@ -20,7 +20,7 @@ WaterWindow::WaterWindow() : QMainWindow()
   createMainWidget();
   createMenus();
   setupStyles();
-  
+  createStatusBar();
   setMinimumWidth(1250);
   setMinimumHeight(600);
   setWindowTitle(tr("Water Quality Monitor"));
@@ -167,6 +167,7 @@ void WaterWindow::setPath()
 {
   dataLocation = loadDataWidget->getPath();
   loadData(dataLocation);
+  fileInfo->setText("Current file: " + dataLocation);
 }
 
 void WaterWindow::cancelLoad()
@@ -265,6 +266,13 @@ void WaterWindow::changeLanguage(const QString &language)
   setWindowTitle(tr("Water Quality Monitor"));
 }
 
+void WaterWindow::createStatusBar()
+{
+  fileInfo = new QLabel("No file loaded");
+  QStatusBar* status = statusBar();
+  status->addWidget(fileInfo);
+}
+
 void WaterWindow::about()
 {
   QMessageBox::about(this, tr("About Water Quality Monitor"),
@@ -315,6 +323,17 @@ void WaterWindow::setupStyles()
 
     QMenu::item:selected {
       background-color: %7;
+    }
+
+    QStatusBar {
+      background-color: %3;
+      color: %2;
+      border-top: 1px solid %8;
+    }
+
+    QStatusBar QLabel {
+      color: %2;
+      padding: %4px %5px;
     }
 
     QTabWidget::pane {
