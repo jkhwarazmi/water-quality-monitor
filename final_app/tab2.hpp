@@ -2,7 +2,6 @@
 
 #include <QtWidgets/QWidget>
 #include <QtCharts/QChartView>
-#include <QtCharts/QLineSeries>
 #include <QtWidgets/QTableView>
 #include <QtWidgets/QComboBox>
 #include <QtWidgets/QLineEdit>
@@ -18,16 +17,16 @@ public:
     explicit Tab2(WaterModel* model, QWidget* parent = nullptr);
     void updateCharts();
 
+private slots:
+    void filterTable(const QString& searchText);
+    void onPollutantSelectionChanged(int index);
+
 private:
     void createWidgets();
     void createLayout();
     void setupStyles();
     void populateDropdowns();
     void updateTable(const QVector<QPair<QDateTime, double>>& dataPoints);
-
-private slots:
-    void filterTable(const QString& searchText);
-    void onPollutantSelectionChanged(int index);
 
     WaterModel* waterModel;
     QLabel* title;
@@ -36,5 +35,5 @@ private slots:
     QChartView* chartView;
     QTableView* dataTable;
     QLineEdit* searchBar;
-    QStandardItemModel* tableModel = nullptr;
+    QStandardItemModel* tableModel;
 };

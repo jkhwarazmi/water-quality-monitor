@@ -22,6 +22,11 @@ Tab2::Tab2(WaterModel* model, QWidget* parent)
     updateCharts();
 }
 
+void Tab2::onPollutantSelectionChanged(int index) {
+    Q_UNUSED(index);
+    updateCharts();
+}
+
 void Tab2::createWidgets() {
     searchBar = new QLineEdit(this);
     searchBar->setPlaceholderText("Search pollutants...");
