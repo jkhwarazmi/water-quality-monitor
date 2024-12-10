@@ -11,7 +11,7 @@ class WaterModel: public QAbstractTableModel
 {
   Q_OBJECT
 
-public:
+  public:
     WaterModel(QObject* parent = nullptr): QAbstractTableModel(parent) {}
       
     void updateFromFile(const QString&);
@@ -43,28 +43,25 @@ public:
     QMap<QString, QVector<double>> getFluorPollutantData() const { return fluorPollutantData; }
     QMap<QString, QVector<QPair<QString, double>>> getFluorLocations() const { return fluorLocations; }
     const QMap<QString, QSet<QString>>& getPollutantToLocations() const { return pollutantToLocations; }
-
+  
     QMap<QString, QMap<QString, int>*> getLitterLocation() const { return litterLocation;}
     QMap<QString, QMap<QString, int>*> getLitterWaterType() const { return litterWaterType;}
 
     QVector<QPair<QDateTime, double>> getDataForSpecificPollutants(const QString& pollutant) const;
-
-    QMap<QString, QVector<QPair<QDateTime, double>>> getYourPollutantData() const;
-    QMap<QString, QSet<QString>> getYourPollutantLocations() const;
-
-
-
-private:
+    QMap<QString, QVector<QPair<QDateTime, double>>> getYourPollutantData() const { return pollutantData; }
+    QMap<QString, QSet<QString>> getYourPollutantLocations() const { return pollutantLocations; }
+  private:
     WaterDataset dataset;
 
     // Variables for chart data
     int locationCount = 0;
     int determinandCount = 0;
-    QMap<QString, QVector<QPair<QString, double>>> samplingPointData; 
 
-    QMap<QString, QVector<double>> fluorPollutantData;              
-    QMap<QString, QVector<QPair<QString, double>>> fluorLocations; 
-    QMap<QString, QSet<QString>> pollutantToLocations;
+    QMap<QString, QVector<QPair<QString, double>>> samplingPointData; // Corrected type
+
+    QMap<QString, QVector<double>> fluorPollutantData;              // Stores pollutants with "fluor"
+    QMap<QString, QVector<QPair<QString, double>>> fluorLocations; // Stores locations for "fluor" pollutants
+    QMap<QString, QSet<QString>> pollutantToLocations; // Maps pollutant to associated locations
 
     QPair<int, int> complianceSamples = qMakePair(0, 0);
     QMap<QString, int> sampleLocations = QMap<QString, int>();
@@ -74,6 +71,6 @@ private:
     QMap<QString, QMap<QString, int>*> litterLocation = QMap<QString, QMap<QString, int>*>();
     QMap<QString, QMap<QString, int>*> litterWaterType = QMap<QString, QMap<QString, int>*>();
 
-    QMap<QString, QList<QPair<QDateTime, double>>> pollutantData;
-
+    QMap<QString, QVector<QPair<QDateTime, double>>> pollutantData;
+    QMap<QString, QSet<QString>> pollutantLocations;
 };

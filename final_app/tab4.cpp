@@ -1,3 +1,6 @@
+// Implementation for the fourth card - Flourinated Compounds
+// Yusuf
+
 #include <QtWidgets>
 #include <QtCharts>
 #include "styles.hpp"
@@ -9,22 +12,22 @@ Tab4::Tab4(WaterModel* model, QWidget* parent) : waterModel(model), QWidget(pare
     createLayout();
     setupStyles();
 
-    // Install event filter
+    // Installs the event filter
     qApp->installEventFilter(this);
 
-    // Connect signal for dropdown selection change
+    // Connects the signal for dropdown selection change
     connect(pollutantDropdown, &QComboBox::currentIndexChanged, this, &Tab4::onPollutantSelectionChanged);
     connect(locationDropdown, &QComboBox::currentIndexChanged, this, &Tab4::onLocationSelectionChanged);
 }
 
 void Tab4::updateLocationDropdown(const QString& pollutant)
 {
-    // Block signals to prevent unwanted slot executions during update
+    // Blocks any signals to prevent unwanted slot executions during update
     locationDropdown->blockSignals(true);
     locationDropdown->clear();
 
-    if (pollutant.isEmpty() || pollutant == tr("No unique pollutants found.") || pollutant == tr("No data available.")) {
-        locationDropdown->addItem(tr("No data available."));
+    if (pollutant.isEmpty() || pollutant == tr("Unique pollutants not found.") || pollutant == tr("Data unavailable.")) {
+        locationDropdown->addItem(tr("Data unavailable."));
         locationDropdown->blockSignals(false);
         return;
     }
@@ -33,7 +36,7 @@ void Tab4::updateLocationDropdown(const QString& pollutant)
     QSet<QString> locations = waterModel->getPollutantToLocations().value(pollutant);
 
     if (locations.isEmpty()) {
-        locationDropdown->addItem(tr("No locations found for this pollutant."));
+        locationDropdown->addItem(tr("Locations not found for this pollutant."));
     } else {
         // Convert QSet to a sorted QStringList for better UX
         QStringList sortedLocations = locations.values();
@@ -45,13 +48,13 @@ void Tab4::updateLocationDropdown(const QString& pollutant)
 
     locationDropdown->blockSignals(false);
 
-    // Optionally, trigger an update to the chart if locations are available
+    // Triggers an update to the chart if locations are available
     if (!locations.isEmpty()) {
-        // Select the first location by default
+        // Selects the first location by default
         locationDropdown->setCurrentIndex(0);
         updateTimeSeriesChart();
     } else {
-        // Clear the chart if no locations are available
+        // This will clear the chart if no locations are available
         if (currentChartView) {
             QVBoxLayout* layout = static_cast<QVBoxLayout*>(this->layout());
             layout->removeWidget(currentChartView);
@@ -89,18 +92,14 @@ void Tab4::updateTimeSeriesChart()
 
         currentChartView = chartView;
 
-        qDebug() << "Chart successfully created and added to layout.";
-    } else {
-        qDebug() << "No chart created.";
     }
 }
 
 void Tab4::onPollutantSelectionChanged(int index)
 {
     QString selectedPollutant = pollutantDropdown->itemText(index);
-    qDebug() << "Selected pollutant:" << selectedPollutant;
 
-    // Update the location dropdown based on the selected pollutant
+    // Updates the location dropdown based on the selected pollutant
     updateLocationDropdown(selectedPollutant);
 }
 
@@ -108,7 +107,8 @@ void Tab4::onPollutantSelectionChanged(int index)
 void Tab4::onLocationSelectionChanged(int index)
 {
     QString selectedLocation = locationDropdown->itemText(index);
-    qDebug() << "Selected location:" << selectedLocation;
+
+    // Updates the chart
 
     updateTimeSeriesChart();
 }
@@ -132,23 +132,32 @@ void Tab4::createWidgets()
     title->setAlignment(Qt::AlignCenter);
     title->setObjectName("titleLabel");
 
-    // Dropdown's labels
-    pollutantLabel = new QLabel(tr("Select a Unique Pollutant:"));
-    locationLabel = new QLabel(tr("Select a Unique Location:"));
+    description = new QLabel(tr("Monitor fluorinated compound concentrations in water samples over time. "
+                               "Select a compound and location to view detailed time series data with compliance indicators."));
+    description->setWordWrap(true);
+    description->setAlignment(Qt::AlignCenter);
+    description->setObjectName("descriptionLabel");
+
+    // Dropdown labels with consistent styling
+    pollutantLabel = new QLabel(tr("Select Pollutant:"));
+    locationLabel = new QLabel(tr("Select Location:"));
 
     QFont labelFont;
-    labelFont.setPointSize(18);
+    labelFont.setPointSize(14);
     labelFont.setBold(true);
     pollutantLabel->setFont(labelFont);
     locationLabel->setFont(labelFont);
 
-    // Pollutants and Location dropdowns
+    // Style the dropdowns
     pollutantDropdown = new QComboBox(this);
     locationDropdown = new QComboBox(this);
 
-    pollutantDropdown->setObjectName("pollutantDropdown");
-    locationDropdown->setObjectName("locationDropdown");
+    pollutantDropdown->setObjectName("dataDropdown");
+    locationDropdown->setObjectName("dataDropdown");
 
+    pollutantDropdown->setFixedHeight(40);
+    locationDropdown->setFixedHeight(40);
+    
     pollutantDropdown->setEditable(false);
     locationDropdown->setEditable(false);
 }
@@ -156,32 +165,82 @@ void Tab4::createWidgets()
 void Tab4::createLayout()
 {
     QVBoxLayout* layout = new QVBoxLayout;
+    
+    // Title section with consistent spacing
     layout->addWidget(title);
-    layout->addWidget(pollutantLabel);
-    layout->addWidget(pollutantDropdown);
-    layout->addWidget(locationLabel);
-    layout->addWidget(locationDropdown);
-    layout->addStretch();
-    layout->setSpacing(20);
+    layout->addWidget(description);
+    layout->addSpacing(20);
+
+    // Dropdown section
+    QHBoxLayout* dropdownLayout = new QHBoxLayout;
+    
+    QVBoxLayout* pollutantSection = new QVBoxLayout;
+    pollutantSection->addWidget(pollutantLabel);
+    pollutantSection->addWidget(pollutantDropdown);
+    
+    QVBoxLayout* locationSection = new QVBoxLayout;
+    locationSection->addWidget(locationLabel);
+    locationSection->addWidget(locationDropdown);
+    
+    dropdownLayout->addLayout(pollutantSection);
+    dropdownLayout->addLayout(locationSection);
+    
+    layout->addLayout(dropdownLayout);
+    layout->addSpacing(20);  // Consistent spacing before chart
+    
+    // The chart will be added here dynamically
+    layout->setSpacing(10);
     layout->setContentsMargins(30, 30, 30, 30);
 
     setLayout(layout);
 }
 
-void Tab4::setupStyles()
+void Tab4::setupGeneralStyles()
 {
     QString styleSheet = QString(R"(
-        QLabel {
-            font-size: 18px;
-            font-weight: bold;
+        QWidget {
+            background-color: transparent;
+            color: %1;
         }
 
+        QLabel#titleLabel {
+            font-size: 32px;
+            font-weight: bold;
+            color: %1;
+        }
+
+        QLabel#descriptionLabel {
+            font-size: 14px;
+            color: %1;
+            margin-bottom: 20px;
+        }
+    )")
+    .arg(Styles::textColor());                    // %1
+
+    this->setStyleSheet(this->styleSheet() + styleSheet);
+}
+
+void Tab4::setupComboBoxStyles()
+{
+    QString styleSheet = QString(R"(
         QComboBox {
             font-size: 16px;
             padding: 5px;
-        }
-    )");
-    this->setStyleSheet(styleSheet);
+            background-color: %2;  /* Dropdown background color */
+            color: %1;  /* Text color in dropdown */
+            border: 1px solid %3;  /* Border color */
+        })")
+    .arg(Styles::textColor())  // Text color
+    .arg(Styles::backgroundColor())  // Dropdown background color
+    .arg(Styles::borderColor());  // Border color for dropdown
+
+    this->setStyleSheet(this->styleSheet() + styleSheet);
+}
+
+void Tab4::setupStyles()
+{
+    setupGeneralStyles();
+    setupComboBoxStyles();
 }
 
 void Tab4::updateCharts()
@@ -192,13 +251,12 @@ void Tab4::updateCharts()
 
 void Tab4::updatePollutantList()
 {
-    qDebug() << "Updating pollutant dropdown in Tab4...";
 
-    pollutantDropdown->blockSignals(true); // Prevent triggering slot during update
+    pollutantDropdown->blockSignals(true); // Prevents triggering slot during update
     pollutantDropdown->clear();
 
     if (!waterModel->hasData()) {
-        pollutantDropdown->addItem(tr("No data available."));
+        pollutantDropdown->addItem(tr("Data unavailable."));
         pollutantDropdown->blockSignals(false);
         updateLocationDropdown(QString());
         return;
@@ -208,21 +266,20 @@ void Tab4::updatePollutantList()
     pollutantDropdown->clear();
 
     if (uniquePollutants.isEmpty()) {
-        pollutantDropdown->addItem(tr("No unique pollutants found."));
+        pollutantDropdown->addItem(tr("Unique pollutants not found."));
         pollutantDropdown->blockSignals(false);
         updateLocationDropdown(QString());
         return;
     }
 
-    // Populate the pollutant dropdown
+    // Fill in the pollutant dropdown
     for (const auto& pollutant : uniquePollutants) {
         pollutantDropdown->addItem(pollutant);
-        qDebug() << pollutant;
     }
 
     pollutantDropdown->blockSignals(false);
 
-    // Optionally, select the first pollutant and update locations
+    // Select the first pollutant and update locations
     if (!uniquePollutants.isEmpty()) {
         pollutantDropdown->setCurrentIndex(0);
         updateLocationDropdown(pollutantDropdown->currentText());
@@ -232,11 +289,10 @@ void Tab4::updatePollutantList()
 
 void Tab4::updateLocationList()
 {
-    qDebug() << "Updating location dropdown in Tab4...";
 
     if (!waterModel->hasData()) {
         locationDropdown->clear();
-        locationDropdown->addItem(tr("No data available."));
+        locationDropdown->addItem(tr("Data unavailable."));
         return;
     }
 
@@ -244,7 +300,7 @@ void Tab4::updateLocationList()
     locationDropdown->clear();
 
     if (uniqueLocations.isEmpty()) {
-        locationDropdown->addItem(tr("No unique locations found."));
+        locationDropdown->addItem(tr("Unique locations not found."));
         return;
     }
 
@@ -257,11 +313,10 @@ QChart* Tab4::createTimeSeriesChart(const QString& pollutant, const QString& loc
 {
     // Validate selections
     if (pollutant.isEmpty() || location.isEmpty()) {
-        qDebug() << "Pollutant or location not selected. Cannot create chart.";
         return nullptr;
     }
 
-    // Retrieve all matching samples
+    // Retrieve all samples which match
     QVector<QPair<QDateTime, double>> dataPoints;
 
     for (int i = 0; i < waterModel->rowCount(QModelIndex()); ++i) {
@@ -272,7 +327,7 @@ QChart* Tab4::createTimeSeriesChart(const QString& pollutant, const QString& loc
             QDateTime dateTime = waterModel->data(waterModel->index(i, 3), Qt::DisplayRole).toDateTime();
             double concentration = waterModel->data(waterModel->index(i, 6), Qt::DisplayRole).toDouble();
 
-            // Validate data points
+            // Validates data points
             if (!dateTime.isValid()) {
                 qDebug() << "Invalid QDateTime at row" << i << ". Skipping this data point.";
                 continue;
@@ -287,34 +342,31 @@ QChart* Tab4::createTimeSeriesChart(const QString& pollutant, const QString& loc
         }
     }
 
-    qDebug() << "Total valid data points retrieved:" << dataPoints.size();
-
     // Check if data points exist
     if (dataPoints.isEmpty()) {
-        qDebug() << "No valid data points available for the selected pollutant and location.";
+        qDebug() << "No valid data points exist for the selected pollutant and location.";
         return nullptr;
     }
 
-    // Sort points by time
+    // Sorts points by time
     std::sort(dataPoints.begin(), dataPoints.end(), [](const QPair<QDateTime, double>& a, const QPair<QDateTime, double>& b) {
         return a.first < b.first;
     });
 
-    // Retrieve threshold
+    // Retrieves threshold
     double threshold = waterModel->getDeterminandThreshold(pollutant);
-    qDebug() << "Threshold for" << pollutant << ":" << threshold;
 
     if (threshold <= 0.0) {
         qDebug() << "Invalid threshold for" << pollutant << ". Threshold must be greater than 0.";
         return nullptr;
     }
 
-    // Create line series
+    // Create a line series
     QLineSeries* lineSeries = new QLineSeries();
     lineSeries->setName(tr("Concentration over Time"));
     lineSeries->setColor(QColor(0, 0, 255)); // Blue line for trend
 
-    // Create scatter series for each compliance cat
+    // Create  a scatter series for each compliance cat
     QScatterSeries* compliantSeries = new QScatterSeries();
     compliantSeries->setMarkerShape(QScatterSeries::MarkerShapeCircle);
     compliantSeries->setMarkerSize(10.0);
@@ -332,7 +384,7 @@ QChart* Tab4::createTimeSeriesChart(const QString& pollutant, const QString& loc
     QScatterSeries* nonCompliantSeries = new QScatterSeries();
     nonCompliantSeries->setMarkerShape(QScatterSeries::MarkerShapeCircle);
     nonCompliantSeries->setMarkerSize(10.0);
-    nonCompliantSeries->setName(tr("Non-Compliant"));
+    nonCompliantSeries->setName(tr("Not Compliant"));
     nonCompliantSeries->setBrush(QBrush(QColor(215, 0, 64))); // Rou
     nonCompliantSeries->setPen(QPen(QColor(215, 0, 64)));
 
@@ -341,7 +393,7 @@ QChart* Tab4::createTimeSeriesChart(const QString& pollutant, const QString& loc
     int nearThresholdCount = 0;
     int nonCompliantCount = 0;
 
-    // Implement data points into series
+    // Implement the data points into the series
     for (const auto& point : dataPoints) {
         qint64 x = point.first.toMSecsSinceEpoch(); // xaxis as milliseconds
         double y = point.second; // y concentration acis
@@ -364,10 +416,6 @@ QChart* Tab4::createTimeSeriesChart(const QString& pollutant, const QString& loc
         }
     }
 
-    qDebug() << "Compliant points:" << compliantCount;
-    qDebug() << "Near Threshold points:" << nearThresholdCount;
-    qDebug() << "Non-Compliant points:" << nonCompliantCount;
-
     // creat chart, add series
     QChart* chart = new QChart();
     chart->addSeries(lineSeries);
@@ -375,20 +423,14 @@ QChart* Tab4::createTimeSeriesChart(const QString& pollutant, const QString& loc
     // Only adds scatter series only if they have data points
     if (compliantSeries->count() > 0) {
         chart->addSeries(compliantSeries);
-    } else {
-        qDebug() << "No compliant data points to display.";
     }
 
     if (nearThresholdSeries->count() > 0) {
         chart->addSeries(nearThresholdSeries);
-    } else {
-        qDebug() << "No near threshold data points to display.";
     }
 
     if (nonCompliantSeries->count() > 0) {
         chart->addSeries(nonCompliantSeries);
-    } else {
-        qDebug() << "No non-compliant data points to display.";
     }
 
     chart->setTitle(tr("Time Series for %1 at %2").arg(pollutant, location));
@@ -421,7 +463,7 @@ QChart* Tab4::createTimeSeriesChart(const QString& pollutant, const QString& loc
     if (nearThresholdCount > 0)
         setupTooltip(nearThresholdSeries, tr("Near Threshold"));
     if (nonCompliantCount > 0)
-        setupTooltip(nonCompliantSeries, tr("Non-Compliant"));
+        setupTooltip(nonCompliantSeries, tr("Not Compliant"));
 
     // Sets up the x axis (time)
     QDateTimeAxis* axisX = new QDateTimeAxis();
@@ -496,11 +538,8 @@ QChart* Tab4::createTimeSeriesChart(const QString& pollutant, const QString& loc
     chart->legend()->setVisible(true);
     chart->legend()->setAlignment(Qt::AlignBottom);
 
-    qDebug() << "Chart successfully created with title:" << chart->title();
-    qDebug() << "Chart has" << chart->series().size() << "series.";
-
     return chart;
 }
-// COND @ 25 WORKS GREAT FOR TESTING
+// COND @ 25 HAS MANY DATA POINTS
 // 1,3 -DICHLOR
-// PFOS WORKS FAB TOO
+// PFOS WORKS GREAT TOO

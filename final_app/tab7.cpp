@@ -1,24 +1,16 @@
-// Sample implementation for the third card - Raw Data
+// Implementation of Tab 7 - Help
 
 #include <QtWidgets>
 #include "styles.hpp"
 #include "tab7.hpp"
-
 
 Tab7::Tab7(WaterModel* model, QWidget* parent): waterModel(model), QWidget(parent)
 {
   createWidgets();
   createLayout();
   setupStyles();
-  adjustColumnWidths();
   
-  // Install event filter for Styles changes
   qApp->installEventFilter(this);
-  
-  // Connect to model changes to readjust columns when data changes
-  connect(waterModel, SIGNAL(modelReset()), this, SLOT(adjustColumnWidths()));
-  connect(waterModel, SIGNAL(dataChanged(QModelIndex,QModelIndex)), this, SLOT(adjustColumnWidths()));
-  connect(waterModel, SIGNAL(rowsInserted(QModelIndex,int,int)), this, SLOT(adjustColumnWidths()));
 }
 
 bool Tab7::eventFilter(QObject *watched, QEvent *event)
@@ -30,178 +22,173 @@ bool Tab7::eventFilter(QObject *watched, QEvent *event)
   return QWidget::eventFilter(watched, event);
 }
 
-void Tab7::createWidgets() 
+void Tab7::createWidgets()
 {
-  tableView = new QTableView;
-  tableView->setModel(waterModel);
-  QFont tableFont = QFontDatabase::systemFont(QFontDatabase::FixedFont);
-  tableFont.setPointSize(12);
-  tableView->setFont(tableFont);
-  
-  // Table behavior settings
-  tableView->setAlternatingRowColors(true);
-  tableView->setSortingEnabled(true);
-  tableView->setSelectionBehavior(QAbstractItemView::SelectRows);
-  tableView->setSelectionMode(QAbstractItemView::SingleSelection);
-  tableView->setShowGrid(true);
-  tableView->setObjectName("mainTable");
-  tableView->setWordWrap(false);  // Prevent word wrapping to get accurate column widths
-  
-  // Header settings
-  QHeaderView* horizontalHeader = tableView->horizontalHeader();
-  horizontalHeader->setStretchLastSection(true);
-  horizontalHeader->setSectionsClickable(true);
-  horizontalHeader->setHighlightSections(true);
-  horizontalHeader->setObjectName("tableHeader");
-  horizontalHeader->setDefaultAlignment(Qt::AlignLeft | Qt::AlignVCenter);
-  
-  // Setting minimum row height
-  tableView->verticalHeader()->setDefaultSectionSize(40);
-  tableView->verticalHeader()->setVisible(false);
-  
-  // Make the table take up all available space
-  tableView->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-} 
+  title = new QLabel(tr("Help"));
+  QFont titleFont;
+  titleFont.setPointSize(32);
+  titleFont.setBold(true);
+  title->setFont(titleFont);
+  title->setAlignment(Qt::AlignCenter);
+  title->setObjectName("titleLabel");
 
-void Tab7::adjustColumnWidths()
-{
-  if (!waterModel) return;
-  
-  const int padding = 20;  // Additional padding for each column
-  QFontMetrics metrics(tableView->font());
-  QModelIndex parent;  // Empty model index for root items
-  
-  for (int column = 0; column < waterModel->columnCount(parent); ++column) {
-    int maxWidth = 0;
+  contentContainer = new QWidget;
+  QVBoxLayout* contentLayout = new QVBoxLayout(contentContainer);
+  contentLayout->setSpacing(20);
+  contentLayout->setContentsMargins(20, 20, 20, 20);
+
+  // About the Dataset
+  QLabel* datasetTitle = new QLabel(tr("About the Dataset"));
+  datasetTitle->setFont(QFont("", 24, QFont::Bold));
+  QLabel* datasetText = new QLabel(tr(
+    "This application visualises water quality data collected from various locations by the UK Environment Agency. "
+    "The datasets includes measurements of different determinands (substances) in water samples, "
+    "along with information about sampling locations, dates, and whether samples were taken "
+    "to comply with UK regulations."
+  ));
+  datasetText->setWordWrap(true);
+  contentLayout->addWidget(datasetTitle);
+  contentLayout->addWidget(datasetText);
+
+  // Navigation Guide
+  QLabel* navTitle = new QLabel(tr("Navigation Guide"));
+  navTitle->setFont(QFont("", 24, QFont::Bold));
+  QLabel* navText = new QLabel(tr(
+  "• <b>Dashboard</b>: Overview of key data metrics to quickly assess overall monitoring status<br>"
+  "• <b>Pollutant Overview</b>: Track concentrations of key pollutants to monitor water quality and safety<br>"
+  "• <b>Litter Indicators</b>: Assess environmental impact and cleanliness of waterways through litter monitoring<br>" 
+  "• <b>Fluorinated Compounds</b>: Track levels of fluorinated chemicals to ensure safe drinking water standards and dental health<br>"
+  "• <b>Compliance</b>: Monitor adherence to water quality regulations to maintain public safety standards<br>"
+  "• <b>Raw Data</b>: Access the complete dataset for detailed research and custom analysis<br>"
+  "• <b>Help</b>: Guide to using this water quality monitoring system"
+  ));
+
+  navText->setTextFormat(Qt::RichText);
+  navText->setWordWrap(true);
+  contentLayout->addWidget(navTitle);
+  contentLayout->addWidget(navText);
+
+  // Using the Application
+  QLabel* usageTitle = new QLabel(tr("Using the Application"));
+  usageTitle->setFont(QFont("", 24, QFont::Bold));
+  QLabel* usageText = new QLabel(tr(
+    "• Use the tabs at the top to navigate between different pages<br>"
+    "• Hover over charts and graphs to see detailed information<br>"
+    "• Use the 'Reload Data' on the dashboard or through the file menu to load a different dataset<br>"
+    "<br>Data can be downloaded from: "
+    "<a href='https://environment.data.gov.uk/water-quality/view/download'>The UK Environment Agency</a><br>"
+    "<br>More information about the datasets can be found "
+    "<a href='https://environment.data.gov.uk/water-quality/view/doc/reference'>here</a>"
+  ));
+  usageText->setTextFormat(Qt::RichText);
+  usageText->setOpenExternalLinks(true);
+  usageText->setWordWrap(true);
+  contentLayout->addWidget(usageTitle);
+  contentLayout->addWidget(usageText);
+
+  // Compliance Indicators
+  QLabel* complianceTitle = new QLabel(tr("Compliance Indicators"));
+  complianceTitle->setFont(QFont("", 24, QFont::Bold));
+  contentLayout->addWidget(complianceTitle);
+
+  // Create colour indicators
+  const struct {
+    QColor colour;
+    QString meaning;
+    QString description;
+  } indicators[] = {
+    {QColor(32, 125, 32), tr("Safe"), tr("Measurement is within safe limits according to the UK Drinking Water Standards")},
+    {QColor(253, 183, 0), tr("Warning"), tr("Measurement is approaching threshold (>80%) of the UK Drinking Water Standards")},
+    {QColor(204, 31, 40), tr("Exceeded"), tr("Measurement exceeds safe threshold according to the UK Drinking Water Standards")}
+  };
+
+  for (const auto& indicator : indicators) {
+    QWidget* row = new QWidget;
+    QHBoxLayout* rowLayout = new QHBoxLayout(row);
     
-    // Check header width
-    QString headerText = waterModel->headerData(column, Qt::Horizontal, Qt::DisplayRole).toString();
-    maxWidth = metrics.horizontalAdvance(headerText);
+    // colour block
+    QFrame* colourBlock = new QFrame;
+    colourBlock->setFixedSize(30, 30);
+    colourBlock->setStyleSheet(QString("background-color: %1; border-radius: 4px;")
+                            .arg(indicator.colour.name()));
     
-    // Check content width for first 100 rows
-    for (int row = 0; row < 100; ++row) {
-      QModelIndex idx = waterModel->index(row, column, parent);
-      QString text = waterModel->data(idx, Qt::DisplayRole).toString();
-      int width = metrics.horizontalAdvance(text);
-      maxWidth = qMax(maxWidth, width);
-    }
+    // Text
+    QLabel* text = new QLabel(QString("<b>%1</b>: %2")
+                            .arg(indicator.meaning)
+                            .arg(indicator.description));
+    text->setWordWrap(true);
     
-    // Set the column width to the maximum width plus padding
-    tableView->setColumnWidth(column, maxWidth + padding * 2);
+    rowLayout->addWidget(colourBlock);
+    rowLayout->addWidget(text, 1);
+    rowLayout->setSpacing(15);
+    
+    contentLayout->addWidget(row);
   }
+
+  scrollArea = new QScrollArea;
+  scrollArea->setWidget(contentContainer);
+  scrollArea->setWidgetResizable(true);
 }
 
 void Tab7::createLayout()
 {
   QVBoxLayout* layout = new QVBoxLayout;
-  layout->addWidget(tableView);
-  layout->setContentsMargins(20, 20, 20, 20);
-  layout->setSpacing(0);
-  
+  layout->addWidget(title);
+  layout->addWidget(scrollArea);
+  layout->setSpacing(20);
+  layout->setContentsMargins(30, 30, 30, 30);
+    
   setLayout(layout);
 }
 
-void Tab7::setupStyles()
-{
-  // QString styleSheet = QString(R"(
-  //   QWidget {
-  //     background-color: transparent;
-  //     color: %1;
-  //   }
+void Tab7::setupStyles() {
+  QString styleSheet = QString(R"(
+    QWidget {
+      background-color: transparent;
+      color: %1;
+    }
     
-  //   QTableView#mainTable {
-  //     background-color: %2;
-  //     border: 1px solid %3;
-  //     border-radius: %4px;
-  //     selection-background-color: %5;
-  //     selection-color: %6;
-  //     gridline-color: %7;
-  //   }
+    QLabel#titleLabel {
+      font-size: 32px;
+      font-weight: bold;
+      color: %1;
+    }
     
-  //   QHeaderView::section {
-  //     background-color: %8;
-  //     color: %9;
-  //     padding: %10px;
-  //     border: none;
-  //     font-weight: bold;
-  //   }
+    QScrollArea {
+      border: none;
+      background-color: transparent;
+    }
     
-  //   QHeaderView::section:first {
-  //     border-top-left-radius: %4px;
-  //   }
+    QScrollBar:vertical {
+      background-color: transparent;
+      width: 12px;
+      margin: 0;
+    }
     
-  //   QHeaderView::section:hover {
-  //     background-color: %11;
-  //   }
+    QScrollBar::handle:vertical {
+      background-color: %2;
+      border-radius: 6px;
+      min-height: 20px;
+      margin: 2px;
+    }
     
-  //   QTableView::item {
-  //     padding: %12px;
-  //     margin: 0;
-  //     border: none;
-  //   }
+    QScrollBar::handle:vertical:hover {
+      background-color: %3;
+    }
     
-  //   QTableView::item:selected {
-  //     background-color: %5;
-  //     color: %6;
-  //     padding: %12px;
-  //     margin: 0;
-  //     border: none;
-  //   }
+    QScrollBar::add-line:vertical,
+    QScrollBar::sub-line:vertical {
+      height: 0px;
+    }
     
-  //   QTableView::item:alternate {
-  //     background-color: %13;
-  //     padding: %12px;
-  //     margin: 0;
-  //     border: none;
-  //   }
-    
-  //   QScrollBar:vertical {
-  //     border: none;
-  //     background-color: %2;
-  //     width: 12px;
-  //     margin: 0px;
-  //   }
-    
-  //   QScrollBar::handle:vertical {
-  //     background-color: %3;
-  //     border-radius: %4px;
-  //     min-height: 20px;
-  //   }
-    
-  //   QScrollBar::handle:vertical:hover {
-  //     background-color: %11;
-  //   }
-    
-  //   QScrollBar:horizontal {
-  //     border: none;
-  //     background-color: %2;
-  //     height: 12px;
-  //     margin: 0px;
-  //   }
-    
-  //   QScrollBar::handle:horizontal {
-  //     background-color: %3;
-  //     border-radius: %4px;
-  //     min-width: 20px;
-  //   }
-    
-  //   QScrollBar::handle:horizontal:hover {
-  //     background-color: %11;
-  //   }
-  // )")
-  // .arg(Styles::textColor())                    // %1
-  // .arg(Styles::backgroundColor())              // %2
-  // .arg(Styles::borderColor())                  // %3
-  // .arg(Styles::BORDER_RADIUS)                  // %4
-  // .arg(Styles::selectionBackground())          // %5
-  // .arg(Styles::selectionText())                // %6
-  // .arg(Styles::gridColor())                    // %7
-  // .arg(Styles::tableHeaderBackground())        // %8
-  // .arg(Styles::tableHeaderText())              // %9
-  // .arg(Styles::PADDING_MEDIUM)                 // %10
-  // .arg(Styles::menuHover())                    // %11
-  // .arg(Styles::PADDING_SMALL)                  // %12
-  // .arg(Styles::alternateRowBackground());      // %13
+    QScrollBar::add-page:vertical,
+    QScrollBar::sub-page:vertical {
+      background: none;
+    }
+  )")
+  .arg(Styles::textColor())                    // %1
+  .arg(Styles::borderColor())                  // %2
+  .arg(Styles::actionButtonHover());           // %3
 
-  // this->setStyleSheet(styleSheet);
+  this->setStyleSheet(styleSheet);
 }

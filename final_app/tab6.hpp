@@ -1,22 +1,25 @@
-// [OPTIONAL] Header for sixth card - Geographical Hotspots
+// Header for Tab 6 - Raw Data
 
 #pragma once
 
 #include <QWidget>
 #include "model.hpp"
 
-class QLabel;
+class QTableView;
 
-class Tab6: public QWidget
+class Tab6 : public QWidget
 {
   Q_OBJECT
 
   public:
-    Tab6(WaterModel *model, QWidget *parent = nullptr);
+    Tab6(WaterModel* model, QWidget* parent = nullptr);
+
+  private slots:
+    void adjustColumnWidths();
 
   private:
     WaterModel* waterModel;
-    QLabel *placeholder;
+    QTableView* tableView;
 
     void createWidgets();
     void createLayout();

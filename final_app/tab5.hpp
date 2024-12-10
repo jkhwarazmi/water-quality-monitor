@@ -41,6 +41,7 @@ private slots:
 private:
     WaterModel* waterModel;
     QLabel *title;
+    QLabel* overviewLabel;
     QLabel* pollutantLabel;
     QLabel* locationLabel;
     QLabel* definitionLabel;
@@ -67,6 +68,7 @@ private:
     void createLayout();
     void createCharts();
     void setupStyles();
+    void createOverviewLabel();
     bool eventFilter(QObject* watched, QEvent* event) override;
 
     QChart* createTimeSeriesChart(const QString& pollutant, const QString& location);

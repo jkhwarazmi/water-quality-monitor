@@ -20,7 +20,7 @@ WaterWindow::WaterWindow() : QMainWindow()
   createMainWidget();
   createMenus();
   setupStyles();
-  
+  createStatusBar();
   setMinimumWidth(1250);
   setMinimumHeight(600);
   setWindowTitle(tr("Water Quality Monitor"));
@@ -47,6 +47,7 @@ void WaterWindow::createMainWidget()
 
   connect(loadDataWidget, SIGNAL(dataFileSelected()), this, SLOT(setDataLocation()));
   connect(loadDataWidget, SIGNAL(loadRequested()), this, SLOT(setPath()));
+  connect(loadDataWidget, SIGNAL(cancelRequested()), this, SLOT(cancelLoad()));
     
   tabWidget = new QTabWidget;
   tabWidget->setObjectName("mainTabs");
@@ -62,12 +63,25 @@ void WaterWindow::createMainWidget()
   connect(tab1, SIGNAL(reloadRequested()), this, SLOT(switchToLoadView()));
     
   tabWidget->addTab(tab1, tr("Dashboard"));
+  tabWidget->setTabToolTip(0, tr("View summary of the loaded data"));
+
   tabWidget->addTab(tab2, tr("Pollutant Overview"));
+  tabWidget->setTabToolTip(1, tr("Analyse various water pollutants"));
+
   tabWidget->addTab(tab3, tr("Litter Indicators"));
+  tabWidget->setTabToolTip(2, tr("Monitor water litter levels"));
+
   tabWidget->addTab(tab4, tr("Fluorinated Compounds"));
+  tabWidget->setTabToolTip(3, tr("Examine fluorinated compound data"));
+
   tabWidget->addTab(tab5, tr("Compliance"));
-  tabWidget->addTab(tab6, tr("Hotspots"));
-  tabWidget->addTab(tab7, tr("Raw Data"));
+  tabWidget->setTabToolTip(4, tr("Check compliance of detected pollutants with UK regulations"));
+
+  tabWidget->addTab(tab6, tr("Raw Data"));
+  tabWidget->setTabToolTip(5, tr("View data from the CSV file as a table"));
+
+  tabWidget->addTab(tab7, tr("Help"));
+  tabWidget->setTabToolTip(6, tr("Get help using the application"));
     
   stackedWidget->addWidget(loadDataWidget);
   stackedWidget->addWidget(tabWidget);
@@ -75,8 +89,150 @@ void WaterWindow::createMainWidget()
   setCentralWidget(stackedWidget);
     
   stackedWidget->setCurrentWidget(loadDataWidget);
+}
 
-  connect(loadDataWidget, SIGNAL(languageChanged(QString)), this, SLOT(changeLanguage(QString)));
+void WaterWindow::createMenus()
+{
+  QAction *locAction = new QAction(tr("Set Data &Location"), this);
+  locAction->setShortcut(QKeySequence(Qt::CTRL | Qt::Key_L));
+  connect(locAction, SIGNAL(triggered()), this, SLOT(switchToLoadView()));
+
+  QAction *closeAction = new QAction(tr("Quit"), this);
+  closeAction->setShortcut(QKeySequence::Close);
+  connect(closeAction, SIGNAL(triggered()), this, SLOT(close()));
+
+  QMenu *fileMenu = menuBar()->addMenu(tr("&File"));
+  fileMenu->addAction(locAction);
+  fileMenu->addAction(closeAction);
+
+  QAction *aboutAction = new QAction(tr("&About"), this);
+  connect(aboutAction, SIGNAL(triggered()), this, SLOT(about()));
+
+  QAction *findDataAction = new QAction(tr("&Get data sources"), this);
+  findDataAction->setShortcut(QKeySequence(Qt::CTRL | Qt::Key_G));
+  connect(findDataAction, &QAction::triggered, this, []{
+    QDesktopServices::openUrl(QUrl("https://environment.data.gov.uk/water-quality/view/download"));
+  });
+
+  QAction *understandDataAction = new QAction(tr("Understanding the &data"), this);
+  understandDataAction->setShortcut(QKeySequence(Qt::CTRL | Qt::Key_D));
+  connect(understandDataAction, &QAction::triggered, this, []{
+    QDesktopServices::openUrl(QUrl("https://environment.data.gov.uk/water-quality/view/doc/reference"));
+  });
+
+  QMenu *helpMenu = menuBar()->addMenu(tr("&Help"));
+  helpMenu->addAction(aboutAction);
+  helpMenu->addAction(findDataAction);
+  helpMenu->addAction(understandDataAction);
+}
+
+void WaterWindow::setDataLocation()
+{
+  QString directory = QFileDialog::getOpenFileName(this, tr("Select Data File"), dataLocation, tr("CSV files (*.csv)"));
+
+  if (!directory.isEmpty()) {
+    dataLocation = directory;
+    loadDataWidget->updatePath(dataLocation);
+  } else {
+    QMessageBox::critical(this, tr("Data Error"), tr("No file selected."));
+  }
+}
+
+void WaterWindow::setPath()
+{
+  dataLocation = loadDataWidget->getPath();
+  loadData(dataLocation);
+  fileInfo->setText("Current file: " + dataLocation);
+}
+
+void WaterWindow::cancelLoad()
+{
+  switchToTabView();
+}
+
+void WaterWindow::loadData(const QString &path)
+{
+  // Create custom loading dialog
+  QDialog loadingDialog(this);
+  loadingDialog.setWindowTitle(tr("Loading"));
+  loadingDialog.setWindowFlags(Qt::Dialog | Qt::CustomizeWindowHint | Qt::WindowTitleHint);
+  loadingDialog.setFixedSize(300, 100);
+  loadingDialog.setModal(true);
+  
+  QVBoxLayout *layout = new QVBoxLayout(&loadingDialog);
+  
+  QLabel *loadingLabel = new QLabel(tr("Loading data..."));
+  loadingLabel->setAlignment(Qt::AlignCenter);
+  QFont font = loadingLabel->font();
+  font.setPointSize(12);
+  loadingLabel->setFont(font);
+  
+  QProgressBar *progressBar = new QProgressBar();
+  progressBar->setMinimum(0);
+  progressBar->setMaximum(0);
+  progressBar->setTextVisible(false);
+  
+  layout->addWidget(loadingLabel);
+  layout->addWidget(progressBar);
+  
+  // Show dialog and process events to ensure it appears
+  loadingDialog.show();
+  QCoreApplication::processEvents();
+
+  try {
+    model.updateFromFile(path);
+      
+    if (!model.hasData()) {
+      loadingDialog.close();
+      QMessageBox::critical(this, tr("Data Error"), tr("The selected file contains no valid data."));
+      return;
+    }
+
+    model.dataProcessing();
+
+    // Add chart update methods below
+    tab1->updateCharts();
+    tab2->updateCharts();
+    tab3->updateCharts();
+    tab4->updateCharts();
+    tab5->updateCharts();
+    
+    switchToTabView();
+    loadDataWidget->setDataLoaded(true);
+
+  } catch (const std::exception& error) {
+    loadingDialog.close();
+    QMessageBox::critical(this, tr("CSV File Error"), error.what());
+  }
+    
+  loadingDialog.close();
+}
+
+void WaterWindow::switchToTabView()
+{
+  stackedWidget->setCurrentWidget(tabWidget);
+}
+
+void WaterWindow::switchToLoadView()
+{
+  stackedWidget->setCurrentWidget(loadDataWidget);
+}
+
+void WaterWindow::createStatusBar()
+{
+  fileInfo = new QLabel("No file loaded");
+  QStatusBar* status = statusBar();
+  status->addWidget(fileInfo);
+}
+
+void WaterWindow::about()
+{
+  QMessageBox::about(this, tr("About Water Quality Monitor"),
+    tr("Water Quality Monitor displays water quality data from the UK Environment Agency's "
+    "official monitoring program.\n\n This data is sourced directly from the Environment Agency's public datasets.\n\n"
+    "(c) 2024 Nick Efford and Group 37. Data provided by the Environment Agency under the "
+    "Open Government Licence."));
+
 }
 
 void WaterWindow::setupStyles()
@@ -121,6 +277,17 @@ void WaterWindow::setupStyles()
 
     QMenu::item:selected {
       background-color: %7;
+    }
+
+    QStatusBar {
+      background-color: %3;
+      color: %2;
+      border-top: 1px solid %8;
+    }
+
+    QStatusBar QLabel {
+      color: %2;
+      padding: %4px %5px;
     }
 
     QTabWidget::pane {
@@ -196,158 +363,3 @@ void WaterWindow::setupStyles()
 
   this->setStyleSheet(styleSheet);
 }
-
-void WaterWindow::createMenus()
-{
-  QAction *locAction = new QAction(tr("Set Data &Location"), this);
-  locAction->setShortcut(QKeySequence(Qt::CTRL | Qt::Key_L));
-  connect(locAction, SIGNAL(triggered()), this, SLOT(switchToLoadView()));
-
-  QAction *closeAction = new QAction(tr("Quit"), this);
-  closeAction->setShortcut(QKeySequence::Close);
-  connect(closeAction, SIGNAL(triggered()), this, SLOT(close()));
-
-  QMenu *fileMenu = menuBar()->addMenu(tr("&File"));
-  fileMenu->addAction(locAction);
-  fileMenu->addAction(closeAction);
-
-  QAction *aboutAction = new QAction(tr("&About"), this);
-  connect(aboutAction, &QAction::triggered, this, &WaterWindow::about);
-
-  QMenu *helpMenu = menuBar()->addMenu(tr("&Help"));
-  helpMenu->addAction(aboutAction);
-
-  createLanguageMenu();
-}
-
-void WaterWindow::createLanguageMenu() 
-{
-  QMenu *languageMenu = menuBar()->addMenu(tr("&Language"));
-
-  QActionGroup *languageGroup = new QActionGroup(this);
-  QAction* englishAction = new QAction(tr("&English"), this);
-  englishAction->setCheckable(true);
-  englishAction->setData("English");
-    
-  QAction* frenchAction = new QAction(tr("&Français"), this);
-  frenchAction->setCheckable(true);
-  frenchAction->setData("French");
-
-  // Set current language
-  QString currentLocale = QLocale::system().name().split('_').first();
-  if (currentLocale == "fr") {
-    frenchAction->setChecked(true);
-  } else {
-    englishAction->setChecked(true);
-  }
-
-  languageGroup->addAction(englishAction);
-  languageGroup->addAction(frenchAction);
-    
-  languageMenu->addAction(englishAction);
-  languageMenu->addAction(frenchAction);
-
-  // Connect using a lambda to convert QAction* to QString
-  connect(languageGroup, SIGNAL(triggered(QAction *)), this, SLOT(handleLanguageAction(QAction *)));
-}
-
-void WaterWindow::handleLanguageAction(QAction *action)
-{
-  changeLanguage(action->data().toString());
-}
-
-void WaterWindow::setDataLocation()
-{
-  QString directory = QFileDialog::getOpenFileName(this, tr("Select Data File"), dataLocation, tr("CSV files (*.csv)"));
-
-  if (!directory.isEmpty()) {
-    dataLocation = directory;
-    loadDataWidget->updatePath(dataLocation);
-  } else {
-    QMessageBox::critical(this, tr("Data Error"), tr("No file selected."));
-  }
-}
-
-void WaterWindow::setPath()
-{
-  dataLocation = loadDataWidget->getPath();
-  loadData(dataLocation);
-}
-
-void WaterWindow::loadData(const QString &path)
-{
-  QProgressDialog progress(tr("Loading data..."), tr("Cancel"), 0, 0, this);
-  progress.setWindowModality(Qt::WindowModal);
-  progress.show();
-
-  try {
-    model.updateFromFile(path);
-      
-    if (!model.hasData()) {
-      QMessageBox::critical(this, tr("Data Error"), tr("The selected file contains no valid data."));
-      return;
-    }
-
-    model.dataProcessing();
-
-    // Add chart update methods below
-    tab1->updateCharts();
-    tab2->updateCharts();
-    tab3->updateCharts();
-    tab4->updateCharts();
-    tab5->updateCharts();
-    
-    switchToTabView();
-
-  } catch (const std::exception& error) {
-    QMessageBox::critical(this, tr("CSV File Error"), error.what());
-  }
-    
-  progress.close();
-}
-
-void WaterWindow::switchToTabView()
-{
-  stackedWidget->setCurrentWidget(tabWidget);
-}
-
-void WaterWindow::switchToLoadView()
-{
-  stackedWidget->setCurrentWidget(loadDataWidget);
-}
-
-void WaterWindow::changeLanguage(const QString &language)
-{ 
-  QString code = "en";
-
-  if (language == "French") {
-    code = "fr";
-  }
-
-  qApp->removeTranslator(&translator);
-
-  if (translator.load("WaterQualityMonitor_" + code, ":/i18n")) {
-    qApp->installTranslator(&translator);
-  } else {
-    QMessageBox::critical(this, tr("Language Error"), tr("Could not load language file."));
-  }
-
-  QEvent event(QEvent::LanguageChange);
-  qApp->sendEvent(qApp, &event);
-
-  // Not everything translates properly, may need custom changeEvent in each
-  // Where we re-specify strings?
-  setWindowTitle(tr("Water Quality Monitor"));
-}
-
-void WaterWindow::about()
-{
-  QMessageBox::about(this, tr("About Water Quality Monitor"),
-    tr("Water Quality Monitor displays water data loaded from "
-    "a CSV file produced by the UK Environment Agency.\n\n"
-    "(c) 2024 Nick Efford and Group 37"));
-}
-
-// Add help menu option
-// Add horizontal scrollbar
-// Add file label at bottom of app

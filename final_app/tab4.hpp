@@ -25,14 +25,17 @@ private slots:
 private:
     WaterModel* waterModel;
     QComboBox* pollutantDropdown;
-    QComboBox* locationDropdown;  //
+    QComboBox* locationDropdown; 
     QLabel* pollutantLabel;
     QLabel* locationLabel;
     QChartView* currentChartView; //Holds current view
     QLabel *title;
+    QLabel* description;
 
     void createWidgets();
     void createLayout();
+    void setupGeneralStyles();
+    void setupComboBoxStyles();
     void setupStyles();
     bool eventFilter(QObject* watched, QEvent* event) override;
 
