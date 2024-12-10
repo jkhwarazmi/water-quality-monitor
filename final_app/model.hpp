@@ -49,6 +49,9 @@ public:
 
     QVector<QPair<QDateTime, double>> getDataForSpecificPollutants(const QString& pollutant) const;
 
+    QMap<QString, QVector<QPair<QDateTime, double>>> getYourPollutantData() const;
+    QMap<QString, QSet<QString>> getYourPollutantLocations() const;
+
 
 
 private:
@@ -72,9 +75,5 @@ private:
     QMap<QString, QMap<QString, int>*> litterWaterType = QMap<QString, QMap<QString, int>*>();
 
     QMap<QString, QList<QPair<QDateTime, double>>> pollutantData;
-
-    QMap<QString, QVector<QPair<QDateTime, double>>> getYourPollutantData() const;
-    QMap<QString, QSet<QString>> getYourPollutantLocations() const;
-
 
 };
