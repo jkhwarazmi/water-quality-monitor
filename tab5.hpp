@@ -31,6 +31,7 @@ public:
     void updateLocationList();  // Updates to update the location dropdown
     void updateComplianceStatus(const QString& pollutant, const QString& location);
     void updateBarChart(); 
+    void updateCharts();
 
 private slots:
     void onPollutantSelectionChanged(int index);
@@ -39,6 +40,8 @@ private slots:
 
 private:
     WaterModel* waterModel;
+    QLabel *title;
+    QLabel* overviewLabel;
     QLabel* pollutantLabel;
     QLabel* locationLabel;
     QLabel* definitionLabel;
@@ -65,6 +68,7 @@ private:
     void createLayout();
     void createCharts();
     void setupStyles();
+    void createOverviewLabel();
     bool eventFilter(QObject* watched, QEvent* event) override;
 
     QChart* createTimeSeriesChart(const QString& pollutant, const QString& location);
