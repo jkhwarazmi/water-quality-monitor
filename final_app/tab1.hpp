@@ -57,4 +57,11 @@ class Tab1: public QWidget
 
     // This creates empty charts
     void createCharts();
+
+    // Chart update methods
+    void updateStats();
+    void updateComplianceChart();
+    void updateLocationChart();
+    void updateDeterminandChart();
+    void updateTimelineChart();
 };

@@ -70,6 +70,7 @@ void Tab1::createCharts()
   complianceChartView = new QChartView(complianceChart);
   complianceChartView->setRenderHint(QPainter::Antialiasing);
   complianceChartView->setMinimumHeight(300);
+  complianceChartView->setToolTip(tr("Number of samples taken to measure compliance with regulations compared to samples taken for other reasons"));
   chartLayout->addWidget(complianceChartView, 0, 0);
 
   // Location Bar Chart
@@ -176,9 +177,16 @@ void Tab1::createLayout()
   setLayout(layout);
 }
 
-// These should probably be their own functions tbh
-// i.e. updateComplianceChart(), updateLocationChart(), updateDeterminandChart()
 void Tab1::updateCharts()
+{
+  updateStats();
+  updateComplianceChart();
+  updateLocationChart();
+  updateDeterminandChart();
+  updateTimelineChart();
+}
+
+void Tab1::updateStats()
 {
   stats->setText(
     tr("Distinct Samples Taken: ") + QString("%L1").arg(waterModel->rowCount(QModelIndex())) + "\n" +
@@ -186,101 +194,179 @@ void Tab1::updateCharts()
     tr("Distinct Determinands Sampled: ") + QString("%L1").arg(waterModel->getDeterminandCount()) + "\n\n" +
     tr("Last Updated: ") + QDateTime::currentDateTime().toString("yyyy-MM-dd, hh:mm:ss")
   );
+}
 
-  // Clear the old data and add the new data
+void Tab1::updateComplianceChart()
+{
+  // No tooltips here, hover gives chart details
   complianceSeries->clear();
-  complianceSeries->append(tr("Compliance"), waterModel->getComplianceSampleCount().first);
-  complianceSeries->append(tr("Other Samples"), waterModel->getComplianceSampleCount().second);
-  complianceSeries->setHoleSize(0.35);
+  QPair<int, int> complianceData = waterModel->getComplianceSampleCount();
+  int totalSamples = complianceData.first + complianceData.second;
+  
+  if (totalSamples > 0) {
+    double compliancePercent = (complianceData.first * 100.0) / totalSamples;
+    double otherPercent = (complianceData.second * 100.0) / totalSamples;
+    
+    complianceSeries->append(tr("Compliance (%1%)").arg(QString::number(compliancePercent, 'f', 1)), 
+                            complianceData.first);
+    complianceSeries->append(tr("Other Samples (%1%)").arg(QString::number(otherPercent, 'f', 1)), 
+                            complianceData.second);
+    complianceSeries->setHoleSize(0.35);
+  }
+}
 
+void Tab1::updateLocationChart() {
   locationSeries->clear();
   QMap<QString, int> locationData = waterModel->getSampleLocations();
-    
-  // Create a single bar set for all locations
+  
   QBarSet *set = new QBarSet("Samples");
   QStringList categories;
-    
-  // Add data to the set and categories
-  for (auto it = locationData.constBegin(); it != locationData.constEnd(); ++it) {
-    categories << it.key();
-    *set << it.value();
+  
+  QVector<QPair<QString, int>> sortedLocations;
+  for(auto it = locationData.constBegin(); it != locationData.constEnd(); ++it) {
+    sortedLocations.append(qMakePair(it.key(), it.value()));
   }
-    
-  // Add the set to the series
+  
+  std::sort(sortedLocations.begin(), sortedLocations.end(),
+    [](const QPair<QString, int>& a, const QPair<QString, int>& b) {
+      return a.second > b.second;
+  });
+  
+  for(const auto& pair : sortedLocations) {
+    categories << pair.first;
+    *set << pair.second;
+  }
+  
   locationSeries->append(set);
-    
-  // Update the axis categories
+  
+  // Tooltips on hover
+  connect(locationSeries, &QBarSeries::hovered,
+  [this, categories](bool status, int index, QBarSet *barset) {
+    if (status && index >= 0 && index < categories.size()) {
+      QString tooltipText = QString("%1\nSamples: %2")
+        .arg(categories[index])
+        .arg(barset->at(index));
+          
+      QToolTip::showText(
+        QCursor::pos(),
+        tooltipText,
+        locationChartView
+      );
+      } else {
+        QToolTip::hideText();
+      }
+  });
+  
   QBarCategoryAxis *axis = qobject_cast<QBarCategoryAxis*>(
     locationChartView->chart()->axes(Qt::Horizontal).first()
   );
   axis->clear();
   axis->append(categories);
-    
-  // Update y-axis range
+  
   QValueAxis *valueAxis = qobject_cast<QValueAxis*>(
     locationChartView->chart()->axes(Qt::Vertical).first()
   );
-  int maxValue = *std::max_element(locationData.begin(), locationData.end());
+  int maxValue = sortedLocations.isEmpty() ? 0 : sortedLocations.first().second;
   valueAxis->setRange(0, maxValue * 1.1);
   valueAxis->setLabelFormat("%d");
+}
 
+void Tab1::updateDeterminandChart() {
   determinandSeries->clear();
   QMap<QString, int> determinandData = waterModel->getDeterminandCounts();
-
-  // Create a single bar set for all determinands
-  QBarSet *set2 = new QBarSet("Samples");
-  QStringList categories2;
-
-  // Add data to the set and categories
-  for (auto it = determinandData.constBegin(); it != determinandData.constEnd(); ++it) {
-    categories2 << it.key();
-    *set2 << it.value();
+  
+  QBarSet *set = new QBarSet("Samples");
+  QStringList categories;
+  
+  QVector<QPair<QString, int>> sortedDeterminands;
+  for(auto it = determinandData.constBegin(); it != determinandData.constEnd(); ++it) {
+    sortedDeterminands.append(qMakePair(it.key(), it.value()));
   }
-
-  // Add the set to the series
-  determinandSeries->append(set2);
-
-  // Update the axis categories
-  QBarCategoryAxis *axis2 = qobject_cast<QBarCategoryAxis*>(
+  
+  std::sort(sortedDeterminands.begin(), sortedDeterminands.end(),
+    [](const QPair<QString, int>& a, const QPair<QString, int>& b) {
+      return a.second > b.second;
+  });
+  
+  for(const auto& pair : sortedDeterminands) {
+    categories << pair.first;
+    *set << pair.second;
+  }
+  
+  determinandSeries->append(set);
+  
+  // Add tooltip handling
+  connect(determinandSeries, &QBarSeries::hovered,
+    [this, categories](bool status, int index, QBarSet *barset) {
+      if (status && index >= 0 && index < categories.size()) {
+        QString tooltipText = QString("%1\nSamples: %2")
+          .arg(categories[index])
+          .arg(barset->at(index));
+        
+        QToolTip::showText(
+          QCursor::pos(),
+          tooltipText,
+          determinandChartView
+        );
+      } else {
+        QToolTip::hideText();
+      }
+  });
+  
+  QBarCategoryAxis *axis = qobject_cast<QBarCategoryAxis*>(
     determinandChartView->chart()->axes(Qt::Horizontal).first()
   );
-  axis2->clear();
-  axis2->append(categories2);
-
-  // Update y-axis range
-  QValueAxis *valueAxis2 = qobject_cast<QValueAxis*>(
+  axis->clear();
+  axis->append(categories);
+  
+  QValueAxis *valueAxis = qobject_cast<QValueAxis*>(
     determinandChartView->chart()->axes(Qt::Vertical).first()
   );
-  int maxValue2 = *std::max_element(determinandData.begin(), determinandData.end());
-  valueAxis2->setRange(0, maxValue2 * 1.1);
-  valueAxis2->setLabelFormat("%d"); 
+  int maxValue = sortedDeterminands.isEmpty() ? 0 : sortedDeterminands.first().second;
+  valueAxis->setRange(0, maxValue * 1.1);
+  valueAxis->setLabelFormat("%d");
+}
 
-  // Update timeline chart
+void Tab1::updateTimelineChart() {
   timelineSeries->clear();
   QMap<QDate, int> dateData = waterModel->getSampleDates();
-
+  
   for(auto it = dateData.constBegin(); it != dateData.constEnd(); ++it) {
     qint64 msecsSinceEpoch = it.key().startOfDay().toMSecsSinceEpoch();
     timelineSeries->append(msecsSinceEpoch, it.value());
   }
-
-  // Update axes ranges with improved visibility
+  
   if(!dateData.isEmpty()) {
+    connect(timelineSeries, &QLineSeries::hovered,
+      [](const QPointF &point, bool status) {
+        if (status) {
+          QDateTime pointDate = QDateTime::fromMSecsSinceEpoch(point.x());
+          QString tooltipText = QString("%1\nSamples: %2")
+            .arg(pointDate.toString("yyyy-MM-dd"))
+            .arg(point.y(), 0, 'f', 0);
+          
+          QToolTip::showText(
+            QCursor::pos(),
+            tooltipText
+          );
+        } else {
+          QToolTip::hideText();
+        }
+    });
+    
     QDateTimeAxis *axisX = qobject_cast<QDateTimeAxis*>(
       timelineChartView->chart()->axes(Qt::Horizontal).first()
     );
     axisX->setRange(dateData.firstKey().startOfDay(), dateData.lastKey().endOfDay());
-
+    
     QValueAxis *axisY = qobject_cast<QValueAxis*>(
       timelineChartView->chart()->axes(Qt::Vertical).first()
     );
     int maxValue = *std::max_element(dateData.begin(), dateData.end());
     
-    // Add 20% padding to the top to ensure labels don't get cut off
     axisY->setRange(0, maxValue * 1.2);
     
-    // Adjust the number of tick marks based on the maximum value
-    int tickCount = std::min(10, maxValue + 1);  // Cap at 10 tick marks
+    int tickCount = std::min(10, maxValue + 1);
     axisY->setTickCount(tickCount);
   }
 }
@@ -318,6 +404,65 @@ void Tab1::setupStyles()
       font-weight: bold;
       color: %1;
     }
+
+    QScrollArea {
+      border: none;
+      background-color: transparent;
+    }
+
+    QScrollBar:vertical {
+      background-color: transparent;
+      width: 12px;
+      margin: 0;
+    }
+
+    QScrollBar::handle:vertical {
+      background-color: %10;
+      border-radius: 6px;
+      min-height: 20px;
+      margin: 2px;
+    }
+
+    QScrollBar::handle:vertical:hover {
+      background-color: %8;
+    }
+
+    QScrollBar::add-line:vertical,
+    QScrollBar::sub-line:vertical {
+      height: 0px;
+    }
+
+    QScrollBar::add-page:vertical,
+    QScrollBar::sub-page:vertical {
+      background: none;
+    }
+
+    QScrollBar:horizontal {
+      background-color: transparent;
+      height: 12px;
+      margin: 0;
+    }
+
+    QScrollBar::handle:horizontal {
+      background-color: %10;
+      border-radius: 6px;
+      min-width: 20px;
+      margin: 2px;
+    }
+
+    QScrollBar::handle:horizontal:hover {
+      background-color: %8;
+    }
+
+    QScrollBar::add-line:horizontal,
+    QScrollBar::sub-line:horizontal {
+      width: 0px;
+    }
+
+    QScrollBar::add-page:horizontal,
+    QScrollBar::sub-page:horizontal {
+      background: none;
+    }
   )")
   .arg(Styles::textColor())                    // %1
   .arg(Styles::actionButtonBackground())       // %2
@@ -327,7 +472,8 @@ void Tab1::setupStyles()
   .arg(Styles::ACTION_BUTTON_WIDTH)            // %6
   .arg(Styles::ACTION_BUTTON_HEIGHT)           // %7
   .arg(Styles::actionButtonHover())            // %8
-  .arg(Styles::actionButtonDisabled());        // %9
+  .arg(Styles::actionButtonDisabled())         // %9
+  .arg(Styles::borderColor());                 // %10
 
   this->setStyleSheet(styleSheet);
 }
