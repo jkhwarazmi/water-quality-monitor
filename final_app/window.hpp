@@ -33,6 +33,7 @@ class WaterWindow: public QMainWindow
     QStackedWidget *stackedWidget;
     LoadDataWidget *loadDataWidget;
     QTabWidget *tabWidget;
+    QLabel *fileInfo;
       
     Tab1 *tab1;
     Tab2 *tab2;
@@ -48,7 +49,7 @@ class WaterWindow: public QMainWindow
 
     void createMainWidget();
     void createMenus();
-    void createLanguageMenu();
+    void createStatusBar();
     void switchToTabView();
     void loadData(const QString& path);
     void setupStyles();
@@ -58,7 +59,6 @@ class WaterWindow: public QMainWindow
     void setDataLocation();
     void setPath();
     void switchToLoadView();
+    void cancelLoad();
     void about();
-    void changeLanguage(const QString &);
-    void handleLanguageAction(QAction *);
 };

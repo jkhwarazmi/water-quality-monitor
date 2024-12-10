@@ -1,5 +1,4 @@
 #include <QtWidgets>
-// #include <QtCharts>
 #include <QHBoxLayout>
 #include <QFrame>
 #include "styles.hpp"
@@ -8,10 +7,9 @@
 
 
 Tab5::Tab5(WaterModel* model, QWidget* parent) : QWidget(parent), waterModel(model), complianceLayout(new QHBoxLayout)
-//, currentChartView(nullptr)
-{
+{   
+    createOverviewLabel();
     createWidgets();
-    // createCharts();
     setupStyles();
     createLayout();
 
@@ -21,7 +19,19 @@ Tab5::Tab5(WaterModel* model, QWidget* parent) : QWidget(parent), waterModel(mod
     // Connect signal for dropdown selection change
     connect(pollutantDropdown, &QComboBox::currentIndexChanged, this, &Tab5::onPollutantSelectionChanged);
     connect(locationDropdown, &QComboBox::currentIndexChanged, this, &Tab5::onLocationSelectionChanged);
-    //connect(pollutantDropdown, &QComboBox::currentIndexChanged, this, &Tab5::updateBarChart);
+}
+ //OverviewLabelOverviewLabel
+void Tab5::createOverviewLabel()
+{
+    overviewLabel = new QLabel(tr("Monitor water quality compliance against UK/EU safety standards. "
+                                 "Select a pollutant and location to see whether any samples in the dataset exceed regulatory standards i.e <i>the threshold value</i> at that location using color-coded indicators."));
+    
+    overviewLabel->setWordWrap(true);
+    overviewLabel->setAlignment(Qt::AlignCenter);
+    overviewLabel->setObjectName("descriptionLabel"); // Match Tab4's object name
+
+    // Allow the label to resize dynamically
+    overviewLabel->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
 }
 
 
@@ -29,17 +39,14 @@ Tab5::Tab5(WaterModel* model, QWidget* parent) : QWidget(parent), waterModel(mod
 void Tab5::onPollutantSelectionChanged(int index)
 {
     QString selectedPollutant = pollutantDropdown->itemText(index);
-    qDebug() << "Selected pollutant:" << selectedPollutant;
     updateComplianceStatus(selectedPollutant, locationDropdown->currentText());
 }
 
 void Tab5::onLocationSelectionChanged(int index)
 {
     QString selectedLocation = locationDropdown->itemText(index);
-    QString selectedPollutant = pollutantDropdown->currentText(); // Add this line to get the selected pollutant
-    qDebug() << "Selected location:" << selectedLocation;
+    QString selectedPollutant = pollutantDropdown->currentText(); 
 
-    // Now you can use selectedPollutant in the updateComplianceStatus call
     updateComplianceStatus(selectedPollutant, selectedLocation);
 }
 
@@ -56,7 +63,7 @@ bool Tab5::eventFilter(QObject* watched, QEvent* event)
 
 void Tab5::createWidgets()
 {
-    title = new QLabel(tr("Compliance Information"));
+    title = new QLabel(tr("Regulatory Compliance Information"));
     QFont titleFont;
     titleFont.setPointSize(32);
     titleFont.setBold(true);
@@ -91,6 +98,9 @@ void Tab5::createWidgets()
 
     pollutantDropdown->setEditable(false);
     locationDropdown->setEditable(false);
+     // Set QSizePolicy to Expanding for dropdowns
+    pollutantDropdown->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
+    locationDropdown->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
 
     // Compliance Widgets
     complianceStatusLabel = new QLabel(tr("Compliance Status:"));
@@ -109,13 +119,11 @@ void Tab5::createWidgets()
     complianceCard->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 
     // Optionally set a minimum and maximum size
-    complianceCard->setMinimumSize(400, 400);  // Minimum size: 400x300px
+    complianceCard->setMinimumSize(600, 400);  // Minimum size: 400x300px
     complianceCard->setMaximumSize(800, 800);  // Maximum size: 800x600px
 
     // Layout for the compliance card content
     QVBoxLayout* cardLayout = new QVBoxLayout(complianceCard);
-
-    // Add widgets to the card layout in the desired order
     cardLayout->addWidget(definitionLabel, 0, Qt::AlignLeft);
     cardLayout->addWidget(thresholdLabel, 0, Qt::AlignLeft);
     cardLayout->addWidget(currentValueLabel, 0, Qt::AlignLeft);
@@ -125,8 +133,8 @@ void Tab5::createWidgets()
     QVBoxLayout* legendLayout = new QVBoxLayout;
     QLabel* greenLegend = new QLabel(tr("• Green: Compliant"));
     greenLegend->setStyleSheet("color: green;");
-    QLabel* amberLegend = new QLabel(tr("• yellow: Near Threshold"));
-    amberLegend->setStyleSheet("color: yellow;");
+    QLabel* amberLegend = new QLabel(tr("• Amber: Caution"));
+    amberLegend->setStyleSheet("color: #FFBF00;");
     QLabel* redLegend = new QLabel(tr("• Red: Non-Compliant"));
     redLegend->setStyleSheet("color: red;");
 
@@ -134,10 +142,9 @@ void Tab5::createWidgets()
     legendLayout->addWidget(greenLegend);
     legendLayout->addWidget(amberLegend);
     legendLayout->addWidget(redLegend);
-
     cardLayout->addLayout(legendLayout); // Add legend layout to the card layout
 
-    // Compliance status and traffic light section
+
     cardLayout->addWidget(complianceStatusLabel, 0, Qt::AlignCenter);
 
     // Center the traffic light widget
@@ -157,31 +164,41 @@ void Tab5::createLayout()
 {
     // Main layout for Tab5
     QVBoxLayout* mainLayout = new QVBoxLayout;
+    
+    // Title section with consistent spacing
     mainLayout->addWidget(title);
+    mainLayout->addWidget(overviewLabel);
+    mainLayout->addSpacing(20);
 
-    // Add pollutant and location dropdowns
-    mainLayout->addWidget(pollutantLabel);
-    mainLayout->addWidget(pollutantDropdown);
-    mainLayout->addWidget(locationLabel);
-    mainLayout->addWidget(locationDropdown);
+    // Create horizontal layout for dropdowns
+    QHBoxLayout* dropdownLayout = new QHBoxLayout;
+    
+    // Pollutant section
+    QVBoxLayout* pollutantSection = new QVBoxLayout;
+    pollutantSection->addWidget(pollutantLabel);
+    pollutantSection->addWidget(pollutantDropdown);
+    
+    // Location section
+    QVBoxLayout* locationSection = new QVBoxLayout;
+    locationSection->addWidget(locationLabel);
+    locationSection->addWidget(locationDropdown);
+    
+    // Add both sections to horizontal layout
+    dropdownLayout->addLayout(pollutantSection);
+    dropdownLayout->addLayout(locationSection);
+    
+    // Add dropdown section to main layout
+    mainLayout->addLayout(dropdownLayout);
+    mainLayout->addSpacing(20);
 
-    // Add the compliance card directly below the dropdowns
-    mainLayout->addWidget(complianceCard);
+    // Add the compliance card
+    mainLayout->addWidget(complianceCard, 0, Qt::AlignCenter);
 
-    // Chart section and additional layout (currently empty)
-    QVBoxLayout* chartLayout = new QVBoxLayout;
-    mainLayout->addLayout(chartLayout);
-
-    // Add the bar chart view if it exists
-    if (chartView) {
-        mainLayout->addWidget(chartView);
-    }
-
-    // Add stretch to fill the remaining space
+    // Add stretch to fill remaining space
     mainLayout->addStretch();
 
     // Set margins and spacing
-    mainLayout->setSpacing(20);
+    mainLayout->setSpacing(10);
     mainLayout->setContentsMargins(30, 30, 30, 30);
 
     // Set the layout for the widget
@@ -189,37 +206,55 @@ void Tab5::createLayout()
 }
 
 
-
 void Tab5::setupStyles()
 {
     QString styleSheet = QString(R"(
+        QLabel#titleLabel {
+            font-size: 32px;
+            font-weight: bold;
+            color: %1;
+        }
+
+        QLabel#descriptionLabel {
+            font-size: 14px;
+            color: %1;
+            margin-bottom: 20px;
+        }
+
         QLabel {
             font-size: 18px;
-            
+            color: %1;
         }
 
         QComboBox {
             font-size: 16px;
             padding: 5px;
-        }
-
-        QWidget#Tab5 {
-            border: 2px solid white;
-            border-radius: 8px;
-            background-color: #f9f9f9;
+            background-color: %2;
+            color: %1;
+            border: 1px solid %3;
         }
 
         QFrame#complianceCard {
             background-color: white;
-            border: 2px solid #dcdcdc;
+            border: 2px solid %3;
             border-radius: 10px;
             padding: 15px;
         }
 
-        QWidget#trafficLightWidget {
-            border-radius: 25px;  // Circle
+        QFrame#complianceCard QLabel {
+            color: #2c3e50;  /* Always use light mode text color for the card */
         }
-    )");
+
+        QWidget#trafficLightWidget {
+            border-radius: 25px;  
+            background-color: %4;
+        }
+    )")
+    .arg(Styles::textColor())                    // %1
+    .arg(Styles::backgroundColor())              // %2
+    .arg(Styles::borderColor())                  // %3
+    .arg(Styles::actionButtonBackground());      // %4
+
     this->setObjectName("Tab5");
     this->setStyleSheet(styleSheet);
 }
@@ -232,9 +267,7 @@ void Tab5::updateCharts()
 
 void Tab5::updatePollutantList()
 {
-    qDebug() << "Updating pollutant dropdown in Tab5...";
-
-    // Define the list of pollutants you want to select from the model
+    // Define the list of pollutants from the model
     QStringList selectedPollutants = {
     "Ammonia(N)", 
     "BOD ATU", 
@@ -248,7 +281,7 @@ void Tab5::updatePollutantList()
     "COD as O2", 
     "Phosphorus-P", 
     "Nitrogen - N"
-    }; // Customize this list
+    }; 
 
     if (!waterModel->hasData()) {
         pollutantDropdown->clear();
@@ -271,7 +304,7 @@ void Tab5::updatePollutantList()
         }
     }
 
-    // If no pollutants match, you can add a default message
+    // If no pollutants match
     if (pollutantDropdown->count() == 0) {
         pollutantDropdown->addItem(tr("No matching pollutants found."));
     }
@@ -279,8 +312,6 @@ void Tab5::updatePollutantList()
 
 void Tab5::updateLocationList()
 {
-    qDebug() << "Updating location dropdown in Tab5...";
-
     if (!waterModel->hasData()) {
         locationDropdown->clear();
         locationDropdown->addItem(tr("No data available."));
@@ -329,23 +360,20 @@ void Tab5::updateComplianceStatus(const QString& pollutant, const QString& locat
      definitionLabel->setText(tr("Definition: %1").arg(definition.isEmpty() ? tr("Not available") : definition));
 
 
-    // Check if the pollutant concentration at the location exceeds the threshold
-    bool isCompliant = false;
-    QVector<QPair<QDateTime, double>> dataPoints;
-
-    double concentration = -1.0; // Initialize with an invalid value
+    // Find the highest concentration for the given pollutant and location
+    double maxConcentration = -1.0;
     for (int i = 0; i < waterModel->rowCount(QModelIndex()); ++i) {
         QString samplePollutant = waterModel->data(waterModel->index(i, 4), Qt::DisplayRole).toString();
         QString sampleLocation = waterModel->data(waterModel->index(i, 2), Qt::DisplayRole).toString();
 
         if (samplePollutant == pollutant && sampleLocation == location) {
-            concentration = waterModel->data(waterModel->index(i, 6), Qt::DisplayRole).toDouble();
-            break; // Use the first matching value
+            double currentConcentration = waterModel->data(waterModel->index(i, 6), Qt::DisplayRole).toDouble();
+            maxConcentration = qMax(maxConcentration, currentConcentration);
         }
     }
 
     // Update compliance status and traffic light color
-    if (concentration < 0.0) {
+    if (maxConcentration < 0.0) {
         complianceStatusLabel->setText(tr("No data available for the selected location and pollutant."));
         currentValueLabel->setText(tr("Current Value: Not available"));
         trafficLightWidget->setStyleSheet("background-color: black;");
@@ -353,94 +381,19 @@ void Tab5::updateComplianceStatus(const QString& pollutant, const QString& locat
     }
 
     // Update Current Value label
-    currentValueLabel->setText(tr("Current Value: %1").arg(concentration));
+    currentValueLabel->setText(tr("Current Value: %1").arg(maxConcentration));
 
     // Determine and display compliance status
-if (concentration <= threshold) {
-    // Fully compliant, concentration is less than or equal to threshold
-    complianceStatusLabel->setText(tr("Compliant"));
-    trafficLightWidget->setStyleSheet("background-color: green;");
-} else if (concentration <= threshold * 0.8) {
-    // Amber color when concentration is near the threshold (within 80% of threshold)
-    complianceStatusLabel->setText(tr("Near Threshold"));
-    trafficLightWidget->setStyleSheet("background-color: yellow;");
-} else {
-    // Non-compliant, concentration is above 80% of the threshold
-    complianceStatusLabel->setText(tr("Non-Compliant"));
-    trafficLightWidget->setStyleSheet("background-color: red;");
-}
+    if (maxConcentration <= threshold) {
+        complianceStatusLabel->setText(tr("Compliant"));
+        trafficLightWidget->setStyleSheet("background-color: rgb(32, 125, 32);");
+    } else if (maxConcentration <= threshold * 0.8) {  
+        complianceStatusLabel->setText(tr("Near Threshold"));
+        trafficLightWidget->setStyleSheet("background-color: rgb(253, 183, 0);");
+    } else {
+        complianceStatusLabel->setText(tr("Non-Compliant"));
+        trafficLightWidget->setStyleSheet("background-color: rgb(204, 31, 40);");
+    }
 
 }
-
-// void Tab5::updateBarChart()
-// {
-//     // Ensure the pollutantDropdown is the correct widget used for selection
-//     QString selectedPollutant = pollutantDropdown->currentText(); // Get selected pollutant
-
-//     if (selectedPollutant.isEmpty()) {
-//         qDebug() << "No pollutant selected.";
-//         return; // Exit if no pollutant is selected
-//     }
-
-//     // Fetch the top 5 locations by concentration for the selected pollutant from WaterModel
-//     QVector<QPair<QString, double>> topLocations = waterModel->getTopLocationsByPollutant(selectedPollutant);
-
-//     if (topLocations.isEmpty()) {
-//         qDebug() << "No data available for the selected pollutant.";
-//         return; // Exit if no data is available for the selected pollutant
-//     }
-
-//     // Debugging: Check the fetched data
-//     qDebug() << "Top Locations for Pollutant:" << selectedPollutant;
-//     for (const auto& location : topLocations) {
-//         qDebug() << "Location:" << location.first << "Concentration:" << location.second;
-//     }
-
-//     // Clear any previous data in the chart
-//     chart->removeAllSeries();
-
-//     // Create a new bar series for the chart
-//     QBarSeries *series = new QBarSeries();
-
-//     // Prepare data for the chart
-//     QBarSet *set = new QBarSet("Concentration");
-
-//     // Add the top 5 locations and their concentrations to the bar set
-//     for (const auto& location : topLocations) {
-//         set->append(location.second);  // Append the concentration value (second part of QPair)
-//     }
-
-//     // Add the bar set to the series
-//     series->append(set);
-
-//     // Set the series for the chart
-//     chart->addSeries(series);
-
-//     // Set the chart's categories (location names)
-//     QStringList categories;
-//     for (const auto& location : topLocations) {
-//         categories << location.first;  // Add location names to categories
-//     }
-
-//     // Set the axis labels for X (Location names)
-//     QBarCategoryAxis *axisX = new QBarCategoryAxis();
-//     axisX->append(categories);
-//     chart->addAxis(axisX, Qt::AlignBottom);  // Updated to addAxis()
-
-//     // Set the axis labels for Y (Concentration values)
-//     QValueAxis *axisY = new QValueAxis();
-//     axisY->setTitleText("Concentration");
-//     axisY->setLabelFormat("%f");  // You can adjust the format for the concentration values
-//     chart->addAxis(axisY, Qt::AlignLeft);  // Updated to addAxis()
-
-//     // Attach the axis to the series
-//     series->attachAxis(axisX);
-//     series->attachAxis(axisY);
-
-//     // Update the chart's title dynamically based on the selected pollutant
-//     chart->setTitle("Top 5 Locations for " + selectedPollutant + " Concentration");
-
-//     // Optionally, update other chart settings (colors, animations, etc.)
-// }
-
 
