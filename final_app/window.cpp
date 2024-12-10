@@ -64,12 +64,25 @@ void WaterWindow::createMainWidget()
   connect(tab1, SIGNAL(reloadRequested()), this, SLOT(switchToLoadView()));
     
   tabWidget->addTab(tab1, tr("Dashboard"));
+  tabWidget->setTabToolTip(0, tr("View summary of the loaded data"));
+
   tabWidget->addTab(tab2, tr("Pollutant Overview"));
+  tabWidget->setTabToolTip(1, tr("Analyse various water pollutants"));
+
   tabWidget->addTab(tab3, tr("Litter Indicators"));
+  tabWidget->setTabToolTip(2, tr("Monitor water litter levels"));
+
   tabWidget->addTab(tab4, tr("Fluorinated Compounds"));
+  tabWidget->setTabToolTip(3, tr("Examine fluorinated compound data"));
+
   tabWidget->addTab(tab5, tr("Compliance"));
+  tabWidget->setTabToolTip(4, tr("Check compliance of detected pollutants with UK regulations"));
+
   tabWidget->addTab(tab6, tr("Hotspots"));
+  tabWidget->setTabToolTip(5, tr("Identify pollution hotspots"));
+
   tabWidget->addTab(tab7, tr("Raw Data"));
+  tabWidget->setTabToolTip(6, tr("View data from the CSV file as a table"));
     
   stackedWidget->addWidget(loadDataWidget);
   stackedWidget->addWidget(tabWidget);
