@@ -68,26 +68,6 @@ void LoadDataWidget::createWidgets()
   cancelButton->setToolTip(tr("Return to viewing current data"));
   cancelButton->hide();
 
-  languageLabel = new QLabel(tr("Language:"));
-  languageLabel->setObjectName("settingsLabel");
-  
-  languageComboBox = new QComboBox();
-  languageComboBox->setMinimumWidth(150);
-  languageComboBox->setMinimumHeight(35);
-  languageComboBox->addItem("English", "en");
-  languageComboBox->addItem("French", "fr");
-  languageComboBox->setObjectName("languageSelect");
-  languageComboBox->setToolTip(tr("Change application language"));
-
-  // Set initial language based on current locale
-  QString currentLocale = QLocale::system().name().split('_').first();
-  int index = languageComboBox->findData(currentLocale);
-  if (index != -1) {
-    languageComboBox->setCurrentIndex(index);
-  } else {
-    languageComboBox->setCurrentIndex(0);
-  }
-
   helpLabel = new QLabel(tr("Load water quality data from a CSV file. Datasets can be downloaded from:"));
   helpLabel->setWordWrap(true);
   helpLabel->setObjectName("helpLabel");
@@ -122,14 +102,6 @@ void LoadDataWidget::createLayout()
   pathLayout->setSpacing(15);
   pathLayout->setContentsMargins(0, 0, 0, 0);
 
-  // Language selection area
-  QHBoxLayout* languageLayout = new QHBoxLayout;
-  languageLayout->addWidget(languageLabel);
-  languageLayout->addWidget(languageComboBox);
-  languageLayout->addStretch();
-  languageLayout->setSpacing(10);
-  languageLayout->setContentsMargins(0, 0, 0, 0);
-
   // Button area layout
   QHBoxLayout* buttonLayout = new QHBoxLayout;
   buttonLayout->addStretch();
@@ -151,13 +123,9 @@ void LoadDataWidget::createLayout()
   mainLayout->addSpacing(20);
   mainLayout->addLayout(buttonLayout);
   mainLayout->addStretch();
-  mainLayout->addLayout(languageLayout);
-  mainLayout->setSpacing(10);
-  mainLayout->setContentsMargins(30, 30, 30, 30);
 
   connect(selectButton, SIGNAL(clicked()), this, SIGNAL(dataFileSelected()));
   connect(loadButton, SIGNAL(clicked()), this, SIGNAL(loadRequested()));
-  connect(languageComboBox, SIGNAL(currentTextChanged(QString)), this, SIGNAL(languageChanged(QString)));
   connect(cancelButton, SIGNAL(clicked()), this, SIGNAL(cancelRequested()));
   
   setLayout(mainLayout);
@@ -246,36 +214,6 @@ void LoadDataWidget::setupStyles()
 
     QPushButton#secondaryButton:hover {
       background-color: #ff6666;
-    }
-
-    QComboBox#languageSelect {
-      background-color: %5;
-      border: 2px solid %6;
-      border-radius: %3px;
-      color: %1;
-      padding: 5px 10px;
-      min-width: 150px;
-      min-height: 35px;
-    }
-
-    QComboBox#languageSelect::drop-down {
-      border: none;
-      width: 30px;
-    }
-
-    QComboBox#languageSelect::down-arrow {
-      image: none;
-      border-left: 5px solid transparent;
-      border-right: 5px solid transparent;
-      border-top: 5px solid %1;
-      margin-right: 10px;
-    }
-
-    QComboBox#languageSelect QAbstractItemView {
-      background-color: %5;
-      border: 2px solid %6;
-      color: %1;
-      selection-background-color: %11;
     }
 
     QLabel#helpLabel {

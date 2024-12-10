@@ -49,7 +49,6 @@ class WaterWindow: public QMainWindow
 
     void createMainWidget();
     void createMenus();
-    void createLanguageMenu();
     void createStatusBar();
     void switchToTabView();
     void loadData(const QString& path);
@@ -62,6 +61,4 @@ class WaterWindow: public QMainWindow
     void switchToLoadView();
     void cancelLoad();
     void about();
-    void changeLanguage(const QString &);
-    void handleLanguageAction(QAction *);
 };

@@ -21,7 +21,6 @@ class LoadDataWidget : public QWidget
   signals:
     void dataFileSelected();
     void loadRequested();
-    void languageChanged(QString);
     void cancelRequested();
 
   private:
@@ -32,11 +31,9 @@ class LoadDataWidget : public QWidget
     QLabel *helpLabel;
     QLabel *urlLabel;
     QLabel *infoLabel;
-    QLabel *languageLabel;
     QPushButton *selectButton;
     QPushButton *loadButton;
     QPushButton *cancelButton;
-    QComboBox *languageComboBox;
 
     void createWidgets();
     void createLayout();

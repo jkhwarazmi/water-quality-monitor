@@ -47,7 +47,6 @@ void WaterWindow::createMainWidget()
 
   connect(loadDataWidget, SIGNAL(dataFileSelected()), this, SLOT(setDataLocation()));
   connect(loadDataWidget, SIGNAL(loadRequested()), this, SLOT(setPath()));
-  connect(loadDataWidget, SIGNAL(languageChanged(QString)), this, SLOT(changeLanguage(QString)));
   connect(loadDataWidget, SIGNAL(cancelRequested()), this, SLOT(cancelLoad()));
     
   tabWidget = new QTabWidget;
@@ -111,44 +110,6 @@ void WaterWindow::createMenus()
 
   QMenu *helpMenu = menuBar()->addMenu(tr("&Help"));
   helpMenu->addAction(aboutAction);
-
-  createLanguageMenu();
-}
-
-void WaterWindow::createLanguageMenu() 
-{
-  QMenu *languageMenu = menuBar()->addMenu(tr("&Language"));
-
-  QActionGroup *languageGroup = new QActionGroup(this);
-  QAction* englishAction = new QAction(tr("&English"), this);
-  englishAction->setCheckable(true);
-  englishAction->setData("English");
-    
-  QAction* frenchAction = new QAction(tr("&Français"), this);
-  frenchAction->setCheckable(true);
-  frenchAction->setData("French");
-
-  // Set current language
-  QString currentLocale = QLocale::system().name().split('_').first();
-  if (currentLocale == "fr") {
-    frenchAction->setChecked(true);
-  } else {
-    englishAction->setChecked(true);
-  }
-
-  languageGroup->addAction(englishAction);
-  languageGroup->addAction(frenchAction);
-    
-  languageMenu->addAction(englishAction);
-  languageMenu->addAction(frenchAction);
-
-  // Connect using a lambda to convert QAction* to QString
-  connect(languageGroup, SIGNAL(triggered(QAction *)), this, SLOT(handleLanguageAction(QAction *)));
-}
-
-void WaterWindow::handleLanguageAction(QAction *action)
-{
-  changeLanguage(action->data().toString());
 }
 
 void WaterWindow::setDataLocation()
@@ -242,30 +203,6 @@ void WaterWindow::switchToLoadView()
   stackedWidget->setCurrentWidget(loadDataWidget);
 }
 
-void WaterWindow::changeLanguage(const QString &language)
-{ 
-  QString code = "en";
-
-  if (language == "French") {
-    code = "fr";
-  }
-
-  qApp->removeTranslator(&translator);
-
-  if (translator.load("WaterQualityMonitor_" + code, ":/i18n")) {
-    qApp->installTranslator(&translator);
-  } else {
-    QMessageBox::critical(this, tr("Language Error"), tr("Could not load language file."));
-  }
-
-  QEvent event(QEvent::LanguageChange);
-  qApp->sendEvent(qApp, &event);
-
-  // Not everything translates properly, may need custom changeEvent in each
-  // Where we re-specify strings?
-  setWindowTitle(tr("Water Quality Monitor"));
-}
-
 void WaterWindow::createStatusBar()
 {
   fileInfo = new QLabel("No file loaded");
@@ -276,9 +213,11 @@ void WaterWindow::createStatusBar()
 void WaterWindow::about()
 {
   QMessageBox::about(this, tr("About Water Quality Monitor"),
-    tr("Water Quality Monitor displays water data loaded from "
-    "a CSV file produced by the UK Environment Agency.\n\n"
-    "(c) 2024 Nick Efford and Group 37"));
+    tr("Water Quality Monitor displays water quality data from the UK Environment Agency's "
+    "official monitoring program.\n\n This data is sourced directly from the Environment Agency's public datasets.\n\n"
+    "(c) 2024 Nick Efford and Group 37. Data provided by the Environment Agency under the "
+    "Open Government Licence."));
+
 }
 
 void WaterWindow::setupStyles()
