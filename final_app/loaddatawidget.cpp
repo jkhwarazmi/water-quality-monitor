@@ -73,7 +73,7 @@ void LoadDataWidget::createWidgets()
   helpLabel->setObjectName("helpLabel");
   helpLabel->setAlignment(Qt::AlignCenter);
   
-  urlLabel = new QLabel("<a href='https://environment.data.gov.uk/water-quality/view/download'>The UK Environment Agency</a>");
+  urlLabel = new QLabel(tr("<a href='https://environment.data.gov.uk/water-quality/view/download'>The UK Environment Agency</a>"));
   urlLabel->setTextFormat(Qt::RichText);
   urlLabel->setTextInteractionFlags(Qt::TextBrowserInteraction);
   urlLabel->setOpenExternalLinks(true);
@@ -82,8 +82,7 @@ void LoadDataWidget::createWidgets()
   urlLabel->setCursor(Qt::PointingHandCursor);
   urlLabel->setToolTip(tr("Click to download sample datasets"));
 
-  infoLabel = new QLabel(tr("More information on the datasets can be found ") + 
-                        "<a href='https://environment.data.gov.uk/water-quality/view/doc/reference'>here</a>");
+  infoLabel = new QLabel(tr("More information on the datasets can be found <a href='https://environment.data.gov.uk/water-quality/view/doc/reference'>here</a>"));
   infoLabel->setTextFormat(Qt::RichText);
   infoLabel->setTextInteractionFlags(Qt::TextBrowserInteraction);
   infoLabel->setOpenExternalLinks(true);

@@ -8,7 +8,7 @@ int main(int argc, char* argv[])
   QApplication app(argc, argv);
 
   QTranslator trn;
-  if (trn.load(QLocale::system(), "watermonitor", "_", ":/i18n")) {
+  if (trn.load(QLocale::system(), "WaterQualityMonitor", "_", ":/i18n")) {
     app.installTranslator(&trn);
   }
 

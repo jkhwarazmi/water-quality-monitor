@@ -418,14 +418,10 @@ void Tab1::setupStyles()
     }
 
     QScrollBar::handle:vertical {
-      background-color: %10;
+      background-color: %8;
       border-radius: 6px;
       min-height: 20px;
       margin: 2px;
-    }
-
-    QScrollBar::handle:vertical:hover {
-      background-color: %8;
     }
 
     QScrollBar::add-line:vertical,
@@ -445,14 +441,10 @@ void Tab1::setupStyles()
     }
 
     QScrollBar::handle:horizontal {
-      background-color: %10;
+      background-color: %8;
       border-radius: 6px;
       min-width: 20px;
       margin: 2px;
-    }
-
-    QScrollBar::handle:horizontal:hover {
-      background-color: %8;
     }
 
     QScrollBar::add-line:horizontal,
@@ -473,8 +465,11 @@ void Tab1::setupStyles()
   .arg(Styles::ACTION_BUTTON_WIDTH)            // %6
   .arg(Styles::ACTION_BUTTON_HEIGHT)           // %7
   .arg(Styles::actionButtonHover())            // %8
-  .arg(Styles::actionButtonDisabled())         // %9
-  .arg(Styles::borderColor());                 // %10
+  .arg(Styles::actionButtonDisabled());        // %9
 
   this->setStyleSheet(styleSheet);
+  
+  // Add tooltip to scrollbar
+  scrollArea->verticalScrollBar()->setToolTip(tr("Scroll to view more"));
+  scrollArea->horizontalScrollBar()->setToolTip(tr("Scroll to view more"));
 }

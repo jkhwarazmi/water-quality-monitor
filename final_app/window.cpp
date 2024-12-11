@@ -22,7 +22,7 @@ WaterWindow::WaterWindow() : QMainWindow()
   setupStyles();
   createStatusBar();
   setMinimumWidth(1250);
-  setMinimumHeight(600);
+  setMinimumHeight(700);
   setWindowTitle(tr("Water Quality Monitor"));
 
   // Install event filter for Styles changes
@@ -163,7 +163,7 @@ void WaterWindow::setPath()
 {
   dataLocation = loadDataWidget->getPath();
   loadData(dataLocation);
-  fileInfo->setText("Current file: " + dataLocation);
+  fileInfo->setText(tr("Current file: ") + dataLocation);
 }
 
 void WaterWindow::cancelLoad()
@@ -235,7 +235,7 @@ void WaterWindow::switchToLoadView()
 
 void WaterWindow::createStatusBar()
 {
-  fileInfo = new QLabel("No file loaded");
+  fileInfo = new QLabel(tr("No file loaded"));
   QStatusBar* status = statusBar();
   status->addWidget(fileInfo);
 }
