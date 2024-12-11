@@ -45,6 +45,9 @@ void Tab1::createWidgets()
 
   stats = new QLabel();
   stats->setAlignment(Qt::AlignCenter);
+  QFont statsFont;
+  statsFont.setPointSize(14);
+  stats->setFont(statsFont);
 
   // Chart creation and layout
   chartContainer = new QWidget;

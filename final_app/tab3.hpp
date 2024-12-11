@@ -1,4 +1,5 @@
 // Header for third card - Environmental Litter Indicators
+// Mila
 
 #pragma once
 
@@ -23,28 +24,24 @@ class Tab3: public QWidget
 
   private:
     WaterModel* waterModel;
-    QLabel *placeholder;
-    
+    QLabel *title;
+    QLabel *description;
+    QLabel *litterChartError;
+    QLabel *waterTypeChartError;
+    //NEW
     // declares a private member variable *litterChartView* which is a pointer to a *QChartView* object
     QChartView *litterChartView;
     // declares a private member variable *litterSeries* which is a pointer to a *QBarSeries* object
     QBarSeries *litterSeries;
     
-    QChartView *waterTypeChartView; 
-    QChartView *waterTypeChartView2; 
-    QPieSeries *waterTypeSeries_inner; 
-    QPieSeries *waterTypeSeries_outer; 
+    // NEW NEW
+    QChartView *waterTypeChartView; // was complianceChartView
+    QPieSeries *waterTypeSeries; // was complianceSeries
 
-    QScrollArea *scrollArea; 
-    QScrollArea *textScrollArea; 
-    QWidget *graphContainer; 
-    QGridLayout *graphLayout; 
-
-    QTextEdit *stats; 
     void createWidgets();
     void createLayout();
     void setupStyles();
     bool eventFilter(QObject *watched, QEvent *event) override;
-
+    //new
     void createCharts();
 };

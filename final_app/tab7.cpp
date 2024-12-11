@@ -41,6 +41,9 @@ void Tab7::createWidgets()
   sectionFont.setPointSize(24); 
   sectionFont.setBold(true);
 
+  QFont contentFont;
+  contentFont.setPointSize(14);  // Base font size for all content
+
   // About the Dataset
   QLabel* datasetTitle = new QLabel(tr("About the Dataset"));
   datasetTitle->setFont(sectionFont);
@@ -50,6 +53,7 @@ void Tab7::createWidgets()
     "along with information about sampling locations, dates, and whether samples were taken "
     "to comply with UK regulations."
   ));
+  datasetText->setFont(contentFont);
   datasetText->setWordWrap(true);
   contentLayout->addWidget(datasetTitle);
   contentLayout->addWidget(datasetText);
@@ -58,15 +62,15 @@ void Tab7::createWidgets()
   QLabel* navTitle = new QLabel(tr("Navigation Guide"));
   navTitle->setFont(sectionFont);
   QLabel* navText = new QLabel(tr(
-  "• <b>Dashboard</b>: Overview of key data metrics to quickly assess overall monitoring status<br>"
-  "• <b>Pollutant Overview</b>: Track concentrations of key pollutants to monitor water quality and safety<br>"
-  "• <b>Litter Indicators</b>: Assess environmental impact and cleanliness of waterways through litter monitoring<br>" 
-  "• <b>Fluorinated Compounds</b>: Track levels of fluorinated chemicals to ensure safe drinking water standards and dental health<br>"
-  "• <b>Compliance</b>: Monitor adherence to water quality regulations to maintain public safety standards<br>"
-  "• <b>Raw Data</b>: Access the complete dataset for detailed research and custom analysis<br>"
-  "• <b>Help</b>: Guide to using this water quality monitoring system"
+    "• <b>Dashboard</b>: Overview of key data metrics to quickly assess overall monitoring status<br>"
+    "• <b>Pollutant Overview</b>: Track concentrations of key pollutants to monitor water quality and safety<br>"
+    "• <b>Litter Indicators</b>: Assess environmental impact and cleanliness of waterways through litter monitoring<br>" 
+    "• <b>Fluorinated Compounds</b>: Track levels of fluorinated chemicals to ensure safe drinking water standards and dental health<br>"
+    "• <b>Compliance</b>: Monitor adherence to water quality regulations to maintain public safety standards<br>"
+    "• <b>Raw Data</b>: Access the complete dataset for detailed research and custom analysis<br>"
+    "• <b>Help</b>: Guide to using this water quality monitoring system"
   ));
-
+  navText->setFont(contentFont);
   navText->setTextFormat(Qt::RichText);
   navText->setWordWrap(true);
   contentLayout->addWidget(navTitle);
@@ -84,6 +88,7 @@ void Tab7::createWidgets()
     "<br>More information about the datasets can be found "
     "<a href='https://environment.data.gov.uk/water-quality/view/doc/reference'>here</a>"
   ));
+  usageText->setFont(contentFont);
   usageText->setTextFormat(Qt::RichText);
   usageText->setOpenExternalLinks(true);
   usageText->setWordWrap(true);
@@ -120,6 +125,7 @@ void Tab7::createWidgets()
     QLabel* text = new QLabel(QString("<b>%1</b>: %2")
                             .arg(indicator.meaning)
                             .arg(indicator.description));
+    text->setFont(contentFont);
     text->setWordWrap(true);
     
     rowLayout->addWidget(colourBlock);
@@ -145,7 +151,8 @@ void Tab7::createLayout()
   setLayout(layout);
 }
 
-void Tab7::setupStyles() {
+void Tab7::setupStyles()
+{
   QString styleSheet = QString(R"(
     QWidget {
       background-color: transparent;
@@ -176,10 +183,6 @@ void Tab7::setupStyles() {
       margin: 2px;
     }
     
-    QScrollBar::handle:vertical:hover {
-      background-color: %3;
-    }
-    
     QScrollBar::add-line:vertical,
     QScrollBar::sub-line:vertical {
       height: 0px;
@@ -189,10 +192,36 @@ void Tab7::setupStyles() {
     QScrollBar::sub-page:vertical {
       background: none;
     }
+
+    QScrollBar:horizontal {
+      background-color: transparent;
+      height: 12px;
+      margin: 0;
+    }
+
+    QScrollBar::handle:horizontal {
+      background-color: %2;
+      border-radius: 6px;
+      min-width: 20px;
+      margin: 2px;
+    }
+
+    QScrollBar::add-line:horizontal,
+    QScrollBar::sub-line:horizontal {
+      width: 0px;
+    }
+
+    QScrollBar::add-page:horizontal,
+    QScrollBar::sub-page:horizontal {
+      background: none;
+    }
   )")
   .arg(Styles::textColor())                    // %1
-  .arg(Styles::borderColor())                  // %2
-  .arg(Styles::actionButtonHover());           // %3
+  .arg(Styles::actionButtonHover());           // %2
 
   this->setStyleSheet(styleSheet);
+
+  // Add tooltip to scrollbar
+  scrollArea->verticalScrollBar()->setToolTip(tr("Scroll to view more"));
+  scrollArea->horizontalScrollBar()->setToolTip(tr("Scroll to view more"));
 }

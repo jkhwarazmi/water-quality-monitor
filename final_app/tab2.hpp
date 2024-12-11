@@ -30,7 +30,7 @@ private:
     QLabel* locationLabel;
     QChartView* currentChartView; //Holds current view
     QLabel *title;
-    QLabel* description;
+    QLabel *description;
 
     void createWidgets();
     void createLayout();

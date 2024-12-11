@@ -1,4 +1,43 @@
 // Implementation for the third card - Environmental Litter Indicator
+// Mila
+/*
+ENVIRONMENTAL LITTER INDICATORS:
+PURPOSE: Summarises physical pollutants such as plastic litter and other visible debris in water
+- Litter comparisons - provide comparisons of litter levels across different litters and water body types, using bar or pie charts.
+- Compliance Indicators - Show adherence to EU Bathing Water standards regarding litter presence
+- Interaction - Allow people to filter by litter or type of litter to explore trends.
+NEED:
+- determindand.label: TarryResidus(9691)[pres/nf], BWP - O.L.(4826)[gerber c], SewageDebris(9156)[gerber c] 
+      {bracket is determindand.notation, square is determinand.unit.label}
+- determindand.notation:  (9691), (4826), (9156)
+- determinand.unit.label:   [pres/nf], [gerber c], [gerber c] 
+- determindand.definition:  Bathing Water Profile : Other Litter (incl. plastics), Sewage debris, Tarry residues
+- sample.samplingPoint.label:   litters
+- sample.sampledMaterialType.label:   water type: RIver Running and sea water
+- sample.isComplianceSample: False/True
+- sample.purpose.label:   why
+
+
+To create a chart:
+
+    Modify model.hpp and model.cpp as follows:
+        In model.hpp add the variable you want to use to store the chart data under private and create a public getter for it
+        In model.cpp, construct the variable in the method `dataProcessing()` in the main loop
+    Modify tab1.hpp and tab1.cpp and window.cpp follows:
+        Follow the example in tab1.hpp and tab1.cpp to create new charts for your tab, note the modifications to the `createWidgets()`, `createLayout()`, `createCharts()` and `updateCharts()` methods
+        `createCharts()` just creates dummy charts with no data, these will be updated on each data load
+        In window.cpp add `yourTab->updateCharts();` below `tab1->updateCharts()` in the `loadData()` method
+
+Add charts one at a time and always recompile the program to see the changes. As always, wrap all user facing strings in `tr()` to allow for easy translation in the future. 
+*/
+
+//helpful
+// filterAcceptsRow()
+// what litters have good, bad  and filter between different litter type
+// litterLocation eg: { "Leeds", { {"sewage", 1}, {"plastic", 3} } }
+// 1217 unique ids
+// two water types
+// 
 
 #include <QtWidgets>
 #include "styles.hpp"
@@ -26,72 +65,66 @@ bool Tab3::eventFilter(QObject *watched, QEvent *event)
 
 void Tab3::createWidgets()
 {
-  placeholder = new QLabel(tr("Environmental Litter Indicators - Coming Soon (Mila)"));
+  title = new QLabel(tr("Environmental Litter Indicators"));
   QFont labelFont;
   labelFont.setPointSize(32);
   labelFont.setBold(true);
-  placeholder->setFont(labelFont);
-  placeholder->setAlignment(Qt::AlignCenter);
-  placeholder->setObjectName("placeholderLabel");
+  title->setFont(labelFont);
+  title->setAlignment(Qt::AlignCenter);
+  title->setObjectName("placeholderLabel");
 
+  description = new QLabel(tr("Monitor number of litter measurements in water samples per location and water type."));
+  description->setWordWrap(true);
+  description->setAlignment(Qt::AlignCenter);
+  description->setObjectName("descriptionLabel");
+  QFont descriptionFont;
+  descriptionFont.setPointSize(14);  // Increased font size
+  description->setFont(descriptionFont);
 
-  // area where the graphs are !!!!
-  graphContainer = new QWidget;
-  graphLayout = new QGridLayout(graphContainer);
-  graphLayout->setSpacing(20);
-  graphLayout->setContentsMargins(10, 10, 10, 10);
-  
-  textScrollArea = new QScrollArea(this);
+  // Create error labels with larger font
+  QFont errorFont;
+  errorFont.setPointSize(14);
 
-  textScrollArea->setWidgetResizable(true);
-  stats = new QTextEdit(textScrollArea); 
-  stats->setReadOnly(true);
-  stats->setAlignment(Qt::AlignLeft); 
-  textScrollArea->setWidget(stats);
-  textScrollArea->setWidgetResizable(true);
+  // filter button
 
-  scrollArea = new QScrollArea();
-  scrollArea->setWidget(graphContainer);
-  scrollArea->setWidgetResizable(true);
+  // area where the graphs are
+  // graphContainer = new QWidget;
+  // graphLayout = new QGridLayout(graphContainer);
+  // graphLayout->setSpacing(20);
+  // graphLayout->setContentsMargins(20, 20, 20, 20);
+
+  // scrollArea = new QScrollArea;
+  // scrollArea->setWidget(graphContainer);
+  // scrollArea->setWidgetResizable(true);
+
+  // Create error labels
+  litterChartError = new QLabel(tr("No litter location data available"));
+  litterChartError->setAlignment(Qt::AlignCenter);
+  litterChartError->hide();  // Hidden by default
+
+  waterTypeChartError = new QLabel(tr("No water type data available"));
+  waterTypeChartError->setAlignment(Qt::AlignCenter);
+  waterTypeChartError->hide();  // Hidden by default
 
   createCharts();
 }
 
-void Tab3::createCharts()
+void Tab3::createCharts() //STOLEN
 {
   // Water type Donut chart
 
-  waterTypeSeries_inner = new QPieSeries(); 
-  waterTypeSeries_outer = new QPieSeries(); 
-  QChart *waterTypeChart = new QChart(); 
-  QChart *waterTypeChart2 = new QChart(); 
-  waterTypeChart->addSeries(waterTypeSeries_inner);
-  waterTypeChart2->addSeries(waterTypeSeries_outer);
-  waterTypeChart->setTitle(tr("Water types tested"));
-  waterTypeChart2->setTitle(tr("Different types of litter"));
+    //    QChartView *waterTypeChartView; // was complianceChartView
+    //    QPieSeries *waterTypeSeries; // was complianceSeries
+    //    
+  waterTypeSeries = new QPieSeries(); 
+  QChart *waterTypeChart = new QChart(); // was complianceChart
+  waterTypeChart->addSeries(waterTypeSeries);
+  waterTypeChart->setTitle(tr("Water types and their litters"));
   waterTypeChart->legend()->setAlignment(Qt::AlignRight);
-  waterTypeChart2->legend()->setAlignment(Qt::AlignRight);
-
-  for (auto slice : waterTypeSeries_inner->slices()) {
-      slice->setLabelVisible(false);  
-      slice->setBrush(QColor(50, 150, 255)); 
-  }
-
-  for (auto slice : waterTypeSeries_outer->slices()) {
-      slice->setLabelVisible(false);  
-      slice->setBrush(QColor(200, 100, 255)); 
-  }
-
   waterTypeChartView = new QChartView(waterTypeChart);
-  waterTypeChartView2 = new QChartView(waterTypeChart2);
   waterTypeChartView->setRenderHint(QPainter::Antialiasing);
-  waterTypeChartView2->setRenderHint(QPainter::Antialiasing);
   waterTypeChartView->setMinimumHeight(300);
-  waterTypeChartView2->setMinimumHeight(300);
-
-  graphLayout->addWidget(waterTypeChartView, 0, 0); 
-  graphLayout->addWidget(waterTypeChartView2, 0, 1);
-
+  //chartLayout->addWidget(waterTypeChartView, 0, 0);
 
   // LITTER BAR CHART_______________
   //new instance of QBarSeries(from hpp). *litterSeries* now points to the new QBarSeries object which holds bar data to be plotted on the chart
@@ -121,156 +154,185 @@ void Tab3::createCharts()
 
   litterChart->legend()->setVisible(false);
   litterChartView = new QChartView(litterChart);
-  litterChartView->setRenderHint(QPainter::Antialiasing);
+  //litterChartView->setRenderHint(QPainter::Antialiasing); remove
   litterChartView->setMinimumHeight(300);
-  graphLayout->addWidget(litterChartView, 1, 0, 2, 2); 
+  //chartLayout->addWidget(litterChartView, 0, 1); remove
 
 
+  // // Determinands Bar Chart
+  // determinandSeries = new QBarSeries();
+  // QChart *determinandChart = new QChart();
+  // determinandChart->addSeries(determinandSeries);
+  // determinandChart->setTitle(tr("Top Determinands Sampled"));
+  // determinandChart->setAnimationOptions(QChart::SeriesAnimations);
+
+  // QStringList categories2;
+  // categories2 << "Loading...";
+  // QBarSet *set2 = new QBarSet("");
+  // *set2 << 0;
+  // determinandSeries->append(set2);
+
+  // QBarCategoryAxis *axisX2 = new QBarCategoryAxis();
+  // axisX2->append(categories2);
+  // determinandChart->addAxis(axisX2, Qt::AlignBottom);
+  // determinandSeries->attachAxis(axisX2);
+
+  // QValueAxis *axisY2 = new QValueAxis();
+  // axisY2->setRange(0, 100);
+  // determinandChart->addAxis(axisY2, Qt::AlignLeft);
+  // determinandSeries->attachAxis(axisY2);
+
+  // determinandChart->legend()->setVisible(false);
+  // determinandChartView = new QChartView(determinandChart);
+  // determinandChartView->setRenderHint(QPainter::Antialiasing);
+  // determinandChartView->setMinimumHeight(300);
+  // chartLayout->addWidget(determinandChartView, 1, 0);
+
+  // // Timeline Line Chart
+  // timelineSeries = new QLineSeries();
+  // QChart *timelineChart = new QChart();
+  // timelineChart->addSeries(timelineSeries);
+  // timelineChart->setTitle(tr("Samples Collected Per Date"));
+
+  // // Create axes with improved settings
+  // QDateTimeAxis *axisX3 = new QDateTimeAxis;
+  // axisX3->setFormat("yyyy-MM-dd");
+  // axisX3->setTitleText(tr("Date"));
+  // timelineChart->addAxis(axisX3, Qt::AlignBottom);
+  // timelineSeries->attachAxis(axisX3);
+
+  // QValueAxis *axisY3 = new QValueAxis;
+  // axisY3->setLabelFormat("%d");
+  // axisY3->setTitleText(tr("Number of Samples"));
+  // axisY3->setMinorTickCount(0);  // Disable minor ticks
+  // axisY3->setLabelsVisible(true);
+  // axisY3->setMin(0);  // Always start from 0
+  // timelineChart->addAxis(axisY3, Qt::AlignLeft);
+  // timelineSeries->attachAxis(axisY3);
+
+  // // Add some padding to prevent label clipping
+  // timelineChart->setMargins(QMargins(10, 10, 10, 10));
+  // timelineChart->layout()->setContentsMargins(0, 0, 0, 0);
+
+  // timelineChart->legend()->setVisible(false);
+  // timelineChartView = new QChartView(timelineChart);
+  // timelineChartView->setRenderHint(QPainter::Antialiasing);
+  // timelineChartView->setMinimumHeight(300);
+  // chartLayout->addWidget(timelineChartView, 1, 1);
 }
 
 
 void Tab3::createLayout()
 {
   QVBoxLayout* layout = new QVBoxLayout;
-  layout->addWidget(placeholder);
-  layout->addStretch();
+  layout->addWidget(title);
+  layout->addWidget(description);
   layout->setSpacing(20);
   layout->setContentsMargins(30, 30, 30, 30);
-  layout->addWidget(textScrollArea);
-  layout->addWidget(scrollArea);
+  //layout->addWidget(stats, 0, Qt::AlignCenter);
+  
+  // Add both chart views and their error labels
+  layout->addWidget(litterChartView);
+  layout->addWidget(litterChartError);
+  layout->addWidget(waterTypeChartView);
+  layout->addWidget(waterTypeChartError);
     
   setLayout(layout);
 }
 
+// These should probably be their own functions tbh
+// i.e. updateComplianceChart(), updatelitterChart(), updateDeterminandChart()
 void Tab3::updateCharts()
 {
-
+  // Water type pie chart
+  waterTypeSeries->clear();
   QMap<QString, QMap<QString, int>*> litterWaterType = waterModel->getLitterWaterType();
-  QMap<QString, QMap<QString, int>*> litterLocation = waterModel->getLitterLocation(); // eg [Leeds, [ sewage, 1]]
+  int totalSamples = 0;
 
-  // Prepare containers for unique values
-  QSet<QString> distinctLocations;
-  QSet<QString> distinctLitterTypes;
-  QSet<QString> distinctWaterTypes;
-
-  // Extract distinct locations from litterLocation map
-  for (auto it = litterLocation.begin(); it != litterLocation.end(); ++it) {
-      distinctLocations.insert(it.key());  
-  }
-  // Extract distinct litter types from litterWaterType map
-  for (auto it = litterWaterType.begin(); it != litterWaterType.end(); ++it) {
-      for (auto innerIt = it.value()->begin(); innerIt != it.value()->end(); ++innerIt) {
-          distinctLitterTypes.insert(innerIt.key());  
-      }
-  }
-
-  // Extract distinct water types from litterWaterType map
-  for (auto it = litterWaterType.begin(); it != litterWaterType.end(); ++it) {
-      distinctWaterTypes.insert(it.key());  // Insert water type key
-  }
-  QRegularExpression regex("\\(\\d+\\)");
-  // Format the output for display
-  QString locationsText = ("Distinct locations tested for litter: ") + QString::number(distinctLocations.size()) + " - ";
-  for (const QString &location : distinctLocations) {
-    QString location_mod = location;
-      location_mod.remove(regex);
-      locationsText += location_mod + ", ";
-  }
-  locationsText.chop(2);
-
-  QString litterTypesText = ("\nTypes of litter present: ") + QString::number(distinctLitterTypes.size()) + " - ";
-  for (const QString &litterType : distinctLitterTypes) {
-      litterTypesText += litterType + ", ";
-  }
-  litterTypesText.chop(2);
-
-  QString waterTypesText = ("\nTypes of bodies of water tested: ") + QString::number(distinctWaterTypes.size()) + " - ";
-  for (const QString &waterType : distinctWaterTypes) {
-      waterTypesText += waterType + ", ";
-  }
-  waterTypesText.chop(2);
-  // Set the text to display the results
-  stats->setText(locationsText + litterTypesText + waterTypesText);
-  // // Clear the old data and add the new data DONUT CHART
-  waterTypeSeries_inner->clear();
-  if (litterWaterType.isEmpty()) {
-      qDebug() << "litterWaterType is empty or null!";
-      return;  // Early exit to avoid further errors
-  }
-
-  int innerWaterTypeTotal = 0;
-
+  // First calculate total for percentage calculation
   for (auto waterTypes : litterWaterType.keys()) {
     int waterCount = 0;
-    for (auto litterTypes : litterWaterType.value(waterTypes)->keys()) {
-      waterCount += litterWaterType.value(waterTypes)->value(litterTypes);
+    for (auto litterType : litterWaterType.value(waterTypes)->keys()) {
+      waterCount += litterWaterType.value(waterTypes)->value(litterType);
     }
-    innerWaterTypeTotal += waterCount;
-    waterTypeSeries_inner->append(waterTypes, waterCount);
-    qDebug() << "Water Type: " << waterTypes;
+    totalSamples += waterCount;
   }
 
-
-  waterTypeSeries_outer->clear();
-  QMap<QString, int> litterData_forWaterType; // eg {"Leeds",  3}
-
-  for (auto waterType : litterWaterType.keys()) {
-    //loop through trash type for each water type
-    for (auto litterType : litterWaterType.value(waterType)->keys()) {
-      // get amount of current type of trash for this water type
-      int litterCount = litterWaterType.value(waterType)->value(litterType);
-      //add count of litter to water type
-      if (litterData_forWaterType.contains(litterType)) {
-        litterData_forWaterType[litterType] += litterCount;
-      } else {
-        litterData_forWaterType.insert(litterType, litterCount);
-      }
-    }
-  }
-  for (auto litterType : litterData_forWaterType.keys()) {
-    int totalCount = litterData_forWaterType.value(litterType);
-    waterTypeSeries_outer->append(litterType, totalCount);
-  }
-
-
-// BAR CHART --------------
-  litterSeries->clear();
-
-
-  // retrieves data about litter location from watermodel using func, then stores it in *litterLocation * variable
-  //QMap<QString, QMap<QString, int>*> litterLocation = waterModel->getLitterLocation(); // eg [Leeds, [ sewage, 1]]
+  // Show/hide chart based on data availability
+  if (totalSamples > 0) {
+    waterTypeChartView->show();
+    waterTypeChartError->hide();
     
-  // Create a single bar set for all litters
-  QBarSet *set = new QBarSet(tr("Amount of Litter"));
-  
-  // empty list that holds the labels for x-axis of the chart
-  QStringList categories; 
-  
+    for (auto waterTypes : litterWaterType.keys()) {
+      int waterCount = 0;
+      for (auto litterType : litterWaterType.value(waterTypes)->keys()) {
+        waterCount += litterWaterType.value(waterTypes)->value(litterType);
+      }
+      double percentage = (waterCount * 100.0) / totalSamples;
+      waterTypeSeries->append(
+        tr("%1 (%2%)").arg(waterTypes).arg(QString::number(percentage, 'f', 1)),
+        waterCount
+      );
+    }
+    waterTypeSeries->setHoleSize(0.35);
+  } else {
+    waterTypeChartView->hide();
+    waterTypeChartError->show();
+  }
 
-  QMap<QString, int> litterData; // eg {"Leeds",  3}
+  // BAR CHART --------------
+  litterSeries->clear();
+  QMap<QString, QMap<QString, int>*> litterLocation = waterModel->getLitterLocation();
+  QMap<QString, int> litterData;
 
-  // Iterate through the initial map and calculate the sum of inner QMaps
-    // it.key() is a location like "Leeds"
-    // it.value() is a pointer to the inner QMap which holds type of litter and count {"sewage", 3}
+  // Calculate totals per location
   for (auto it = litterLocation.cbegin(); it != litterLocation.cend(); ++it) {
     int sum = 0;
-      for (const auto& value : *(it.value())) {
-        sum += value;
-        }
+    for (const auto& value : *(it.value())) {
+      sum += value;
+    }
     litterData[it.key()] = sum;
-      // e.g: litterLocation["Leeds"] = { {"sewage", 1}, {"plastic", 3} }, 
-            //litterData["Leeds"] = 4.
   }
-    
+
+  // Show/hide chart based on data availability
+  if (litterData.isEmpty()) {
+    litterChartView->hide();
+    litterChartError->show();
+    return;  // Exit early if no data
+  }
+
+  litterChartView->show();
+  litterChartError->hide();
+
+  QBarSet *set = new QBarSet("Amount of Litter");
+  QStringList categories;
+
   // Add data to the set and categories
   for (auto it = litterData.constBegin(); it != litterData.constEnd(); ++it) {
     categories << it.key();
     *set << it.value();
   }
-    
-  // Add the set to the series
+
   litterSeries->append(set);
-    
+
+  // Add tooltip handling
+  connect(litterSeries, &QBarSeries::hovered,
+    [this, categories](bool status, int index, QBarSet *barset) {
+      if (status && index >= 0 && index < categories.size()) {
+        QString tooltipText = QString("%1\nAmount: %2")
+          .arg(categories[index])
+          .arg(barset->at(index));
+        
+        QToolTip::showText(
+          QCursor::pos(),
+          tooltipText,
+          litterChartView
+        );
+      } else {
+        QToolTip::hideText();
+      }
+  });
+
   // Update the axis categories
   QBarCategoryAxis *axis = qobject_cast<QBarCategoryAxis*>(
     litterChartView->chart()->axes(Qt::Horizontal).first()
