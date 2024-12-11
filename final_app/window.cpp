@@ -188,7 +188,6 @@ void WaterWindow::loadData(const QString &path)
   font.setPointSize(12);
   loadingLabel->setFont(font);
   
-  
   layout->addWidget(loadingLabel);
   
   // Show dialog and process events to ensure it appears
