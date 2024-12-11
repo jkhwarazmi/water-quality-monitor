@@ -37,9 +37,13 @@ void Tab7::createWidgets()
   contentLayout->setSpacing(20);
   contentLayout->setContentsMargins(20, 20, 20, 20);
 
+  QFont sectionFont;
+  sectionFont.setPointSize(24); 
+  sectionFont.setBold(true);
+
   // About the Dataset
   QLabel* datasetTitle = new QLabel(tr("About the Dataset"));
-  datasetTitle->setFont(QFont("", 24, QFont::Bold));
+  datasetTitle->setFont(sectionFont);
   QLabel* datasetText = new QLabel(tr(
     "This application visualises water quality data collected from various locations by the UK Environment Agency. "
     "The datasets includes measurements of different determinands (substances) in water samples, "
@@ -52,7 +56,7 @@ void Tab7::createWidgets()
 
   // Navigation Guide
   QLabel* navTitle = new QLabel(tr("Navigation Guide"));
-  navTitle->setFont(QFont("", 24, QFont::Bold));
+  navTitle->setFont(sectionFont);
   QLabel* navText = new QLabel(tr(
   "• <b>Dashboard</b>: Overview of key data metrics to quickly assess overall monitoring status<br>"
   "• <b>Pollutant Overview</b>: Track concentrations of key pollutants to monitor water quality and safety<br>"
@@ -70,7 +74,7 @@ void Tab7::createWidgets()
 
   // Using the Application
   QLabel* usageTitle = new QLabel(tr("Using the Application"));
-  usageTitle->setFont(QFont("", 24, QFont::Bold));
+  usageTitle->setFont(sectionFont);
   QLabel* usageText = new QLabel(tr(
     "• Use the tabs at the top to navigate between different pages<br>"
     "• Hover over charts and graphs to see detailed information<br>"
@@ -88,7 +92,7 @@ void Tab7::createWidgets()
 
   // Compliance Indicators
   QLabel* complianceTitle = new QLabel(tr("Compliance Indicators"));
-  complianceTitle->setFont(QFont("", 24, QFont::Bold));
+  complianceTitle->setFont(sectionFont);
   contentLayout->addWidget(complianceTitle);
 
   // Create colour indicators

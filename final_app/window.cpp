@@ -61,27 +61,44 @@ void WaterWindow::createMainWidget()
   tab7 = new Tab7(&model);
     
   connect(tab1, SIGNAL(reloadRequested()), this, SLOT(switchToLoadView()));
+
+  // Keyboard shortcuts for tabs
+  QShortcut* shortcut1 = new QShortcut(QKeySequence(Qt::ALT | Qt::Key_1), this);
+  QShortcut* shortcut2 = new QShortcut(QKeySequence(Qt::ALT | Qt::Key_2), this);
+  QShortcut* shortcut3 = new QShortcut(QKeySequence(Qt::ALT | Qt::Key_3), this);
+  QShortcut* shortcut4 = new QShortcut(QKeySequence(Qt::ALT | Qt::Key_4), this);
+  QShortcut* shortcut5 = new QShortcut(QKeySequence(Qt::ALT | Qt::Key_5), this);
+  QShortcut* shortcut6 = new QShortcut(QKeySequence(Qt::ALT | Qt::Key_6), this);
+  QShortcut* shortcut7 = new QShortcut(QKeySequence(Qt::ALT | Qt::Key_7), this);
+
+  connect(shortcut1, &QShortcut::activated, [this]() { tabWidget->setCurrentIndex(0); });
+  connect(shortcut2, &QShortcut::activated, [this]() { tabWidget->setCurrentIndex(1); });
+  connect(shortcut3, &QShortcut::activated, [this]() { tabWidget->setCurrentIndex(2); });
+  connect(shortcut4, &QShortcut::activated, [this]() { tabWidget->setCurrentIndex(3); });
+  connect(shortcut5, &QShortcut::activated, [this]() { tabWidget->setCurrentIndex(4); });
+  connect(shortcut6, &QShortcut::activated, [this]() { tabWidget->setCurrentIndex(5); });
+  connect(shortcut7, &QShortcut::activated, [this]() { tabWidget->setCurrentIndex(6); });
     
   tabWidget->addTab(tab1, tr("Dashboard"));
-  tabWidget->setTabToolTip(0, tr("View summary of the loaded data"));
+  tabWidget->setTabToolTip(0, tr("View summary of the loaded data (Alt+1)"));
 
   tabWidget->addTab(tab2, tr("Pollutant Overview"));
-  tabWidget->setTabToolTip(1, tr("Analyse various water pollutants"));
+  tabWidget->setTabToolTip(1, tr("Analyse various water pollutants (Alt+2)"));
 
   tabWidget->addTab(tab3, tr("Litter Indicators"));
-  tabWidget->setTabToolTip(2, tr("Monitor water litter levels"));
+  tabWidget->setTabToolTip(2, tr("Monitor water litter levels (Alt+3)"));
 
   tabWidget->addTab(tab4, tr("Fluorinated Compounds"));
-  tabWidget->setTabToolTip(3, tr("Examine fluorinated compound data"));
+  tabWidget->setTabToolTip(3, tr("Examine fluorinated compound data (Alt+4)"));
 
   tabWidget->addTab(tab5, tr("Compliance"));
-  tabWidget->setTabToolTip(4, tr("Check compliance of detected pollutants with UK regulations"));
+  tabWidget->setTabToolTip(4, tr("Check compliance of detected pollutants with UK regulations (Alt+5)"));
 
   tabWidget->addTab(tab6, tr("Raw Data"));
-  tabWidget->setTabToolTip(5, tr("View data from the CSV file as a table"));
+  tabWidget->setTabToolTip(5, tr("View data from the CSV file as a table (Alt+6)"));
 
   tabWidget->addTab(tab7, tr("Help"));
-  tabWidget->setTabToolTip(6, tr("Get help using the application"));
+  tabWidget->setTabToolTip(6, tr("Get help using the application (Alt+7)"));
     
   stackedWidget->addWidget(loadDataWidget);
   stackedWidget->addWidget(tabWidget);
@@ -95,7 +112,7 @@ void WaterWindow::createMenus()
 {
   QAction *locAction = new QAction(tr("Set Data &Location"), this);
   locAction->setShortcut(QKeySequence(Qt::CTRL | Qt::Key_L));
-  connect(locAction, SIGNAL(triggered()), this, SLOT(switchToLoadView()));
+  connect(locAction, SIGNAL(triggered()), this, SLOT(setDataLocation()));
 
   QAction *closeAction = new QAction(tr("Quit"), this);
   closeAction->setShortcut(QKeySequence::Close);
@@ -128,6 +145,10 @@ void WaterWindow::createMenus()
 
 void WaterWindow::setDataLocation()
 {
+  // First switch to load widget view
+  switchToLoadView();
+  
+  // Then trigger file dialog
   QString directory = QFileDialog::getOpenFileName(this, tr("Select Data File"), dataLocation, tr("CSV files (*.csv)"));
 
   if (!directory.isEmpty()) {
@@ -167,44 +188,39 @@ void WaterWindow::loadData(const QString &path)
   font.setPointSize(12);
   loadingLabel->setFont(font);
   
-  QProgressBar *progressBar = new QProgressBar();
-  progressBar->setMinimum(0);
-  progressBar->setMaximum(0);
-  progressBar->setTextVisible(false);
   
   layout->addWidget(loadingLabel);
-  layout->addWidget(progressBar);
   
   // Show dialog and process events to ensure it appears
   loadingDialog.show();
   QCoreApplication::processEvents();
 
   try {
-    model.updateFromFile(path);
+      model.updateFromFile(path);
       
-    if (!model.hasData()) {
-      loadingDialog.close();
-      QMessageBox::critical(this, tr("Data Error"), tr("The selected file contains no valid data."));
-      return;
-    }
+      if (!model.hasData()) {
+          loadingDialog.close();
+          QMessageBox::critical(this, tr("Data Error"), tr("The selected file contains no valid data."));
+          return;
+      }
 
-    model.dataProcessing();
+      model.dataProcessing();
 
-    // Add chart update methods below
-    tab1->updateCharts();
-    tab2->updateCharts();
-    tab3->updateCharts();
-    tab4->updateCharts();
-    tab5->updateCharts();
-    
-    switchToTabView();
-    loadDataWidget->setDataLoaded(true);
+      // Add chart update methods below
+      tab1->updateCharts();
+      tab2->updateCharts();
+      tab3->updateCharts();
+      tab4->updateCharts();
+      tab5->updateCharts();
+      
+      switchToTabView();
+      loadDataWidget->setDataLoaded(true);
 
   } catch (const std::exception& error) {
-    loadingDialog.close();
-    QMessageBox::critical(this, tr("CSV File Error"), error.what());
+      loadingDialog.close();
+      QMessageBox::critical(this, tr("CSV File Error"), error.what());
   }
-    
+  
   loadingDialog.close();
 }
 
