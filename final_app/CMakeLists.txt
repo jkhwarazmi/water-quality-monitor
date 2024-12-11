@@ -6,7 +6,7 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 find_package(Qt6 REQUIRED COMPONENTS Widgets Charts LinguistTools)
-qt_standard_project_setup(I18N_TRANSLATED_LANGUAGES fr) 
+qt_standard_project_setup() 
 
 qt_add_executable(watermonitor
     main.cpp
@@ -24,7 +24,7 @@ qt_add_executable(watermonitor
     loaddatawidget.cpp
 )
 
-qt_add_translations(watermonitor)
+qt_add_translations(watermonitor TS_FILES WaterQualityMonitor_fr.ts)
 
 target_link_libraries(watermonitor PRIVATE Qt6::Widgets Qt6::Charts)
 

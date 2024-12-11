@@ -7,7 +7,11 @@ int main(int argc, char* argv[])
 {
   QApplication app(argc, argv);
 
-  // Create and show window
+  QTranslator trn;
+  if (trn.load(QLocale::system(), "watermonitor", "_", ":/i18n")) {
+    app.installTranslator(&trn);
+  }
+
   WaterWindow window;
   window.show();
 
