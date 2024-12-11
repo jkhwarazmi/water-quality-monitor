@@ -280,7 +280,12 @@ void Tab5::updatePollutantList()
     "NH3 un-ion", 
     "COD as O2", 
     "Phosphorus-P", 
-    "Nitrogen - N"
+    "Nitrogen - N",
+    "Fluoranthene",
+    "Fluoride - F",  // WHO guideline value
+    "Fluoroxypyr",
+    "HFPO-DA",      // Similar to PFOA/PFOS
+    "MeFOSAA-B",
     }; 
 
     if (!waterModel->hasData()) {
