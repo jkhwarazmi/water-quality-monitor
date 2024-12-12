@@ -98,37 +98,37 @@
         <translation>Tableau de bord</translation>
     </message>
     <message>
-        <location filename="tab1.cpp" line="69"/>
+        <location filename="tab1.cpp" line="71"/>
         <source>Compliance vs. Other Samples</source>
         <translation>Échantillons conformes vs. autres échantillons</translation>
     </message>
     <message>
-        <location filename="tab1.cpp" line="74"/>
+        <location filename="tab1.cpp" line="76"/>
         <source>Number of samples taken to measure compliance with regulations compared to samples taken for other reasons</source>
         <translation>Nombre d&apos;échantillons prélevés pour mesurer la conformité aux réglementations par rapport aux échantillons prélevés pour d&apos;autres raisons</translation>
     </message>
     <message>
-        <location filename="tab1.cpp" line="81"/>
+        <location filename="tab1.cpp" line="83"/>
         <source>Top Sampling Locations</source>
         <translation>Principaux lieux d&apos;échantillonnage</translation>
     </message>
     <message>
-        <location filename="tab1.cpp" line="110"/>
+        <location filename="tab1.cpp" line="112"/>
         <source>Top Determinands Sampled</source>
         <translation>Principaux déterminants échantillonnés</translation>
     </message>
     <message>
-        <location filename="tab1.cpp" line="139"/>
+        <location filename="tab1.cpp" line="141"/>
         <source>Samples Collected Per Date</source>
         <translation>Échantillons collectés par date</translation>
     </message>
     <message>
-        <location filename="tab1.cpp" line="144"/>
+        <location filename="tab1.cpp" line="145"/>
         <source>Date</source>
         <translation>Date</translation>
     </message>
     <message>
-        <location filename="tab1.cpp" line="150"/>
+        <location filename="tab1.cpp" line="151"/>
         <source>Number of Samples</source>
         <translation>Nombre d&apos;échantillons</translation>
     </message>
@@ -172,73 +172,73 @@
 <context>
     <name>Tab2</name>
     <message>
-        <location filename="tab2.cpp" line="29"/>
-        <location filename="tab2.cpp" line="266"/>
+        <location filename="tab2.cpp" line="32"/>
+        <location filename="tab2.cpp" line="268"/>
         <source>No unique pollutants found.</source>
         <translation>Aucun polluant unique trouvé.</translation>
     </message>
     <message>
-        <location filename="tab2.cpp" line="29"/>
-        <location filename="tab2.cpp" line="30"/>
-        <location filename="tab2.cpp" line="254"/>
+        <location filename="tab2.cpp" line="32"/>
+        <location filename="tab2.cpp" line="33"/>
+        <location filename="tab2.cpp" line="256"/>
         <source>No data available.</source>
         <translation>Aucune donnée disponible.</translation>
     </message>
     <message>
-        <location filename="tab2.cpp" line="39"/>
+        <location filename="tab2.cpp" line="42"/>
         <source>No locations found for this pollutant.</source>
         <translation>Aucun lieu trouvé pour ce polluant.</translation>
     </message>
     <message>
-        <location filename="tab2.cpp" line="124"/>
+        <location filename="tab2.cpp" line="126"/>
         <source>Pollutant Overview</source>
         <translation>Aperçu des polluants</translation>
     </message>
     <message>
-        <location filename="tab2.cpp" line="132"/>
+        <location filename="tab2.cpp" line="134"/>
         <source>Monitor pollutant concentrations in water samples over time. Select a pollutant and location to view detailed time series data with compliance indicators.</source>
         <translation>Surveiller les concentrations de polluants dans les échantillons d&apos;eau au fil du temps. Sélectionner un polluant et un lieu pour voir les données détaillées de séries temporelles avec les indicateurs de conformité.</translation>
     </message>
     <message>
-        <location filename="tab2.cpp" line="139"/>
+        <location filename="tab2.cpp" line="141"/>
         <source>Select Pollutant:</source>
         <translation>Sélectionner un polluant :</translation>
     </message>
     <message>
-        <location filename="tab2.cpp" line="140"/>
+        <location filename="tab2.cpp" line="142"/>
         <source>Select Location:</source>
         <translation>Sélectionner un lieu :</translation>
     </message>
     <message>
-        <location filename="tab2.cpp" line="339"/>
+        <location filename="tab2.cpp" line="341"/>
         <source>Concentration over Time</source>
         <translation>Concentration dans le temps</translation>
     </message>
     <message>
-        <location filename="tab2.cpp" line="346"/>
-        <location filename="tab2.cpp" line="435"/>
+        <location filename="tab2.cpp" line="348"/>
+        <location filename="tab2.cpp" line="437"/>
         <source>Compliant</source>
         <translation>Conforme</translation>
     </message>
     <message>
-        <location filename="tab2.cpp" line="353"/>
-        <location filename="tab2.cpp" line="437"/>
+        <location filename="tab2.cpp" line="355"/>
+        <location filename="tab2.cpp" line="439"/>
         <source>Near Threshold</source>
         <translation>Proche du seuil</translation>
     </message>
     <message>
-        <location filename="tab2.cpp" line="360"/>
-        <location filename="tab2.cpp" line="439"/>
+        <location filename="tab2.cpp" line="362"/>
+        <location filename="tab2.cpp" line="441"/>
         <source>Non-Compliant</source>
         <translation>Non conforme</translation>
     </message>
     <message>
-        <location filename="tab2.cpp" line="409"/>
+        <location filename="tab2.cpp" line="411"/>
         <source>Time Series for %1 at %2</source>
         <translation>Série temporelle pour %1 à %2</translation>
     </message>
     <message>
-        <location filename="tab2.cpp" line="421"/>
+        <location filename="tab2.cpp" line="423"/>
         <source>Date Time: %1
 Concentration: %2 µg/L
 Status: %3</source>
@@ -247,17 +247,17 @@ Concentration : %2 µg/L
 Statut : %3</translation>
     </message>
     <message>
-        <location filename="tab2.cpp" line="444"/>
+        <location filename="tab2.cpp" line="446"/>
         <source>Date/Time</source>
         <translation>Date/Heure</translation>
     </message>
     <message>
-        <location filename="tab2.cpp" line="467"/>
+        <location filename="tab2.cpp" line="469"/>
         <source>Concentration (µg/L)</source>
         <translation>Concentration (µg/L)</translation>
     </message>
     <message>
-        <location filename="tab2.cpp" line="502"/>
+        <location filename="tab2.cpp" line="504"/>
         <source>Threshold</source>
         <translation>Seuil</translation>
     </message>
@@ -265,19 +265,39 @@ Statut : %3</translation>
 <context>
     <name>Tab3</name>
     <message>
-        <location filename="tab3.cpp" line="68"/>
+        <location filename="tab3.cpp" line="30"/>
         <source>Environmental Litter Indicators</source>
         <translation>Indicateurs des déchets environnementaux</translation>
     </message>
     <message>
-        <location filename="tab3.cpp" line="100"/>
+        <location filename="tab3.cpp" line="38"/>
+        <source>Monitor number of litter measurements in water samples per location and water type.</source>
+        <translation>Surveiller le nombre de mesures de déchets dans les échantillons d&apos;eau par emplacement et type d&apos;eau.</translation>
+    </message>
+    <message>
+        <location filename="tab3.cpp" line="50"/>
+        <source>No litter location data available</source>
+        <translation>Aucune donnée de localisation des déchets disponible</translation>
+    </message>
+    <message>
+        <location filename="tab3.cpp" line="54"/>
+        <source>No water type data available</source>
+        <translation>Aucune donnée sur le type d&apos;eau disponible</translation>
+    </message>
+    <message>
+        <location filename="tab3.cpp" line="66"/>
         <source>Water types and their litters</source>
         <translation>Types d&apos;eau et leurs déchets</translation>
     </message>
     <message>
-        <location filename="tab3.cpp" line="113"/>
+        <location filename="tab3.cpp" line="75"/>
         <source>Litter per Location</source>
         <translation>Déchets par lieu</translation>
+    </message>
+    <message>
+        <location filename="tab3.cpp" line="145"/>
+        <source>%1 (%2%)</source>
+        <translation>%1 (%2%)</translation>
     </message>
 </context>
 <context>
@@ -382,141 +402,141 @@ Statut : %3</translation>
 <context>
     <name>Tab5</name>
     <message>
-        <location filename="tab5.cpp" line="26"/>
+        <location filename="tab5.cpp" line="27"/>
         <source>Monitor water quality compliance against UK/EU safety standards. Select a pollutant and location to see whether any samples in the dataset exceed regulatory standards i.e &lt;i&gt;the threshold value&lt;/i&gt; at that location using color-coded indicators.</source>
         <translation>Surveiller la conformité de la qualité de l&apos;eau aux normes de sécurité UK/UE. Sélectionner un polluant et un lieu pour voir si des échantillons du jeu de données dépassent les normes réglementaires, c&apos;est-à-dire &lt;i&gt;la valeur seuil&lt;/i&gt; à cet endroit, à l&apos;aide d&apos;indicateurs colorés.</translation>
     </message>
     <message>
-        <location filename="tab5.cpp" line="66"/>
+        <location filename="tab5.cpp" line="67"/>
         <source>Regulatory Compliance Information</source>
         <translation>Informations sur la conformité réglementaire</translation>
     </message>
     <message>
-        <location filename="tab5.cpp" line="75"/>
+        <location filename="tab5.cpp" line="76"/>
         <source>Select a Unique Pollutant:</source>
         <translation>Sélectionner un polluant unique :</translation>
     </message>
     <message>
-        <location filename="tab5.cpp" line="76"/>
+        <location filename="tab5.cpp" line="77"/>
         <source>Select a Unique Location:</source>
         <translation>Sélectionner un lieu unique :</translation>
     </message>
     <message>
-        <location filename="tab5.cpp" line="79"/>
-        <location filename="tab5.cpp" line="339"/>
+        <location filename="tab5.cpp" line="80"/>
+        <location filename="tab5.cpp" line="344"/>
         <source>Definition: Not available</source>
         <translation>Définition : Non disponible</translation>
     </message>
     <message>
-        <location filename="tab5.cpp" line="80"/>
-        <location filename="tab5.cpp" line="340"/>
-        <location filename="tab5.cpp" line="352"/>
+        <location filename="tab5.cpp" line="81"/>
+        <location filename="tab5.cpp" line="345"/>
+        <location filename="tab5.cpp" line="357"/>
         <source>EU/UK Standard: Not available</source>
         <translation>Norme UE/UK : Non disponible</translation>
     </message>
     <message>
-        <location filename="tab5.cpp" line="81"/>
-        <location filename="tab5.cpp" line="341"/>
-        <location filename="tab5.cpp" line="353"/>
-        <location filename="tab5.cpp" line="378"/>
+        <location filename="tab5.cpp" line="82"/>
+        <location filename="tab5.cpp" line="346"/>
+        <location filename="tab5.cpp" line="358"/>
+        <location filename="tab5.cpp" line="383"/>
         <source>Current Value: Not available</source>
         <translation>Valeur actuelle : Non disponible</translation>
     </message>
     <message>
-        <location filename="tab5.cpp" line="106"/>
+        <location filename="tab5.cpp" line="107"/>
         <source>Compliance Status:</source>
         <translation>Statut de conformité :</translation>
     </message>
     <message>
-        <location filename="tab5.cpp" line="132"/>
+        <location filename="tab5.cpp" line="133"/>
         <source>Legend:</source>
         <translation>Légende :</translation>
     </message>
     <message>
-        <location filename="tab5.cpp" line="134"/>
+        <location filename="tab5.cpp" line="135"/>
         <source>• Green: Compliant</source>
         <translation>• Vert : Conforme</translation>
     </message>
     <message>
-        <location filename="tab5.cpp" line="136"/>
+        <location filename="tab5.cpp" line="137"/>
         <source>• Amber: Caution</source>
         <translation>• Ambre : Attention</translation>
     </message>
     <message>
-        <location filename="tab5.cpp" line="138"/>
+        <location filename="tab5.cpp" line="139"/>
         <source>• Red: Non-Compliant</source>
         <translation>• Rouge : Non conforme</translation>
     </message>
     <message>
-        <location filename="tab5.cpp" line="288"/>
-        <location filename="tab5.cpp" line="317"/>
+        <location filename="tab5.cpp" line="293"/>
+        <location filename="tab5.cpp" line="322"/>
         <source>No data available.</source>
         <translation>Aucune donnée disponible.</translation>
     </message>
     <message>
-        <location filename="tab5.cpp" line="296"/>
+        <location filename="tab5.cpp" line="301"/>
         <source>No unique pollutants found.</source>
         <translation>Aucun polluant unique trouvé.</translation>
     </message>
     <message>
-        <location filename="tab5.cpp" line="309"/>
+        <location filename="tab5.cpp" line="314"/>
         <source>No matching pollutants found.</source>
         <translation>Aucun polluant correspondant trouvé.</translation>
     </message>
     <message>
-        <location filename="tab5.cpp" line="325"/>
+        <location filename="tab5.cpp" line="330"/>
         <source>No unique locations found.</source>
         <translation>Aucun lieu unique trouvé.</translation>
     </message>
     <message>
-        <location filename="tab5.cpp" line="338"/>
+        <location filename="tab5.cpp" line="343"/>
         <source>Please select both a pollutant and a location.</source>
         <translation>Veuillez sélectionner un polluant et un lieu.</translation>
     </message>
     <message>
-        <location filename="tab5.cpp" line="350"/>
-        <location filename="tab5.cpp" line="360"/>
+        <location filename="tab5.cpp" line="355"/>
+        <location filename="tab5.cpp" line="365"/>
         <source>Definition: %1</source>
         <translation>Définition : %1</translation>
     </message>
     <message>
-        <location filename="tab5.cpp" line="350"/>
-        <location filename="tab5.cpp" line="360"/>
+        <location filename="tab5.cpp" line="355"/>
+        <location filename="tab5.cpp" line="365"/>
         <source>Not available</source>
         <translation>Non disponible</translation>
     </message>
     <message>
-        <location filename="tab5.cpp" line="351"/>
+        <location filename="tab5.cpp" line="356"/>
         <source>No threshold defined for this pollutant.</source>
         <translation>Aucun seuil défini pour ce polluant.</translation>
     </message>
     <message>
-        <location filename="tab5.cpp" line="359"/>
+        <location filename="tab5.cpp" line="364"/>
         <source>EU/UK Standard: %1</source>
         <translation>Norme UE/UK : %1</translation>
     </message>
     <message>
-        <location filename="tab5.cpp" line="377"/>
+        <location filename="tab5.cpp" line="382"/>
         <source>No data available for the selected location and pollutant.</source>
         <translation>Aucune donnée disponible pour le lieu et le polluant sélectionnés.</translation>
     </message>
     <message>
-        <location filename="tab5.cpp" line="384"/>
+        <location filename="tab5.cpp" line="389"/>
         <source>Current Value: %1</source>
         <translation>Valeur actuelle : %1</translation>
     </message>
     <message>
-        <location filename="tab5.cpp" line="388"/>
+        <location filename="tab5.cpp" line="393"/>
         <source>Compliant</source>
         <translation>Conforme</translation>
     </message>
     <message>
-        <location filename="tab5.cpp" line="391"/>
+        <location filename="tab5.cpp" line="396"/>
         <source>Near Threshold</source>
         <translation>Proche du seuil</translation>
     </message>
     <message>
-        <location filename="tab5.cpp" line="394"/>
+        <location filename="tab5.cpp" line="399"/>
         <source>Non-Compliant</source>
         <translation>Non conforme</translation>
     </message>
@@ -529,152 +549,158 @@ Statut : %3</translation>
         <translation>Aide</translation>
     </message>
     <message>
-        <location filename="tab7.cpp" line="45"/>
+        <location filename="tab7.cpp" line="48"/>
         <source>About the Dataset</source>
         <translation>À propos du jeu de données</translation>
     </message>
     <message>
-        <location filename="tab7.cpp" line="47"/>
+        <location filename="tab7.cpp" line="50"/>
         <source>This application visualises water quality data collected from various locations by the UK Environment Agency. The datasets includes measurements of different determinands (substances) in water samples, along with information about sampling locations, dates, and whether samples were taken to comply with UK regulations.</source>
         <translation>Cette application visualise les données de qualité de l&apos;eau collectées à différents endroits par l&apos;Agence britannique pour l&apos;environnement. Les jeux de données comprennent des mesures de différents déterminants (substances) dans les échantillons d&apos;eau, ainsi que des informations sur les lieux d&apos;échantillonnage, les dates et si les échantillons ont été prélevés pour se conformer aux réglementations britanniques.</translation>
     </message>
     <message>
-        <location filename="tab7.cpp" line="58"/>
+        <location filename="tab7.cpp" line="62"/>
         <source>Navigation Guide</source>
         <translation>Guide de navigation</translation>
     </message>
     <message>
-        <location filename="tab7.cpp" line="60"/>
+        <location filename="tab7.cpp" line="64"/>
         <source>• &lt;b&gt;Dashboard&lt;/b&gt;: Overview of key data metrics to quickly assess overall monitoring status&lt;br&gt;• &lt;b&gt;Pollutant Overview&lt;/b&gt;: Track concentrations of key pollutants to monitor water quality and safety&lt;br&gt;• &lt;b&gt;Litter Indicators&lt;/b&gt;: Assess environmental impact and cleanliness of waterways through litter monitoring&lt;br&gt;• &lt;b&gt;Fluorinated Compounds&lt;/b&gt;: Track levels of fluorinated chemicals to ensure safe drinking water standards and dental health&lt;br&gt;• &lt;b&gt;Compliance&lt;/b&gt;: Monitor adherence to water quality regulations to maintain public safety standards&lt;br&gt;• &lt;b&gt;Raw Data&lt;/b&gt;: Access the complete dataset for detailed research and custom analysis&lt;br&gt;• &lt;b&gt;Help&lt;/b&gt;: Guide to using this water quality monitoring system</source>
         <translation>• &lt;b&gt;Tableau de bord&lt;/b&gt; : Aperçu des métriques clés pour évaluer rapidement l&apos;état global de la surveillance&lt;br&gt;• &lt;b&gt;Aperçu des polluants&lt;/b&gt; : Suivre les concentrations des polluants clés pour surveiller la qualité et la sécurité de l&apos;eau&lt;br&gt;• &lt;b&gt;Indicateurs des déchets&lt;/b&gt; : Évaluer l&apos;impact environnemental et la propreté des cours d&apos;eau par la surveillance des déchets&lt;br&gt;• &lt;b&gt;Composés fluorés&lt;/b&gt; : Suivre les niveaux de produits chimiques fluorés pour garantir les normes d&apos;eau potable et la santé dentaire&lt;br&gt;• &lt;b&gt;Conformité&lt;/b&gt; : Surveiller le respect des réglementations sur la qualité de l&apos;eau pour maintenir les normes de sécurité publique&lt;br&gt;• &lt;b&gt;Données brutes&lt;/b&gt; : Accéder au jeu de données complet pour la recherche détaillée et l&apos;analyse personnalisée&lt;br&gt;• &lt;b&gt;Aide&lt;/b&gt; : Guide d&apos;utilisation de ce système de surveillance de la qualité de l&apos;eau</translation>
     </message>
     <message>
-        <location filename="tab7.cpp" line="76"/>
+        <location filename="tab7.cpp" line="80"/>
         <source>Using the Application</source>
         <translation>Utilisation de l&apos;application</translation>
     </message>
     <message>
-        <location filename="tab7.cpp" line="78"/>
+        <location filename="tab7.cpp" line="82"/>
         <source>• Use the tabs at the top to navigate between different pages&lt;br&gt;• Hover over charts and graphs to see detailed information&lt;br&gt;• Use the &apos;Reload Data&apos; on the dashboard or through the file menu to load a different dataset&lt;br&gt;&lt;br&gt;Data can be downloaded from: &lt;a href=&apos;https://environment.data.gov.uk/water-quality/view/download&apos;&gt;The UK Environment Agency&lt;/a&gt;&lt;br&gt;&lt;br&gt;More information about the datasets can be found &lt;a href=&apos;https://environment.data.gov.uk/water-quality/view/doc/reference&apos;&gt;here&lt;/a&gt;</source>
         <translation>• Utilisez les onglets en haut pour naviguer entre les différentes pages&lt;br&gt;• Survolez les graphiques pour voir les informations détaillées&lt;br&gt;• Utilisez &apos;Recharger les données&apos; sur le tableau de bord ou via le menu fichier pour charger un autre jeu de données&lt;br&gt;&lt;br&gt;Les données peuvent être téléchargées depuis : &lt;a href=&apos;https://environment.data.gov.uk/water-quality/view/download&apos;&gt;L&apos;Agence britannique pour l&apos;environnement&lt;/a&gt;&lt;br&gt;&lt;br&gt;Plus d&apos;informations sur les jeux de données peuvent être trouvées &lt;a href=&apos;https://environment.data.gov.uk/water-quality/view/doc/reference&apos;&gt;ici&lt;/a&gt;</translation>
     </message>
     <message>
-        <location filename="tab7.cpp" line="94"/>
+        <location filename="tab7.cpp" line="99"/>
         <source>Compliance Indicators</source>
         <translation>Indicateurs de conformité</translation>
     </message>
     <message>
-        <location filename="tab7.cpp" line="104"/>
+        <location filename="tab7.cpp" line="109"/>
         <source>Safe</source>
         <translation>Sûr</translation>
     </message>
     <message>
-        <location filename="tab7.cpp" line="104"/>
+        <location filename="tab7.cpp" line="109"/>
         <source>Measurement is within safe limits according to the UK Drinking Water Standards</source>
         <translation>La mesure est dans les limites de sécurité selon les normes britanniques de l&apos;eau potable</translation>
     </message>
     <message>
-        <location filename="tab7.cpp" line="105"/>
+        <location filename="tab7.cpp" line="110"/>
         <source>Warning</source>
         <translation>Avertissement</translation>
     </message>
     <message>
-        <location filename="tab7.cpp" line="105"/>
+        <location filename="tab7.cpp" line="110"/>
         <source>Measurement is approaching threshold (&gt;80%) of the UK Drinking Water Standards</source>
         <translation>La mesure approche du seuil (&gt;80%) des normes britanniques de l&apos;eau potable</translation>
     </message>
     <message>
-        <location filename="tab7.cpp" line="106"/>
+        <location filename="tab7.cpp" line="111"/>
         <source>Exceeded</source>
         <translation>Dépassé</translation>
     </message>
     <message>
-        <location filename="tab7.cpp" line="106"/>
+        <location filename="tab7.cpp" line="111"/>
         <source>Measurement exceeds safe threshold according to the UK Drinking Water Standards</source>
         <translation>La mesure dépasse le seuil de sécurité selon les normes britanniques de l&apos;eau potable</translation>
+    </message>
+    <message>
+        <location filename="tab7.cpp" line="225"/>
+        <location filename="tab7.cpp" line="226"/>
+        <source>Scroll to view more</source>
+        <translation>Faire défiler pour voir plus</translation>
     </message>
 </context>
 <context>
     <name>WaterModel</name>
     <message>
-        <location filename="model.cpp" line="61"/>
+        <location filename="model.cpp" line="63"/>
         <source>Yes</source>
         <translation>Oui</translation>
     </message>
     <message>
-        <location filename="model.cpp" line="61"/>
+        <location filename="model.cpp" line="63"/>
         <source>No</source>
         <translation>Non</translation>
     </message>
     <message>
-        <location filename="model.cpp" line="98"/>
+        <location filename="model.cpp" line="100"/>
         <source>Result: %1 %2
 Threshold: %3 %4</source>
         <translation>Résultat : %1 %2
 Seuil : %3 %4</translation>
     </message>
     <message>
-        <location filename="model.cpp" line="105"/>
+        <location filename="model.cpp" line="107"/>
         <source>This is a compliance sample</source>
         <translation>Cet échantillon est conforme</translation>
     </message>
     <message>
-        <location filename="model.cpp" line="106"/>
+        <location filename="model.cpp" line="108"/>
         <source>This is not a compliance sample</source>
         <translation>Cet échantillon n&apos;est pas conforme</translation>
     </message>
     <message>
-        <location filename="model.cpp" line="135"/>
+        <location filename="model.cpp" line="138"/>
         <source>Easting</source>
         <translation>Coordonnée Est</translation>
     </message>
     <message>
-        <location filename="model.cpp" line="136"/>
+        <location filename="model.cpp" line="139"/>
         <source>Northing</source>
         <translation>Coordonnée Nord</translation>
     </message>
     <message>
-        <location filename="model.cpp" line="137"/>
+        <location filename="model.cpp" line="140"/>
         <source>Location Name</source>
         <translation>Nom du lieu</translation>
     </message>
     <message>
-        <location filename="model.cpp" line="138"/>
+        <location filename="model.cpp" line="141"/>
         <source>Date/Time</source>
         <translation>Date/Heure</translation>
     </message>
     <message>
-        <location filename="model.cpp" line="139"/>
+        <location filename="model.cpp" line="142"/>
         <source>Determinand</source>
         <translation>Déterminant</translation>
     </message>
     <message>
-        <location filename="model.cpp" line="140"/>
+        <location filename="model.cpp" line="143"/>
         <source>Determinand Definition</source>
         <translation>Définition du déterminant</translation>
     </message>
     <message>
-        <location filename="model.cpp" line="141"/>
+        <location filename="model.cpp" line="144"/>
         <source>Concentration</source>
         <translation>Concentration</translation>
     </message>
     <message>
-        <location filename="model.cpp" line="142"/>
+        <location filename="model.cpp" line="145"/>
         <source>Unit</source>
         <translation>Unité</translation>
     </message>
     <message>
-        <location filename="model.cpp" line="143"/>
+        <location filename="model.cpp" line="146"/>
         <source>Sample Location</source>
         <translation>Lieu d&apos;échantillonnage</translation>
     </message>
     <message>
-        <location filename="model.cpp" line="144"/>
+        <location filename="model.cpp" line="147"/>
         <source>Compliance Sample</source>
         <translation>Échantillon conforme</translation>
     </message>
     <message>
-        <location filename="model.cpp" line="145"/>
+        <location filename="model.cpp" line="148"/>
         <source>Sample Purpose</source>
         <translation>Objectif de l&apos;échantillon</translation>
     </message>
