@@ -38,7 +38,7 @@ void Tab7::createWidgets()
   contentLayout->setContentsMargins(20, 20, 20, 20);
 
   QFont sectionFont;
-  sectionFont.setPointSize(24); 
+  sectionFont.setPointSize(24);
   sectionFont.setBold(true);
 
   QFont contentFont;

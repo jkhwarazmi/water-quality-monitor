@@ -30,6 +30,9 @@ void Tab5::createOverviewLabel()
     overviewLabel->setWordWrap(true);
     overviewLabel->setAlignment(Qt::AlignCenter);
     overviewLabel->setObjectName("descriptionLabel");
+    QFont descriptionFont;
+    descriptionFont.setPointSize(14);
+    overviewLabel->setFont(descriptionFont);
 
     // Allow the label to resize dynamically
     overviewLabel->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);

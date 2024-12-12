@@ -136,6 +136,9 @@ void Tab2::createWidgets()
     description->setWordWrap(true);
     description->setAlignment(Qt::AlignCenter);
     description->setObjectName("descriptionLabel");
+    QFont descriptionFont;
+    descriptionFont.setPointSize(14);
+    description->setFont(descriptionFont);
 
     // Dropdown labels with consistent styling
     pollutantLabel = new QLabel(tr("Select Pollutant:"));
