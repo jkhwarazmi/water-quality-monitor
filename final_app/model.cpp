@@ -23,13 +23,15 @@ enum Column {
 };
 
 
-void WaterModel::updateFromFile(const QString& filename) {
+void WaterModel::updateFromFile(const QString& filename) 
+{
   beginResetModel();
   dataset.loadData(filename.toStdString());
   endResetModel();
 }
 
-QVariant WaterModel::data(const QModelIndex& index, int role) const {
+QVariant WaterModel::data(const QModelIndex& index, int role) const 
+{
   if (!index.isValid() || index.row() >= dataset.size()) {
     return QVariant();
   }
@@ -111,18 +113,19 @@ QVariant WaterModel::data(const QModelIndex& index, int role) const {
   return QVariant();
 }
 
-// determinand.label
-QString WaterModel::getDeterminandDefinition(const QString& pollutant) const {
+QString WaterModel::getDeterminandDefinition(const QString& pollutant) const 
+{
     for (int i = 0; i < rowCount(QModelIndex()); ++i) {
-        QString samplePollutant = data(index(i, 4), Qt::DisplayRole).toString(); // Column 4 for pollutant
+        QString samplePollutant = data(index(i, 4), Qt::DisplayRole).toString();
         if (samplePollutant == pollutant) {
-            return data(index(i, 5), Qt::DisplayRole).toString(); // Column 5 for definition
+            return data(index(i, 5), Qt::DisplayRole).toString(); 
         }
     }
-    return QString(); // Return an empty string if no definition is found
+    return QString();
 }
 
-QVariant WaterModel::headerData(int section, Qt::Orientation orientation, int role) const {
+QVariant WaterModel::headerData(int section, Qt::Orientation orientation, int role) const 
+{
   if (role != Qt::DisplayRole) {
     return QVariant();
   }
@@ -148,8 +151,9 @@ QVariant WaterModel::headerData(int section, Qt::Orientation orientation, int ro
 }
 
 // Helper method to get threshold for a Determinand
-double WaterModel::getDeterminandThreshold(const QString& Determinand) const {
-  // Example thresholds - replace with actual values
+double WaterModel::getDeterminandThreshold(const QString& Determinand) const 
+{
+  // Template thresholds - unable to get real data
   static const QMap<QString, double> thresholds = {
     // Sarah
     {"Ammonia(N)", 0.2},
@@ -230,7 +234,8 @@ double WaterModel::getDeterminandThreshold(const QString& Determinand) const {
   return thresholds.value(Determinand, 0.005);
 }
 
-void WaterModel::dataProcessing() {
+void WaterModel::dataProcessing() 
+{
   // Clear existing maps and their pointers first
   for (auto map : litterLocation.values()) {
     delete map;
@@ -247,7 +252,6 @@ void WaterModel::dataProcessing() {
 
   complianceSamples = qMakePair(0, 0);
 
-  // Clear nested containers properly
   for (auto& vector : pollutantData) {
     vector.clear();
   }
@@ -280,7 +284,7 @@ void WaterModel::dataProcessing() {
 
     // Validate data points
     if (!currentDateTime.isValid() || qIsNaN(concentration)) {
-      continue;  // Skip invalid rows
+      continue; 
     }
 
     pollutantData[currentPollutant].append(qMakePair(currentDateTime, concentration));
@@ -298,7 +302,7 @@ void WaterModel::dataProcessing() {
 
     pollutantToLocations[currentPollutant].insert(location);
 
-    // Process litter data for charts (bar and pie charts) @MF
+    // Process litter data for charts (bar and pie charts) 
     if (dataset[i].getResult() != 0 && (dataset[i].getDeterminandDefinition() == "Tarry residues" ||
                                           dataset[i].getDeterminandDefinition() == "Bathing Water Profile : Other Litter (incl. plastics)" ||
                                           dataset[i].getDeterminandDefinition() == "Sewage debris")) {
@@ -312,7 +316,7 @@ void WaterModel::dataProcessing() {
         litterLocation[dataset[i].getLocation()]->insert(dataset[i].getDeterminandDefinition(), litterLocation[dataset[i].getLocation()]->value(dataset[i].getDeterminandDefinition()) + (dataset[i].getResult()));
       }
 
-            // Pie chart data
+      // Pie chart data
       if (!litterWaterType.contains(dataset[i].getMaterialType())) {
         litterWaterType[dataset[i].getMaterialType()] = new QMap<QString, int>();
         litterWaterType[dataset[i].getMaterialType()]->insert(dataset[i].getDeterminandDefinition(), (dataset[i].getResult()));
@@ -357,13 +361,13 @@ void WaterModel::dataProcessing() {
     sortedLocations.append(qMakePair(i.key(), i.value()));
   }
 
-  // Sort by count in descending order
+  // Sort by count, name in descending order
   std::sort(sortedLocations.begin(), sortedLocations.end(),
     [](const QPair<QString, int>& a, const QPair<QString, int>& b) {
       if (a.second != b.second) {
-        return a.second > b.second;  // Sort by count first (descending)
+        return a.second > b.second;  
       }
-      return a.first < b.first;     // If counts are equal, sort by name (ascending)
+      return a.first < b.first; 
   });
 
   // Take only top 5 for sampleLocations
@@ -377,13 +381,13 @@ void WaterModel::dataProcessing() {
     sortedDeterminands.append(qMakePair(i.key(), i.value()));
   }
 
-  // Sort by count in descending order
+  // Sort by count, name in descending order
   std::sort(sortedDeterminands.begin(), sortedDeterminands.end(),
     [](const QPair<QString, int>& a, const QPair<QString, int>& b) {
       if (a.second != b.second) {
-        return a.second > b.second;  // Sort by count first (descending)
+        return a.second > b.second;  
       }
-      return a.first < b.first;     // If counts are equal, sort by name (ascending)
+      return a.first < b.first; 
   });
 
   // Take only top 5 for determinandCounts
@@ -401,39 +405,37 @@ QVector<QPair<QString, double>> WaterModel::getTopLocationsByPollutant(const QSt
 {
     QVector<QPair<QString, double>> topLocations;
 
-    // Iterate through the data and gather concentrations for the selected pollutant
-    for (int i = 0; i < rowCount(QModelIndex()); ++i) {  // Fixed rowCount() call
-        QString currentPollutant = data(index(i, 4), Qt::DisplayRole).toString(); // Assuming pollutant is in column 4
+    for (int i = 0; i < rowCount(QModelIndex()); ++i) {
+        QString currentPollutant = data(index(i, 4), Qt::DisplayRole).toString();
         if (currentPollutant == pollutant) {
-            QString location = data(index(i, 2), Qt::DisplayRole).toString(); // Assuming location is in column 2
-            double concentration = data(index(i, 6), Qt::DisplayRole).toDouble(); // Assuming concentration is in column 6
+            QString location = data(index(i, 2), Qt::DisplayRole).toString();
+            double concentration = data(index(i, 6), Qt::DisplayRole).toDouble();
             topLocations.append(qMakePair(location, concentration));
         }
     }
 
     // Sort by concentration in descending order (top concentration first)
     std::sort(topLocations.begin(), topLocations.end(), [](const QPair<QString, double>& a, const QPair<QString, double>& b) {
-        return a.second > b.second; // Sort by concentration (second element of QPair)
+        return a.second > b.second;
     });
 
     // Return top 5 locations
     if (topLocations.size() > 5) {
-        topLocations.resize(5); // Limit to top 5
+        topLocations.resize(5);
     }
 
     return topLocations;
 }
 
-QVector<QPair<QDateTime, double>> WaterModel::getDataForSpecificPollutants(const QString& pollutant) const {
+QVector<QPair<QDateTime, double>> WaterModel::getDataForSpecificPollutants(const QString& pollutant) const 
+{
     QVector<QPair<QDateTime, double>> dataForPollutants;
 
     // Iterate through pollutantData and collect data for the specific pollutant
     const auto& allData = pollutantData.value(pollutant);
     for (const auto& record : allData) {
-        dataForPollutants.append(record); // Add each record to the result
+        dataForPollutants.append(record);
     }
 
     return dataForPollutants;
 }
-
-

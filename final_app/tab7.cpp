@@ -42,7 +42,7 @@ void Tab7::createWidgets()
   sectionFont.setBold(true);
 
   QFont contentFont;
-  contentFont.setPointSize(14);  // Base font size for all content
+  contentFont.setPointSize(14);
 
   // About the Dataset
   QLabel* datasetTitle = new QLabel(tr("About the Dataset"));
@@ -115,7 +115,7 @@ void Tab7::createWidgets()
     QWidget* row = new QWidget;
     QHBoxLayout* rowLayout = new QHBoxLayout(row);
     
-    // colour block
+    // Colour block
     QFrame* colourBlock = new QFrame;
     colourBlock->setFixedSize(30, 30);
     colourBlock->setStyleSheet(QString("background-color: %1; border-radius: 4px;")

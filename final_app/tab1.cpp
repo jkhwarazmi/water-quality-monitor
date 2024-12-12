@@ -62,7 +62,6 @@ void Tab1::createWidgets()
   createCharts();
 }
 
-// These should maybe be their own functions?
 void Tab1::createCharts()
 {
   // Compliance Donut Chart
@@ -141,7 +140,6 @@ void Tab1::createCharts()
   timelineChart->addSeries(timelineSeries);
   timelineChart->setTitle(tr("Samples Collected Per Date"));
 
-  // Create axes with improved settings
   QDateTimeAxis *axisX3 = new QDateTimeAxis;
   axisX3->setFormat("yyyy-MM-dd");
   axisX3->setTitleText(tr("Date"));
@@ -151,13 +149,12 @@ void Tab1::createCharts()
   QValueAxis *axisY3 = new QValueAxis;
   axisY3->setLabelFormat("%d");
   axisY3->setTitleText(tr("Number of Samples"));
-  axisY3->setMinorTickCount(0);  // Disable minor ticks
+  axisY3->setMinorTickCount(0); 
   axisY3->setLabelsVisible(true);
-  axisY3->setMin(0);  // Always start from 0
+  axisY3->setMin(0);
   timelineChart->addAxis(axisY3, Qt::AlignLeft);
   timelineSeries->attachAxis(axisY3);
 
-  // Add some padding to prevent label clipping
   timelineChart->setMargins(QMargins(10, 10, 10, 10));
   timelineChart->layout()->setContentsMargins(0, 0, 0, 0);
 

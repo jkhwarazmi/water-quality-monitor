@@ -57,7 +57,7 @@ class WaterModel: public QAbstractTableModel
     int locationCount = 0;
     int determinandCount = 0;
 
-    QMap<QString, QVector<QPair<QString, double>>> samplingPointData; // Corrected type
+    QMap<QString, QVector<QPair<QString, double>>> samplingPointData; 
 
     QMap<QString, QVector<double>> fluorPollutantData;              // Stores pollutants with "fluor"
     QMap<QString, QVector<QPair<QString, double>>> fluorLocations; // Stores locations for "fluor" pollutants

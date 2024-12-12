@@ -27,8 +27,8 @@ class Tab5 : public QWidget
 
 public:
     Tab5(WaterModel* model, QWidget* parent = nullptr);
-    void updatePollutantList(); // Updates the pollutant dropdown
-    void updateLocationList();  // Updates to update the location dropdown
+    void updatePollutantList(); 
+    void updateLocationList(); 
     void updateComplianceStatus(const QString& pollutant, const QString& location);
     void updateBarChart(); 
     void updateCharts();
@@ -36,7 +36,6 @@ public:
 private slots:
     void onPollutantSelectionChanged(int index);
     void onLocationSelectionChanged(int index);
-   // void updateTimeSeriesChart(); // Updates to update the time series chart
 
 private:
     WaterModel* waterModel;
@@ -61,7 +60,7 @@ private:
     QChart* chart;
     QBarSeries* barSeries;
     QHBoxLayout* complianceLayout; 
-    QBarSeries *pollutantSeries;  // Declare the bar series
+    QBarSeries *pollutantSeries;
     QChartView *pollutantChartView; 
 
     void createWidgets();

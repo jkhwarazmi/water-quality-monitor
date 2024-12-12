@@ -1,3 +1,6 @@
+// Implementation for the second card - Pollutant Overview
+// Nicolas
+
 #include <QtWidgets>
 #include <QtCharts>
 #include "styles.hpp"
@@ -16,7 +19,7 @@ Tab2::Tab2(WaterModel* model, QWidget* parent) : waterModel(model), QWidget(pare
     connect(pollutantDropdown, &QComboBox::currentIndexChanged, this, &Tab2::onPollutantSelectionChanged);
     connect(locationDropdown, &QComboBox::currentIndexChanged, this, &Tab2::onLocationSelectionChanged);
 
-    // Initialize the dropdowns and chart
+    // Initialise the dropdowns and chart
     updateCharts();
 }
 
@@ -48,7 +51,6 @@ void Tab2::updateLocationDropdown(const QString& pollutant)
 
     locationDropdown->blockSignals(false);
 
-    // Optionally, trigger an update to the chart if locations are available
     if (!locations.isEmpty()) {
         // Select the first location by default
         locationDropdown->setCurrentIndex(0);
@@ -84,7 +86,7 @@ void Tab2::updateTimeSeriesChart()
         // Create chart
         QChartView* chartView = new QChartView(chart);
         chartView->setRenderHint(QPainter::Antialiasing);
-        chartView->setMinimumSize(400, 300); // Ensures Visibility
+        chartView->setMinimumSize(400, 300);
 
         // Adds chart to layout
         QVBoxLayout* layout = static_cast<QVBoxLayout*>(this->layout());
@@ -241,7 +243,7 @@ void Tab2::setupStyles()
 
 void Tab2::updateCharts()
 {
-    // Block signals to prevent unwanted updates during initialization
+    // Block signals to prevent unwanted updates during initialisation
     pollutantDropdown->blockSignals(true);
     locationDropdown->blockSignals(true);
 
@@ -358,7 +360,7 @@ QChart* Tab2::createTimeSeriesChart(const QString& pollutant, const QString& loc
     nonCompliantSeries->setMarkerShape(QScatterSeries::MarkerShapeCircle);
     nonCompliantSeries->setMarkerSize(10.0);
     nonCompliantSeries->setName(tr("Non-Compliant"));
-    nonCompliantSeries->setBrush(QBrush(QColor(215, 0, 64))); // Rou
+    nonCompliantSeries->setBrush(QBrush(QColor(215, 0, 64))); // Red
     nonCompliantSeries->setPen(QPen(QColor(215, 0, 64)));
 
     // category counters
@@ -513,6 +515,3 @@ QChart* Tab2::createTimeSeriesChart(const QString& pollutant, const QString& loc
 
     return chart;
 }
-// COND @ 25 WORKS GREAT FOR TESTING
-// 1,3 -DICHLOR
-// PFOS WORKS FAB TOO

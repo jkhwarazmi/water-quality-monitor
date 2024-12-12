@@ -20,7 +20,8 @@ Tab5::Tab5(WaterModel* model, QWidget* parent) : QWidget(parent), waterModel(mod
     connect(pollutantDropdown, &QComboBox::currentIndexChanged, this, &Tab5::onPollutantSelectionChanged);
     connect(locationDropdown, &QComboBox::currentIndexChanged, this, &Tab5::onLocationSelectionChanged);
 }
- //OverviewLabelOverviewLabel
+
+//OverviewLabelOverviewLabel
 void Tab5::createOverviewLabel()
 {
     overviewLabel = new QLabel(tr("Monitor water quality compliance against UK/EU safety standards. "
@@ -28,7 +29,7 @@ void Tab5::createOverviewLabel()
     
     overviewLabel->setWordWrap(true);
     overviewLabel->setAlignment(Qt::AlignCenter);
-    overviewLabel->setObjectName("descriptionLabel"); // Match Tab4's object name
+    overviewLabel->setObjectName("descriptionLabel");
 
     // Allow the label to resize dynamically
     overviewLabel->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
@@ -119,8 +120,8 @@ void Tab5::createWidgets()
     complianceCard->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 
     // Optionally set a minimum and maximum size
-    complianceCard->setMinimumSize(600, 400);  // Minimum size: 400x300px
-    complianceCard->setMaximumSize(800, 800);  // Maximum size: 800x600px
+    complianceCard->setMinimumSize(600, 400); 
+    complianceCard->setMaximumSize(800, 800);
 
     // Layout for the compliance card content
     QVBoxLayout* cardLayout = new QVBoxLayout(complianceCard);
@@ -142,7 +143,7 @@ void Tab5::createWidgets()
     legendLayout->addWidget(greenLegend);
     legendLayout->addWidget(amberLegend);
     legendLayout->addWidget(redLegend);
-    cardLayout->addLayout(legendLayout); // Add legend layout to the card layout
+    cardLayout->addLayout(legendLayout);
 
 
     cardLayout->addWidget(complianceStatusLabel, 0, Qt::AlignCenter);
@@ -159,7 +160,6 @@ void Tab5::createWidgets()
 }
 
 //Modular Layout
-
 void Tab5::createLayout()
 {
     // Main layout for Tab5

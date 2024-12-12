@@ -45,9 +45,9 @@ void Tab6::createWidgets()
   tableView->setSelectionMode(QAbstractItemView::SingleSelection);
   tableView->setShowGrid(true);
   tableView->setObjectName("mainTable");
-  tableView->setWordWrap(false);  // Prevent word wrapping to get accurate column widths
+  tableView->setWordWrap(false); 
   
-  // Enable custom delegates for colour coding
+  // Enable custom delegates for colour coding, i.e. compliance status
   tableView->setItemDelegate(new QStyledItemDelegate(this));
   
   // Header settings
@@ -70,9 +70,9 @@ void Tab6::adjustColumnWidths()
 {
   if (!waterModel) return;
   
-  const int padding = 20;  // Additional padding for each column
+  const int padding = 20; 
   QFontMetrics metrics(tableView->font());
-  QModelIndex parent;  // Empty model index for root items
+  QModelIndex parent;
   
   for (int column = 0; column < waterModel->columnCount(parent); ++column) {
     int maxWidth = 0;
@@ -81,7 +81,7 @@ void Tab6::adjustColumnWidths()
     QString headerText = waterModel->headerData(column, Qt::Horizontal, Qt::DisplayRole).toString();
     maxWidth = metrics.horizontalAdvance(headerText);
     
-    // Check content width for first 100 rows
+    // Check content width for first 100 rows, more introduces performance issues
     for (int row = 0; row < 100; ++row) {
       QModelIndex idx = waterModel->index(row, column, parent);
       QString text = waterModel->data(idx, Qt::DisplayRole).toString();

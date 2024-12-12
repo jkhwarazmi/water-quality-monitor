@@ -1,3 +1,6 @@
+// Header for second card - Pollutant Overview
+// Nicolas
+
 #include <QWidget>
 #include <QComboBox>
 #include <QtCharts>
@@ -12,23 +15,23 @@ class Tab2 : public QWidget
 
 public:
     Tab2(WaterModel* model, QWidget* parent = nullptr);
-    void updatePollutantList(); // Updates the pollutant dropdown
-    void updateLocationList();  // Updates to update the location dropdown
-    void updateCharts();        // Updates all charts
+    void updatePollutantList(); 
+    void updateLocationList();  
+    void updateCharts();   
 
 private slots:
     void onPollutantSelectionChanged(int index);
     void onLocationSelectionChanged(int index);
-    void updateTimeSeriesChart(); // Updates to update the time series chart
+    void updateTimeSeriesChart(); 
     
 
 private:
     WaterModel* waterModel;
     QComboBox* pollutantDropdown;
-    QComboBox* locationDropdown;  //
+    QComboBox* locationDropdown;
     QLabel* pollutantLabel;
     QLabel* locationLabel;
-    QChartView* currentChartView; //Holds current view
+    QChartView* currentChartView;
     QLabel *title;
     QLabel *description;
 

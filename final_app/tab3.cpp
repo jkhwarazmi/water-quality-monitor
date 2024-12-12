@@ -1,43 +1,5 @@
 // Implementation for the third card - Environmental Litter Indicator
 // Mila
-/*
-ENVIRONMENTAL LITTER INDICATORS:
-PURPOSE: Summarises physical pollutants such as plastic litter and other visible debris in water
-- Litter comparisons - provide comparisons of litter levels across different litters and water body types, using bar or pie charts.
-- Compliance Indicators - Show adherence to EU Bathing Water standards regarding litter presence
-- Interaction - Allow people to filter by litter or type of litter to explore trends.
-NEED:
-- determindand.label: TarryResidus(9691)[pres/nf], BWP - O.L.(4826)[gerber c], SewageDebris(9156)[gerber c] 
-      {bracket is determindand.notation, square is determinand.unit.label}
-- determindand.notation:  (9691), (4826), (9156)
-- determinand.unit.label:   [pres/nf], [gerber c], [gerber c] 
-- determindand.definition:  Bathing Water Profile : Other Litter (incl. plastics), Sewage debris, Tarry residues
-- sample.samplingPoint.label:   litters
-- sample.sampledMaterialType.label:   water type: RIver Running and sea water
-- sample.isComplianceSample: False/True
-- sample.purpose.label:   why
-
-
-To create a chart:
-
-    Modify model.hpp and model.cpp as follows:
-        In model.hpp add the variable you want to use to store the chart data under private and create a public getter for it
-        In model.cpp, construct the variable in the method `dataProcessing()` in the main loop
-    Modify tab1.hpp and tab1.cpp and window.cpp follows:
-        Follow the example in tab1.hpp and tab1.cpp to create new charts for your tab, note the modifications to the `createWidgets()`, `createLayout()`, `createCharts()` and `updateCharts()` methods
-        `createCharts()` just creates dummy charts with no data, these will be updated on each data load
-        In window.cpp add `yourTab->updateCharts();` below `tab1->updateCharts()` in the `loadData()` method
-
-Add charts one at a time and always recompile the program to see the changes. As always, wrap all user facing strings in `tr()` to allow for easy translation in the future. 
-*/
-
-//helpful
-// filterAcceptsRow()
-// what litters have good, bad  and filter between different litter type
-// litterLocation eg: { "Leeds", { {"sewage", 1}, {"plastic", 3} } }
-// 1217 unique ids
-// two water types
-// 
 
 #include <QtWidgets>
 #include "styles.hpp"
@@ -78,44 +40,26 @@ void Tab3::createWidgets()
   description->setAlignment(Qt::AlignCenter);
   description->setObjectName("descriptionLabel");
   QFont descriptionFont;
-  descriptionFont.setPointSize(14);  // Increased font size
+  descriptionFont.setPointSize(14); 
   description->setFont(descriptionFont);
 
-  // Create error labels with larger font
   QFont errorFont;
   errorFont.setPointSize(14);
 
-  // filter button
-
-  // area where the graphs are
-  // graphContainer = new QWidget;
-  // graphLayout = new QGridLayout(graphContainer);
-  // graphLayout->setSpacing(20);
-  // graphLayout->setContentsMargins(20, 20, 20, 20);
-
-  // scrollArea = new QScrollArea;
-  // scrollArea->setWidget(graphContainer);
-  // scrollArea->setWidgetResizable(true);
-
-  // Create error labels
+  // Create error labels, hidden by default
   litterChartError = new QLabel(tr("No litter location data available"));
   litterChartError->setAlignment(Qt::AlignCenter);
-  litterChartError->hide();  // Hidden by default
+  litterChartError->hide();
 
   waterTypeChartError = new QLabel(tr("No water type data available"));
   waterTypeChartError->setAlignment(Qt::AlignCenter);
-  waterTypeChartError->hide();  // Hidden by default
+  waterTypeChartError->hide(); 
 
   createCharts();
 }
 
-void Tab3::createCharts() //STOLEN
-{
-  // Water type Donut chart
-
-    //    QChartView *waterTypeChartView; // was complianceChartView
-    //    QPieSeries *waterTypeSeries; // was complianceSeries
-    //    
+void Tab3::createCharts()
+{  
   waterTypeSeries = new QPieSeries(); 
   QChart *waterTypeChart = new QChart(); // was complianceChart
   waterTypeChart->addSeries(waterTypeSeries);
@@ -124,12 +68,8 @@ void Tab3::createCharts() //STOLEN
   waterTypeChartView = new QChartView(waterTypeChart);
   waterTypeChartView->setRenderHint(QPainter::Antialiasing);
   waterTypeChartView->setMinimumHeight(300);
-  //chartLayout->addWidget(waterTypeChartView, 0, 0);
 
-  // LITTER BAR CHART_______________
-  //new instance of QBarSeries(from hpp). *litterSeries* now points to the new QBarSeries object which holds bar data to be plotted on the chart
   litterSeries = new QBarSeries();
-  // creates new QChart object which manages the chart. *litterChart* is a pointer to the QChart object
   QChart *litterChart = new QChart();
   litterChart->addSeries(litterSeries);
   litterChart->setTitle(tr("Litter per Location"));
@@ -143,7 +83,7 @@ void Tab3::createCharts() //STOLEN
 
   QBarCategoryAxis *axisX = new QBarCategoryAxis();
   axisX->append(categories);
-  axisX->setLabelsAngle(270); // makes the text verticle
+  axisX->setLabelsAngle(270);
   litterChart->addAxis(axisX, Qt::AlignBottom);
   litterSeries->attachAxis(axisX);
 
@@ -154,71 +94,7 @@ void Tab3::createCharts() //STOLEN
 
   litterChart->legend()->setVisible(false);
   litterChartView = new QChartView(litterChart);
-  //litterChartView->setRenderHint(QPainter::Antialiasing); remove
   litterChartView->setMinimumHeight(300);
-  //chartLayout->addWidget(litterChartView, 0, 1); remove
-
-
-  // // Determinands Bar Chart
-  // determinandSeries = new QBarSeries();
-  // QChart *determinandChart = new QChart();
-  // determinandChart->addSeries(determinandSeries);
-  // determinandChart->setTitle(tr("Top Determinands Sampled"));
-  // determinandChart->setAnimationOptions(QChart::SeriesAnimations);
-
-  // QStringList categories2;
-  // categories2 << "Loading...";
-  // QBarSet *set2 = new QBarSet("");
-  // *set2 << 0;
-  // determinandSeries->append(set2);
-
-  // QBarCategoryAxis *axisX2 = new QBarCategoryAxis();
-  // axisX2->append(categories2);
-  // determinandChart->addAxis(axisX2, Qt::AlignBottom);
-  // determinandSeries->attachAxis(axisX2);
-
-  // QValueAxis *axisY2 = new QValueAxis();
-  // axisY2->setRange(0, 100);
-  // determinandChart->addAxis(axisY2, Qt::AlignLeft);
-  // determinandSeries->attachAxis(axisY2);
-
-  // determinandChart->legend()->setVisible(false);
-  // determinandChartView = new QChartView(determinandChart);
-  // determinandChartView->setRenderHint(QPainter::Antialiasing);
-  // determinandChartView->setMinimumHeight(300);
-  // chartLayout->addWidget(determinandChartView, 1, 0);
-
-  // // Timeline Line Chart
-  // timelineSeries = new QLineSeries();
-  // QChart *timelineChart = new QChart();
-  // timelineChart->addSeries(timelineSeries);
-  // timelineChart->setTitle(tr("Samples Collected Per Date"));
-
-  // // Create axes with improved settings
-  // QDateTimeAxis *axisX3 = new QDateTimeAxis;
-  // axisX3->setFormat("yyyy-MM-dd");
-  // axisX3->setTitleText(tr("Date"));
-  // timelineChart->addAxis(axisX3, Qt::AlignBottom);
-  // timelineSeries->attachAxis(axisX3);
-
-  // QValueAxis *axisY3 = new QValueAxis;
-  // axisY3->setLabelFormat("%d");
-  // axisY3->setTitleText(tr("Number of Samples"));
-  // axisY3->setMinorTickCount(0);  // Disable minor ticks
-  // axisY3->setLabelsVisible(true);
-  // axisY3->setMin(0);  // Always start from 0
-  // timelineChart->addAxis(axisY3, Qt::AlignLeft);
-  // timelineSeries->attachAxis(axisY3);
-
-  // // Add some padding to prevent label clipping
-  // timelineChart->setMargins(QMargins(10, 10, 10, 10));
-  // timelineChart->layout()->setContentsMargins(0, 0, 0, 0);
-
-  // timelineChart->legend()->setVisible(false);
-  // timelineChartView = new QChartView(timelineChart);
-  // timelineChartView->setRenderHint(QPainter::Antialiasing);
-  // timelineChartView->setMinimumHeight(300);
-  // chartLayout->addWidget(timelineChartView, 1, 1);
 }
 
 
@@ -229,9 +105,7 @@ void Tab3::createLayout()
   layout->addWidget(description);
   layout->setSpacing(20);
   layout->setContentsMargins(30, 30, 30, 30);
-  //layout->addWidget(stats, 0, Qt::AlignCenter);
   
-  // Add both chart views and their error labels
   layout->addWidget(litterChartView);
   layout->addWidget(litterChartError);
   layout->addWidget(waterTypeChartView);
@@ -240,8 +114,6 @@ void Tab3::createLayout()
   setLayout(layout);
 }
 
-// These should probably be their own functions tbh
-// i.e. updateComplianceChart(), updatelitterChart(), updateDeterminandChart()
 void Tab3::updateCharts()
 {
   // Water type pie chart
