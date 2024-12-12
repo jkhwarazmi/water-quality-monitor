@@ -219,7 +219,6 @@ void Tab5::setupStyles()
         }
 
         QLabel#descriptionLabel {
-            font-size: 14px;
             color: %1;
             margin-bottom: 20px;
         }
