@@ -37,6 +37,9 @@ void LoadDataWidget::createWidgets()
   titleLabel->setObjectName("titleLabel");
   
   pathLabel = new QLabel(currentPath);
+  QFont pathFont;
+  pathFont.setPointSize(14);
+  pathLabel->setFont(pathFont);
   pathLabel->setWordWrap(true);
   pathLabel->setMinimumWidth(300);
   pathLabel->setObjectName("pathLabel");
@@ -69,11 +72,17 @@ void LoadDataWidget::createWidgets()
   cancelButton->hide();
 
   helpLabel = new QLabel(tr("Load water quality data from a CSV file. Datasets can be downloaded from:"));
+  QFont helpFont;
+  helpFont.setPointSize(14);
+  helpLabel->setFont(helpFont);
   helpLabel->setWordWrap(true);
   helpLabel->setObjectName("helpLabel");
   helpLabel->setAlignment(Qt::AlignCenter);
   
   urlLabel = new QLabel(tr("<a href='https://environment.data.gov.uk/water-quality/view/download'>The UK Environment Agency</a>"));
+  QFont urlFont;
+  urlFont.setPointSize(14);
+  urlLabel->setFont(urlFont);
   urlLabel->setTextFormat(Qt::RichText);
   urlLabel->setTextInteractionFlags(Qt::TextBrowserInteraction);
   urlLabel->setOpenExternalLinks(true);
@@ -83,6 +92,9 @@ void LoadDataWidget::createWidgets()
   urlLabel->setToolTip(tr("Click to download sample datasets"));
 
   infoLabel = new QLabel(tr("More information on the datasets can be found <a href='https://environment.data.gov.uk/water-quality/view/doc/reference'>here</a>"));
+  QFont infoFont;
+  infoFont.setPointSize(14);
+  infoLabel->setFont(infoFont);
   infoLabel->setTextFormat(Qt::RichText);
   infoLabel->setTextInteractionFlags(Qt::TextBrowserInteraction);
   infoLabel->setOpenExternalLinks(true);
@@ -217,12 +229,10 @@ void LoadDataWidget::setupStyles()
 
     QLabel#helpLabel {
       color: %1;
-      font-size: 14px;
     }
 
     QLabel#urlLabel {
       color: #3498db;
-      font-size: 14px;
     }
 
     QLabel#urlLabel:hover {
